@@ -2,9 +2,12 @@
 r"""Assemble the FOMOD package of Truly Nordic Carved Weapons Replacer from the staged build (assemble.py, textures.py).
 
 LAYOUT
-    Common                     every item but the mace: meshes, textures, the SkyPatcher weapon ini
-    10 Mace - six-flanged      mace v3 (default): its meshes, textures and its own SkyPatcher ini
-    11 Mace - classic          mace v2 (option): the same ini file name, pointing at the v2 model
+    Common                     every item but the mace: meshes and textures
+    10 Mace - six-flanged      mace v3 (default): its meshes and textures
+    11 Mace - classic          mace v2 (option): its meshes and textures, the model at v3's path (mace\mace.nif)
+    20 ESP                     TrulyNordicCarvedWeapons.esp (plugin\ in the repo): every Dragonborn.esm WEAP that shows a
+                               Nordic carved first-person model, the vanilla record with Model.File set (owner, 2026-11-11)
+    21 No ESP - SkyPatcher     the SkyPatcher weapon ini: every weapon and the mace in one file
     fomod\, README.md, NOTICE.md, CHANGELOG.md, LICENSE
 
 HOW THE MODELS REPLACE VANILLA
@@ -53,8 +56,8 @@ def copytree(src, dst):
             s = os.path.join(dp, f); d = os.path.join(dst, os.path.relpath(s, src)); os.makedirs(os.path.dirname(d), exist_ok=True); shutil.copy2(s, d)
 
 def ini_line(item):
-    it = ITEMS[item]
-    return f"filterByFirstPersonModelOr=Dragonborn.esm|{it['fp_stat'].lstrip('0')}:model={MESH_REL[len('meshes') + 1:]}\\{it['stem']}\\{it['stem']}.nif"
+    it = ITEMS[item]; stem = "mace" if it["weap"] == "DLC2NordicMace" else it["stem"]  # both maces install at mace\mace.nif
+    return f"filterByFirstPersonModelOr=Dragonborn.esm|{it['fp_stat'].lstrip('0')}:model={MESH_REL[len('meshes') + 1:]}\\{stem}\\{stem}.nif"
 
 def place_item(item, dest):
     it = ITEMS[item]; src = os.path.join(STAGE, item)
@@ -89,13 +92,20 @@ def main(out_root=None):
     os.makedirs(out_root)
     core = os.path.join(out_root, "Common")
     for item in CORE: place_item(item, core)
-    lines = [ini_line(i) for i in CORE if i != "shield"]
-    p = os.path.join(core, INI_DIR); os.makedirs(p, exist_ok=True)
-    open(os.path.join(p, "TrulyNordicCarvedWeapons.ini"), "w", newline="\r\n").write("\n".join(write_ini(core, lines, "the new models, by weapon record")) + "\n")
     for folder, item in OPTIONS.items():
-        d = os.path.join(out_root, folder); place_item(item, d); os.makedirs(os.path.join(d, INI_DIR), exist_ok=True)
-        open(os.path.join(d, INI_DIR, "TrulyNordicCarvedWeapons_Mace.ini"), "w", newline="\r\n").write(
-            "\n".join(write_ini(d, [ini_line(item)], f"the mace ({ITEMS[item]['version']})")) + "\n")
+        d = os.path.join(out_root, folder); place_item(item, d)
+        stem = ITEMS[item]["stem"]
+        if stem != "mace":  # the classic mace goes at mace\mace.nif too, so one ESP and one ini line serve both options
+            src = os.path.join(d, MESH_REL, stem); dst = os.path.join(d, MESH_REL, "mace"); os.makedirs(dst, exist_ok=True)
+            shutil.move(os.path.join(src, stem + ".nif"), os.path.join(dst, "mace.nif")); shutil.rmtree(src)
+    # the two ways of applying the models (the FOMOD's "Version" step)
+    esp = os.path.join(REPO, "plugin", "TrulyNordicCarvedWeapons.esp")
+    if not os.path.isfile(esp): fail(r"no plugin\TrulyNordicCarvedWeapons.esp in the repo")
+    os.makedirs(os.path.join(out_root, "20 ESP")); shutil.copy2(esp, os.path.join(out_root, "20 ESP"))
+    sp = os.path.join(out_root, "21 No ESP - SkyPatcher")
+    lines = [ini_line(i) for i in CORE if i != "shield"] + [ini_line("mace")]
+    p = os.path.join(sp, INI_DIR); os.makedirs(p, exist_ok=True)
+    open(os.path.join(p, "TrulyNordicCarvedWeapons.ini"), "w", newline="\r\n").write("\n".join(write_ini(sp, lines, "the new models, by weapon record")) + "\n")
     fomod = os.path.join(out_root, "fomod"); os.makedirs(fomod)
     for f in ("info.xml", "ModuleConfig.xml"): shutil.copy2(os.path.join(REPO, "fomod", f), fomod)
     for f in ("README.md", "NOTICE.md", "CHANGELOG.md", "LICENSE"): shutil.copy2(os.path.join(REPO, f), out_root)

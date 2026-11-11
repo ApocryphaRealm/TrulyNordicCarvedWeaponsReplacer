@@ -5,6 +5,28 @@
 		<folder source="Common" destination="" priority="0" />
 	</requiredInstallFiles>
 	<installSteps order="Explicit">
+		<installStep name="Version">
+			<optionalFileGroups order="Explicit">
+				<group name="How the new models are applied" type="SelectExactlyOne">
+					<plugins order="Explicit">
+						<plugin name="No ESP (SkyPatcher)">
+							<description>No plugin. SkyPatcher swaps the models when the game starts, on every copy of each Nordic carved weapon - including copies other mods add - and leaves every other change those mods make to the weapons alone. Needs SkyPatcher.</description>
+							<files>
+								<folder source="21 No ESP - SkyPatcher" destination="" priority="0" />
+							</files>
+							<typeDescriptor><type name="Recommended" /></typeDescriptor>
+						</plugin>
+						<plugin name="ESP">
+							<description>A light plugin (ESL-flagged, takes no load order slot) that sets the models on the Dragonborn Nordic carved weapons and their enchanted versions. No SkyPatcher needed. It carries the weapons' vanilla records, so load it before any mod that changes these weapons' stats, or that mod's changes are undone.</description>
+							<files>
+								<folder source="20 ESP" destination="" priority="0" />
+							</files>
+							<typeDescriptor><type name="Optional" /></typeDescriptor>
+						</plugin>
+					</plugins>
+				</group>
+			</optionalFileGroups>
+		</installStep>
 		<installStep name="Mace">
 			<optionalFileGroups order="Explicit">
 				<group name="Nordic Mace model" type="SelectExactlyOne">

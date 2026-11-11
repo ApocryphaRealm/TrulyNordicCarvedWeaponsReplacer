@@ -11,6 +11,7 @@ Written as changes happen, not reconstructed afterwards (rule 61). Each version 
 ## 1.0.0 - 2026-11-10 - untested
 
 ### Added
+- Two ways to install, chosen in the installer: No ESP (SkyPatcher, recommended) or a light ESP that needs no SkyPatcher.
 - Installer option: the classic four-flanged mace instead of the default six-flanged one.
 - Models swapped per weapon record through SkyPatcher, matched by the vanilla first-person model, so enchanted and added copies change too and other mods' vanilla-path Nordic meshes are not overwritten; first-person models and the shield ship at the vanilla paths.
 - The Nordic War Axe: a new carved model (bearded blade, square hammer poll, triquetra), first-person model included, swapped by its record like the other weapons.
