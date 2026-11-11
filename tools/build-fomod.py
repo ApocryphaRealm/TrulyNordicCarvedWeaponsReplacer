@@ -28,7 +28,7 @@ from items import ITEMS, WORK, MESH_REL, TEX_REL
 STAGE = os.path.join(WORK, "stage")
 NAME = "Truly Nordic Carved Weapons Replacer"
 INI_DIR = r"SKSE\Plugins\SkyPatcher\weapon\TrulyNordicCarvedWeaponsReplacer"
-CORE = ["sword", "battleaxe", "greatsword", "warhammer", "dagger", "bow", "shield"]
+CORE = ["sword", "battleaxe", "greatsword", "warhammer", "waraxe", "dagger", "bow", "shield"]
 OPTIONS = {"10 Mace - six-flanged": "mace", "11 Mace - classic": "mace2"}
 
 def fail(msg): print("FAILED: " + msg); sys.exit(1)

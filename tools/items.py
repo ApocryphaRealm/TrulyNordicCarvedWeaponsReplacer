@@ -19,16 +19,19 @@ ITEMS = {
                   shapes={"metal": {"name": "NordicSwordA5", "tex": W(r"work_sword_ns\tex\nordicsworda5c_nsb")},
                           "wrap": {"name": "NordicWrapA5", "tex": None, "dds_from": r"D:\Modlists\Njordlinger\mods\Nordic Carved Redesign A (test)\textures\pbr\ApocryphaTest\NordicCarvedRedesignA5\nordicwrapa5"}},
                   third="nordicsword.nif", first="1stpersonnordicsword.nif", stem="sword", weap="DLC2NordicSword", fp_stat="03C353"),
-    "battleaxe": dict(version="v8", sources=[W(r"work_v8\tn_battleaxe.nif")],
-                      shapes={"metal": {"name": "TNBattleaxe", "tex": W(r"work_v8\tex\tn_battleaxe")}, "wrap": {"name": "TNBattleaxeWrap", "tex": W(r"work_v8\tex\tn_battleaxe_wrap")}},
+    "battleaxe": dict(version="v9", sources=[W(r"work_v9\tn_battleaxe.nif")], orient=True,   # v9: v8 with the straight pommel (2026-11-11)
+                      shapes={"metal": {"name": "TNBattleaxe", "tex": W(r"work_v9\tex\tn_battleaxe")}, "wrap": {"name": "TNBattleaxeWrap", "tex": W(r"work_v9\tex\tn_battleaxe_wrap")}},
                       third="nordicbattleaxe.nif", first="1stpersonnordicbattleaxe.nif", stem="battleaxe", weap="DLC2NordicBattleaxe", fp_stat="03C34F"),
     "greatsword": dict(version="v3", sources=[W(r"work_gs3\tn_greatsword.nif")],
                        shapes={"metal": {"name": "tn_greatsword", "tex": W(r"work_gs3\tex\tn_greatsword")}, "wrap": {"name": "TNGreatswordWrap", "tex": W(r"work_gs3\tex\tn_greatsword_wrap")},
                                "wrap2": {"name": "TNGreatswordWrap2", "tex": W(r"work_gs3\tex\tn_greatsword_wrap2"), "target": 1500}},
                        third="nordicgreatsword.nif", first="1stpersonnordicgreatsword.nif", stem="greatsword", weap="DLC2NordicGreatsword", fp_stat="03C351"),
-    "warhammer": dict(version="v2e", sources=[W(r"work_wh2e\tn_warhammer2.nif")],
-                      shapes={"metal": {"name": "tn_warhammer2", "tex": W(r"work_wh2e\tex\tn_warhammer2")}, "wrap": {"name": "TNWarhammer2Wrap", "tex": W(r"work_wh2e\tex\tn_warhammer2_wrap")}},
+    "warhammer": dict(version="v2f", sources=[W(r"work_wh2f\tn_warhammer2.nif")], orient=True,   # v2f: v2e with the straight pommel (2026-11-11)
+                      shapes={"metal": {"name": "tn_warhammer2", "tex": W(r"work_wh2f\tex\tn_warhammer2")}, "wrap": {"name": "TNWarhammer2Wrap", "tex": W(r"work_wh2f\tex\tn_warhammer2_wrap")}},
                       third="nordicwarhammer.nif", first="1stpersonnordicwarhammer.nif", stem="warhammer", weap="DLC2NordicWarhammer", fp_stat="03C355"),
+    "waraxe": dict(version="v3", sources=[W(r"work_wa3\tn_waraxe2.nif")], orient=True,   # added 2026-11-11 (the owner: "Did you add the Nordic War Axe?"); v3 = v2 with the straight pommel (00:28)
+                   shapes={"metal": {"name": "tn_waraxe2", "tex": W(r"work_wa3\tex\tn_waraxe2")}, "wrap": {"name": "TNWaraxe2Wrap", "tex": W(r"work_wa3\tex\tn_waraxe2_wrap")}},
+                   third="nordicwaraxe.nif", first="1stpersonnordiclwaraxe.nif", stem="waraxe", weap="DLC2NordicWarAxe", fp_stat="03C354"),
     "dagger": dict(version="v3", sources=[W(r"work_dg3\tn_dagger2.nif")],
                    shapes={"metal": {"name": "tn_dagger2", "tex": W(r"work_dg3\tex\tn_dagger2")}, "wrap": {"name": "TNDagger2Wrap", "tex": W(r"work_dg3\tex\tn_dagger2_wrap")}},
                    third="nordicdagger.nif", first="1stpersonnordicdagger.nif", stem="dagger", weap="DLC2NordicDagger", fp_stat="03C350"),
@@ -42,8 +45,8 @@ ITEMS = {
                 shapes={"metal": {"name": "tn_bow2", "tex": W(r"work_bow2\tex\tn_bow2")}, "wrap": {"name": "TNBowWrap", "tex": W(r"work_bow2\tex\tn_bow2_wrap")},
                         "string": {"name": "TNBowString", "tex": W(r"work_bow2\tex\tn_bow2_string"), "target": None}},
                 third="nordicbow.nif", first=None, stem="bow", weap="DLC2NordicBow", fp_stat="03CA7C"),
-    "shield": dict(version="v3", sources=[W(r"work_sh3\tn_shield3.nif")],
-                   shapes={"metal": {"name": "tn_shield3_steel", "tex": W(r"work_sh3\tex\tn_shield3_steel"), "target": 18000}, "board": {"name": "tn_shield3_board", "tex": W(r"work_sh3\tex\tn_shield3_board"), "target": 2000}},
+    "shield": dict(version="v4", sources=[W(r"work_sh4\tn_shield4.nif")], orient=True,   # v4: vanilla's placement and profile, faces outward (2026-11-11)
+                   shapes={"metal": {"name": "tn_shield4_steel", "tex": W(r"work_sh4\tex\tn_shield4_steel"), "target": 18000}, "board": {"name": "tn_shield4_board", "tex": W(r"work_sh4\tex\tn_shield4_board"), "target": 2000}},
                    third=None, first=None, stem="shield", armo="DLC2ArmorNordicShield"),
 }
 
@@ -56,7 +59,7 @@ def blender_config():
     probe = json.load(open(os.path.join(WORK, "vanilla_probe.json")))
     cfg = {}
     for k, it in ITEMS.items():
-        c = {"out": os.path.join(WORK, k), "sources": it["sources"], "shapes": {}, "skinned": it.get("skinned", False)}
+        c = {"out": os.path.join(WORK, k), "sources": it["sources"], "shapes": {}, "skinned": it.get("skinned", False), "orient": it.get("orient", False)}
         for role, sh in it["shapes"].items():
             t = sh.get("target", METAL_T if role == "metal" else WRAP_T)
             c["shapes"][role] = {"name": sh["name"], "target": t, "atlas_px": 2048 if role in ("metal", "board") else 512}

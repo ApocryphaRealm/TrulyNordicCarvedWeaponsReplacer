@@ -16,7 +16,7 @@ from items import ITEMS, WORK, TEX_REL
 STAGE = os.path.join(WORK, "stage")
 TEXCONV = r"D:\Modlists\Njordlinger\tools\Skyking Toolkit\runtime\texconv.exe"
 FIX_PX = 31.0
-FIX = {"sword": FIX_PX, "battleaxe": FIX_PX, "greatsword": FIX_PX, "warhammer": FIX_PX}
+FIX = {"sword": FIX_PX, "battleaxe": FIX_PX, "greatsword": FIX_PX, "warhammer": FIX_PX, "waraxe": FIX_PX}   # war axe v2 was painted at one px/unit too
 
 def island_density(npz, W, H):
     """Per UV island: px per model unit along the atlas u and v axes (rows of the 3D->pixel Jacobian), area-weighted,

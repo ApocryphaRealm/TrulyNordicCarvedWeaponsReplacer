@@ -8,15 +8,14 @@ is rebuilt to be realistic in proportion, thickness and construction.
 | Item | New look |
 |---|---|
 | Nordic Sword | single-edged curved blade, one-piece half guard sweeping up, hooked pommel, bold carved braid |
-| Nordic Battleaxe | steel haft forged in one piece with the head, carved knot fields on both faces |
+| Nordic Battleaxe | steel haft forged in one piece with the head, carved knot fields on both faces, a forged knob pommel |
 | Nordic Greatsword | double-edged blade, carved guards and ricasso, two wrapped grips |
-| Nordic Warhammer | hammer face and curved pick, a triquetra ring centred on the face |
+| Nordic Warhammer | hammer face and curved pick, a triquetra ring centred on the face, a forged knob pommel |
+| Nordic War Axe | bearded blade with a square hammer poll, a triquetra at the widest point, a forged knob pommel |
 | Nordic Dagger | kukri form, a world serpent carved along the belly |
 | Nordic Mace | six-flanged head, a biting maw on every flange (installer option: the classic four-flanged mace) |
 | Nordic Bow | all-steel bow, a triquetra on the riser; the string still draws and follows the arrow |
-| Nordic Shield | the carved crest filled out to the rim, the four points in place |
-
-The Nordic War Axe is not changed in this version.
+| Nordic Shield | the carved crest filled out to the rim, the four points in place; sits on the arm and on the back where the vanilla shield does |
 
 Every enchanted variant uses the same model as its base weapon, so all of them change.
 

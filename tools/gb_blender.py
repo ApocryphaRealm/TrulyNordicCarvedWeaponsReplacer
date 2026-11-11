@@ -1,6 +1,7 @@
 # Truly Nordic Carved Weapons Replacer - the Blender half of the game build, one item per run.
 # Imports our approved model's shapes (PyNifly), welds each shape (sharp edges kept from the split normals), decimates
-# it to its triangle budget, measures what the decimation changed (surface distance both ways, and how far each
+# it to its triangle budget, turns every face outward where the item asks for it (orient_outward - the game culls a
+# triangle's back), measures what the decimation changed (surface distance both ways, and how far each
 # original vertex's texture coordinate moved, in pixels of the 2048 atlas), builds the edge-blood shapes for weapons
 # whose vanilla model has them, and exports every shape as a single-shape NIF for assemble.py.
 # The bow: its three shapes take vanilla's bone weights (nearest-face interpolated transfer from vanilla's BowMesh) and
@@ -124,6 +125,69 @@ def make_blood(dec, region, uvbox, name, offset=0.012):
     bm.to_mesh(me); bm.free()
     return b
 
+def orient_outward(objs, apply=True, rays=12, samples=300, seed=7):
+    """Every face's winding made to face OUT (the game draws a triangle from its front only - single-sided shader).
+    Per shape: bmesh recalc (each island - faces joined over 2-face edges - gets one consistent winding, and a guess at
+    outward); then each island is put to a vote by rays: from sampled faces, rays in a 60-degree cone round the normal
+    and round its opposite are cast against ALL the item's shapes; the side whose rays escape more is outside, and an
+    island whose back side wins is reversed. This fixes open surfaces too (a board's back face, a crest's back), which
+    the recalc alone orients by guess (shield 1.0.0: its plank back and the crest's back faced the front - invisible
+    from behind). Returns a report per shape."""
+    import random
+    from mathutils import Vector
+    rnd = random.Random(seed)
+    V, P, off = [], [], 0
+    for o in objs:
+        M = o.matrix_world; V += [M @ v.co for v in o.data.vertices]; P += [[off + i for i in p.vertices] for p in o.data.polygons]; off += len(o.data.vertices)
+    tree = BVHTree.FromPolygons(V, P)
+    def cone(n):
+        while True:
+            d = Vector((rnd.gauss(0, 1), rnd.gauss(0, 1), rnd.gauss(0, 1))).normalized()
+            if d.dot(n) > 0.5: return d
+    rep = {}
+    for o in objs:
+        me = o.data; before = [tuple(p.normal) for p in me.polygons]
+        bm = bmesh.new(); bm.from_mesh(me); bm.faces.ensure_lookup_table()
+        bmesh.ops.recalc_face_normals(bm, faces=bm.faces); bm.normal_update()
+        seen, islands = set(), []
+        for f in bm.faces:
+            if f.index in seen: continue
+            isl, stack = [], [f]; seen.add(f.index)
+            while stack:
+                g = stack.pop(); isl.append(g)
+                for e in g.edges:
+                    if len(e.link_faces) != 2: continue
+                    for h in e.link_faces:
+                        if h.index not in seen: seen.add(h.index); stack.append(h)
+            islands.append(isl)
+        flipped, votes = 0, []
+        for isl in islands:
+            pick = isl if len(isl) <= samples else rnd.sample(isl, samples)
+            sc = [0.0, 0.0]
+            for f in pick:
+                c = f.calc_center_median(); n = f.normal; a = f.calc_area()
+                if n.length < 0.5 or a <= 0: continue
+                for k, s in enumerate((1.0, -1.0)):
+                    esc = 0
+                    for _ in range(rays):
+                        d = cone(n * s); hit = tree.ray_cast(c + n * s * 1e-3, d, 1000.0)
+                        if hit[0] is None: esc += 1
+                    sc[k] += a * esc / rays
+            flip = sc[1] > sc[0]
+            if flip:
+                flipped += len(isl)
+                bmesh.ops.reverse_faces(bm, faces=isl)   # on the bmesh only; written back when apply
+            votes.append((len(isl), round(sc[0], 2), round(sc[1], 2), flip))
+        bm.normal_update(); bm.faces.ensure_lookup_table(); after = [tuple(f.normal) for f in bm.faces]
+        if apply: bm.to_mesh(me); me.update()
+        changed = sum(1 for a, b in zip(before, after) if a[0] * b[0] + a[1] * b[1] + a[2] * b[2] < 0)
+        bm.free()
+        rep[o.name] = {"islands": len(islands), "faces": len(before), "faces_reversed_vs_input": changed,
+                       "islands_flipped_by_ray_vote": sum(1 for v in votes if v[3]), "faces_in_flipped_islands": flipped,
+                       "largest_islands (faces, out-score front, out-score back, flipped)": sorted(votes, key=lambda v: -v[0])[:8]}
+        print("ORIENT", o.name, json.dumps(rep[o.name])[:400])
+    return rep
+
 # ------------------------------------------------------------------ import our shapes
 clear()
 for src in C["sources"]:
@@ -144,6 +208,12 @@ for role, sh in C["shapes"].items():
     s["uv_shift_px_max"], s["uv_shift_px_p95"], s["uv_shift_px_p995"] = uv_shift(orig, o, sh.get("atlas_px", 2048))
     stats["shapes"][role] = s; shapes[role] = o
     print("STATS", role, json.dumps(s))
+
+# ------------------------------------------------------------------ face orientation (outward, both shapes together)
+if C.get("orient"):
+    stats["orient"] = orient_outward(list(shapes.values()), apply=C["orient"] != "check")
+    for role, o in shapes.items():   # the npz dumps carry the oriented winding
+        V, F, UV = arrays(o); np.savez(os.path.join(OUT, f"dec_{role}.npz"), V=V, F=F, UV=UV)
 
 # ------------------------------------------------------------------ blood shapes (from the decimated metal)
 for i, bl in enumerate(C.get("blood", [])):
