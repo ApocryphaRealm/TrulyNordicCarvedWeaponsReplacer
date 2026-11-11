@@ -17,7 +17,7 @@
 							<typeDescriptor><type name="Recommended" /></typeDescriptor>
 						</plugin>
 						<plugin name="ESP">
-							<description>A light plugin (ESL-flagged, takes no load order slot) that sets the models on the Dragonborn Nordic carved weapons and their enchanted versions. No SkyPatcher needed. It carries the weapons' vanilla records, so load it before any mod that changes these weapons' stats, or that mod's changes are undone.</description>
+							<description>A light plugin (ESL-flagged, takes no load order slot) that sets the models on the Dragonborn Nordic carved weapons and their enchanted versions. No SkyPatcher needed. It carries the weapons' vanilla records: a mod that also changes these weapons (stats, enchantments) and loads after it keeps the vanilla look, and one that loads before it loses its changes to them. If you use such a mod, choose No ESP.</description>
 							<files>
 								<folder source="20 ESP" destination="" priority="0" />
 							</files>
