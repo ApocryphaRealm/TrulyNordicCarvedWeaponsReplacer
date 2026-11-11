@@ -188,6 +188,11 @@ def build_bow(out_path):
         n.btypes[idx_data] = "NiSkinData"; n.blocks[idx_data] = bytearray(s.blocks[sd])
         n.btypes[idx_part] = "NiSkinPartition"; n.blocks[idx_part] = bytearray(s.blocks[sp])
         n.blocks[ts] = texset_block(tex_paths(item, role)); set_shader(n, sh, ts, struct.unpack_from("<i", n.blocks[sh], 4)[0] if role == "metal" else -1)
+        # a skinned shape needs SLSF1 Skinned (0x2) - the plain template is from a rigid weapon, and without the flag the engine
+        # draws nothing and the bow's 3D never finishes attaching (2026-11-11: invisible bow, equip motion stalls halfway)
+        fo = n.net_end(sh, 4, [], []); f1 = struct.unpack_from("<I", n.blocks[sh], fo)[0]; struct.pack_into("<I", n.blocks[sh], fo, f1 | 0x2)
+        # NiAVObject flags as vanilla's BowMesh (0xE); pynifly writes 0
+        ne = struct.unpack_from("<I", n.blocks[idx_shape], 4)[0]; struct.pack_into("<I", n.blocks[idx_shape], 8 + 4 * ne + 4, 0xE)
         rep[role] = {"bones": names}
     rep["collision"] = rewrite_collision(n, item, (0.0, 0.0, 0.0))
     os.makedirs(os.path.dirname(out_path), exist_ok=True); n.save(out_path); niflib.Nif(out_path)

@@ -28,6 +28,8 @@ for dp, _, fs in os.walk(STAGE):
             ours = [x for x in paths if x.lower().startswith("textures\\pbr\\apocryphatest")]
             miss = [x for x in ours if not exists_any(x)]
             line = f"   {n.name(b)}: type {typ} flags {f1:08x} {f2:08x} TruePBR {pbr} skin {n.btypes[sk] if sk >= 0 else '-'}"
+            # a skinned shape whose shader lacks SLSF1 Skinned (0x2) and vice versa draws nothing (2026-11-11, the invisible bow)
+            if (sk >= 0) != bool(f1 & 0x2): line += "  SKINNED FLAG MISMATCH"; bad += 1
             if ours:
                 if typ != 0 or not pbr or [i for i, x in enumerate(paths) if x] != [0, 1, 5]: line += "  BAD SHADER/SLOTS"; bad += 1
                 line += f"  slots 0/1/5 {'all present' if not miss else 'MISSING ' + ', '.join(miss)}"; bad += len(miss)
