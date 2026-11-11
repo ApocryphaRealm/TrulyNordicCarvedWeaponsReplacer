@@ -2,7 +2,7 @@
 r"""Assemble the FOMOD package of Truly Nordic Carved Weapons Replacer from the staged build (assemble.py, textures.py).
 
 LAYOUT
-    00 Core                    every item but the mace: meshes, textures, the SkyPatcher weapon ini
+    Common                     every item but the mace: meshes, textures, the SkyPatcher weapon ini
     10 Mace - six-flanged      mace v3 (default): its meshes, textures and its own SkyPatcher ini
     11 Mace - classic          mace v2 (option): the same ini file name, pointing at the v2 model
     fomod\, README.md, NOTICE.md, CHANGELOG.md, LICENSE
@@ -87,7 +87,7 @@ def main(out_root=None):
         out_root = os.path.normpath(os.path.join(REPO, "..", "..", "7. current test builds", "Skyrim - " + NAME, f"{NAME} {ver}"))
     if os.path.isdir(out_root): supersede(out_root)
     os.makedirs(out_root)
-    core = os.path.join(out_root, "00 Core")
+    core = os.path.join(out_root, "Common")
     for item in CORE: place_item(item, core)
     lines = [ini_line(i) for i in CORE if i != "shield"]
     p = os.path.join(core, INI_DIR); os.makedirs(p, exist_ok=True)
@@ -105,8 +105,8 @@ def main(out_root=None):
         p = os.path.join(out_root, s)
         if not os.path.isdir(p) or not any(fs for _, _, fs in os.walk(p)): fail(f"ModuleConfig.xml installs from '{s}', but the package has nothing there")
     # every texture a shipped NIF names is in core or in the same option
-    for folder in ["00 Core"] + list(OPTIONS):
-        roots = [core] if folder == "00 Core" else [core, os.path.join(out_root, folder)]
+    for folder in ["Common"] + list(OPTIONS):
+        roots = [core] if folder == "Common" else [core, os.path.join(out_root, folder)]
         for dp, _, fs in os.walk(os.path.join(out_root, folder)):
             for f in fs:
                 if not f.lower().endswith(".nif"): continue
