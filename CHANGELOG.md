@@ -21,5 +21,6 @@ Written as changes happen, not reconstructed afterwards (rule 61). Each version 
 - The shield sits where the vanilla shield does: its back and grip match vanilla's, so the arm no longer passes through it when held and it sits on the back like vanilla's.
 
 ### Fixed
+- The Nordic bow is visible again and equips normally - its skinned parts now carry the shader's Skinned flag.
 - The shield could be seen through from behind: the back of the board and of the steel crest faced the wrong way. Every face now points outward.
 - The shield's collision is rebuilt from the corrected model.
