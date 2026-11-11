@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://qconsulting.ca/fo3/ModConfig5.0.xsd">
+	<moduleName>Truly Nordic Carved Weapons Replacer</moduleName>
+	<requiredInstallFiles>
+		<folder source="00 Core" destination="" priority="0" />
+	</requiredInstallFiles>
+	<installSteps order="Explicit">
+		<installStep name="Mace">
+			<optionalFileGroups order="Explicit">
+				<group name="Nordic Mace model" type="SelectExactlyOne">
+					<plugins order="Explicit">
+						<plugin name="Six-flanged mace (default)">
+							<description>A functional six-flanged mace head, a beast's biting maw carved on every flange face.</description>
+							<files>
+								<folder source="10 Mace - six-flanged" destination="" priority="0" />
+							</files>
+							<typeDescriptor><type name="Recommended" /></typeDescriptor>
+						</plugin>
+						<plugin name="Classic mace">
+							<description>The vanilla mace's four-flanged shape, rebuilt and carved with the same biting maw.</description>
+							<files>
+								<folder source="11 Mace - classic" destination="" priority="0" />
+							</files>
+							<typeDescriptor><type name="Optional" /></typeDescriptor>
+						</plugin>
+					</plugins>
+				</group>
+			</optionalFileGroups>
+		</installStep>
+	</installSteps>
+</config>
