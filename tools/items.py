@@ -114,6 +114,21 @@ ITEMS = {
                    arrows_in_quiver=["arrowq1", "arrowq2", "arrowq3", "arrowq4", "arrowq5"],
                    third="nordicarrow.nif", flight="nordicarrowflight.nif", first=None, stem="quiver",
                    ammo="Dragonborn.esm|2623B", proj="Dragonborn.esm|2623A"),
+    # the spear (2026-11-12 after 1.1.1; the owner 06:12: our own spear modelled from scratch, a NEW item - vanilla has no
+    # spear, so it is in the Standalone packages only, never the Replacer). Approved design v4 = set2\work_final_spearD;
+    # E = D's NIF byte for byte with the spearhead's triquetra on the dark filled ring (08:35; aqs_paint_ring.py,
+    # set2\ring-pass-spear.png). Built on vanilla's two-handed AXE NIFs (the default moveset is TwoHandAxe): root, BSX,
+    # BSInvMarker, Prn 'WeaponBack', blood shapes and collision come from nordicbattleaxe.nif / 1stpersonnordicbattleaxe.nif;
+    # the blood is cut from the blade and wings (blood_region), not vanilla's axe-head box. Shipped UNDECIMATED (target
+    # None, 14,088 triangles): no UV seam can stretch (the greatsword blade lesson). The leather binding uses the
+    # greatsword's wrap maps, as in the approved renders (aqs_render.py), shipped as the spear's own copy.
+    # new_item: its first-person model goes to meshes\TrulyNordic\spear\1stpersonspear.nif (never a vanilla path).
+    "spear": dict(version="E", new_item=True, sources=[W(r"work_final_spearE\tn_spearE.nif")], orient=True,
+                  shapes={"metal": {"name": "TNSpear", "tex": W(r"work_final_spearE\tex\tn_spearE"), "target": None},
+                          "shaft": {"name": "TNSpearShaft_0", "tex": W(r"work_final_spearE\tex\tn_spearE_soft"), "target": None},
+                          "wrap": {"name": "TNSpearWrap", "tex": W(r"work_gs5_sf\tex\tn_greatsword_wrap"), "target": None}},
+                  blood_region=[[-4.8, 66.0, -2.5], [4.8, 104.5, 2.5]],
+                  third="nordicbattleaxe.nif", first="1stpersonnordicbattleaxe.nif", stem="spear"),
 }
 
 def vanilla_path(item, which):
@@ -139,6 +154,7 @@ def blender_config():
             for name, d in pr.items():
                 if "blood" not in name.lower(): continue
                 lo = [d["lo"][0] - 1.0, d["lo"][1] - 0.5, d["lo"][2] - 1.5]; hi = [d["hi"][0] + 1.0, d["hi"][1] + 0.5, d["hi"][2] + 1.5]
+                if it.get("blood_region"): lo, hi = it["blood_region"]   # a new item on a vanilla base: its own blade, not the base's head box
                 c["blood"].append({"vanilla_name": name, "region": [lo, hi], "uvbox": [d["uvlo"], d["uvhi"]]})
         if it.get("skinned"): c["vanilla_skin"] = vp
         cfg[k] = c

@@ -80,6 +80,29 @@ if "quiver" in ITEMS and os.path.isdir(os.path.join(STAGE, "quiver")):
             sh = struct.unpack_from("<i", n.blocks[b], n.av_end(b, 0, [], []) + 20)[0]; ts = n.i32(sh, n.ref_offsets(sh)[0][-1]); tb = bytes(n.blocks[ts])
             ok = b"tn_quiver_arrow.dds" in tb
             print(f"   {n.name(b)}: one shape, texture set {'tn_quiver_arrow' if ok else 'NOT THE ARROW ATLAS'}"); bad += 0 if ok else 1
+# the spear (2026-11-12): a NEW item on vanilla's two-handed axe NIFs - the same node tree, extra data (BSX, BSInvMarker in
+# 1st person, Prn 'WeaponBack'), blood shapes' shaders and alpha byte for byte; only TN_spear_shaft / TN_spear_wrap added
+# under the root; both files at our own path and nothing of the spear's at a vanilla path; undecimated (triangles =
+# the design NIF's after the weld)
+if "spear" in ITEMS and os.path.isdir(os.path.join(STAGE, "spear")):
+    sd = os.path.join(STAGE, "spear"); it = ITEMS["spear"]
+    van_paths = [os.path.relpath(os.path.join(dp, f), sd) for dp, _, fs in os.walk(sd) for f in fs if "\\dlc02\\" in os.path.join(dp, f).lower()]
+    if van_paths: print("== spear: VANILLA PATH STAGED", van_paths); bad += 1
+    for ours_f, van_f in (("spear.nif", it["third"]), ("1stpersonspear.nif", it["first"])):
+        pth = os.path.join(sd, r"meshes\TrulyNordic\spear", ours_f)
+        if not os.path.isfile(pth): print("== spear: MISSING", ours_f); bad += 1; continue
+        a, v = niflib.Nif(pth), niflib.Nif(os.path.join(VAN, van_f)); ta, tv = tree(a), tree(v)
+        root = tv[0]; extra = {f"{root}/BSTriShape:TN_spear_shaft", f"{root}/BSTriShape:TN_spear_wrap"}
+        miss = [x for x in tv if x not in ta]; more = [x for x in ta if x not in tv and x not in extra]
+        kv = [(t, bytes(v.blocks[i])) for i, t in enumerate(v.btypes) if t in KEEP and t != "bhkCollisionObject"]
+        ka = [(t, bytes(a.blocks[i])) for i, t in enumerate(a.btypes) if t in KEEP and t != "bhkCollisionObject"]
+        same = sorted(kv) == sorted(ka)
+        prn = [(a.strings[struct.unpack_from("<i", a.blocks[i], 0)[0]], a.strings[struct.unpack_from("<i", a.blocks[i], 4)[0]]) for i, t in enumerate(a.btypes) if t == "NiStringExtraData"]
+        tris = {a.name(b): len(winding._tris_from_shape(a, b)[1]) for b, t in enumerate(a.btypes) if t == "BSTriShape"}
+        line = (f"== structure {ours_f} vs vanilla {van_f}: {len(tv)} vanilla nodes/shapes, missing {miss or 0}, added {more or 0} (allowed: shaft, wrap); "
+                f"kept blocks {len(kv)} {'byte for byte' if same else 'DIFFER'}; extra data {prn}; triangles {tris}")
+        if miss or more or not same or ("Prn", "WeaponBack") not in prn: line += "  STRUCTURE FAULT"; bad += 1
+        print(line)
 import json; json.dump(WIND, open(os.path.join(STAGE, "..", "winding_report.json") if os.path.basename(STAGE) == "stage" else os.path.join(os.environ.get("TEMP", "."), "tncw_winding_report.json"), "w"), indent=1)
 print(f"RESULT {n_nif} NIFs:", "PASS" if bad == 0 else f"FAIL {bad}")
 sys.exit(1 if bad else 0)

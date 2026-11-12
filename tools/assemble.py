@@ -284,7 +284,10 @@ def build(item):
         rep["third"] = build_static(item, "third", os.path.join(root, r"meshes\dlc02\armor\nordicshield\nordicshield.nif"))
     else:
         rep["third"] = build_static(item, "third", os.path.join(root, MESH_REL, it["stem"], it["stem"] + ".nif"))
-        rep["first"] = build_static(item, "first", os.path.join(root, r"meshes\dlc02\weapons\nordic", it["first"]))
+        if it.get("new_item"):   # a new item (the spear): its own first-person file at our path, read by its STAT; no vanilla path
+            rep["first"] = build_static(item, "first", os.path.join(root, MESH_REL, it["stem"], "1stperson" + it["stem"] + ".nif"))
+        else:
+            rep["first"] = build_static(item, "first", os.path.join(root, r"meshes\dlc02\weapons\nordic", it["first"]))
     json.dump(rep, open(os.path.join(WORK, item, "assemble_report.json"), "w"), indent=1)
     print(item, json.dumps(rep)[:700])
 
