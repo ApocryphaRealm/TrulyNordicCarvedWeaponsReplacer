@@ -29,8 +29,10 @@ ITEMS = {
                    sheath=dict(version="v2", src=W(r"work_sheath_straightsword_v2\tn_sheath_straightsword_v2.nif"), tex=W(r"work_sheath_straightsword_v2\tex\tn_sheath_straightsword_v2")),
                    shapes={"metal": {"name": "tn_straightsword", "tex": W(r"work_straightsword\tex\tn_straightsword")}, "wrap": {"name": "TNStraightswordWrap", "tex": W(r"work_straightsword\tex\tn_straightsword_wrap")}},
                    third="nordicsword.nif", first="1stpersonnordicsword.nif", stem="swordstraight", weap="DLC2NordicSword", fp_stat="03C353"),
-    "battleaxe": dict(version="v12", sources=[W(r"work_v12\tn_battleaxe.nif")], orient=True,   # v12: the owner's traced head (approved 2026-11-11 21:32)
-                      shapes={"metal": {"name": "TNBattleaxe", "tex": W(r"work_v12\tex\tn_battleaxe")}, "wrap": {"name": "TNBattleaxeWrap", "tex": W(r"work_v12\tex\tn_battleaxe_wrap")}},
+    # v13 (approved 2026-11-11 23:57): v12's head (the owner's traced outline, 21:32; the same NIF, byte for byte) repainted
+    # to the engraving layout rule - layout records in work_v13\engraving_check.json pass engraving-layout-gate
+    "battleaxe": dict(version="v13", sources=[W(r"work_v13\tn_battleaxe.nif")], orient=True,
+                      shapes={"metal": {"name": "TNBattleaxe", "tex": W(r"work_v13\tex\tn_battleaxe")}, "wrap": {"name": "TNBattleaxeWrap", "tex": W(r"work_v13\tex\tn_battleaxe_wrap")}},
                       third="nordicbattleaxe.nif", first="1stpersonnordicbattleaxe.nif", stem="battleaxe", weap="DLC2NordicBattleaxe", fp_stat="03C34F"),
     # orient: the ricasso wrap (TNGreatswordWrap2) came out of tn_lib wound inward on most of its faces (1.0.0)
     "greatsword": dict(version="v3", sources=[W(r"work_gs3\tn_greatsword.nif")], orient=True,
