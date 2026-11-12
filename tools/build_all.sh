@@ -9,8 +9,12 @@ CFG="D:/Claude output/4. plans/nordic-carved-redesign-20261110/package/work/blen
 for k in sword sword2 battleaxe greatsword warhammer waraxe dagger mace mace2 bow shield shield2; do
   "$B" --background --factory-startup --python-exit-code 1 --python "$T/gb_blender.py" -- "$CFG" $k > "$(dirname "$CFG")/blender_$k.log" 2>&1
 done
+# the quiver / arrows: their own Blender step (no decimation; the arrows cut out of the quiver onto one arrow atlas)
+"$B" --background --factory-startup --python-exit-code 1 --python "$T/gb_quiver.py" -- "$CFG" quiver > "$(dirname "$CFG")/blender_quiver.log" 2>&1
+python -I "$T/quiver_atlas.py"
 python -I "$T/textures.py"
 python -I "$T/assemble.py"
 python -I "$T/silhouette.py"
 python -I "$T/verify.py"
+python -I "$T/arrow_records.py"   # idempotent: adds the arrow records to the three plugins once
 python -I "$T/build-packages.py"

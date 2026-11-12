@@ -99,6 +99,21 @@ ITEMS = {
     "shield2": dict(version="v5 clean-sf", sources=[W(r"work_sh5_clean_sf\tn_shield5.nif")], orient=True, option=True,
                     shapes={"metal": {"name": "tn_shield5_steel", "tex": W(r"work_sh5_clean_sf\tex\tn_shield5_steel"), "target": 18000}, "board": {"name": "tn_shield5_board", "tex": W(r"work_sh5_clean_sf\tex\tn_shield5_board"), "target": 2000}},
                     third=None, first=None, stem="shieldclean", armo="DLC2ArmorNordicShield"),
+    # quiver B4 + its arrows (2026-11-12 after 1.1.1; the owner: "Quiver B and the arrowheads from B, but I want the black
+    # feathers for the fletching", then 08:35 the ring): B3's mesh byte for byte with the collar plate's triquetra on the
+    # dark filled ring (set2\work_final_quiverB4, aqs_paint_ring.py; set2\ring-pass-quiver.png). Built by gb_quiver.py
+    # (not gb_blender.py): the five arrow ends cut out of the quiver shapes, every arrow ONE shape on its own arrow atlas
+    # (quiver_atlas.py copies the pixels), nothing decimated. third = the AMMO's model (the quiver on the back, the loose
+    # and nocked arrow), flight = the PROJ's model. Replacer: the AMMO DLC2NordicArrow by record (SkyPatcher ammo / the
+    # ESP); the projectile as a loose file at the vanilla path (SkyPatcher has no projectile model op, and the PROJ record
+    # is contested - Shoot Straight overrides it in Njordlinger - so the ESP does not override it either).
+    "quiver": dict(version="B4", sources=[W(r"work_final_quiverB4\tn_quiverB4.nif")], builder="gb_quiver",
+                   shapes={"metal": {"name": "TNQuiver", "tex": W(r"work_final_quiverB4\tex\tn_quiverB4"), "target": None},
+                           "leather": {"name": "TNQuiverLeather", "tex": W(r"work_final_quiverB4\tex\tn_quiverB4_soft"), "target": None},
+                           "arrow": {"name": "arrow", "tex": os.path.join(WORK, r"quiver\tex\tn_quiver_arrow"), "target": None}},
+                   arrows_in_quiver=["arrowq1", "arrowq2", "arrowq3", "arrowq4", "arrowq5"],
+                   third="nordicarrow.nif", flight="nordicarrowflight.nif", first=None, stem="quiver",
+                   ammo="Dragonborn.esm|2623B", proj="Dragonborn.esm|2623A"),
 }
 
 def vanilla_path(item, which):
@@ -110,6 +125,8 @@ def blender_config():
     probe = json.load(open(os.path.join(WORK, "vanilla_probe.json")))
     cfg = {}
     for k, it in ITEMS.items():
+        if it.get("builder") == "gb_quiver":   # gb_quiver.py: sources and out only (no blood, no decimation)
+            cfg[k] = {"out": os.path.join(WORK, k), "sources": it["sources"], "shapes": {r: {"name": sh["name"]} for r, sh in it["shapes"].items()}}; continue
         c = {"out": os.path.join(WORK, k), "sources": it["sources"], "shapes": {}, "skinned": it.get("skinned", False), "orient": it.get("orient", False)}
         if it.get("sheath"): c["sheath"] = it["sheath"]["src"]   # welded and oriented on its own, never decimated
         for role, sh in it["shapes"].items():

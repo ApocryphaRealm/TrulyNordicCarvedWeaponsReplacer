@@ -16,7 +16,7 @@ import os, sys, json, struct, math
 import numpy as np
 from scipy.spatial import ConvexHull
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from items import ITEMS, WORK, MESH_REL, TEX_REL, vanilla_path
+from items import ITEMS, WORK, MESH_REL, TEX_REL, VAN, vanilla_path
 sys.path.insert(0, r"D:\Claude output\4. plans\nordic-double-bit-axe"); import niflib
 PGP = r"D:\Modlists\Njordlinger\mods\PGPatcher Output - Njordlinger Test\meshes\dlc02\weapons\nordic\1stpersonnordicsword.nif"
 HK = 69.99124
@@ -204,8 +204,77 @@ def build_bow(out_path):
     os.makedirs(os.path.dirname(out_path), exist_ok=True); n.save(out_path); niflib.Nif(out_path)
     rep["blocks"] = len(n.blocks); return rep
 
+def set_box(n, body, P):
+    """A vanilla bhkBoxShape + bhkRigidBodyT fitted to points P (in the frame of the node the collision hangs on): the
+    T body places its box by its translation (Havok units) and rotation; vanilla's arrow and quiver bodies turn the box
+    180 degrees about z (a box is symmetric under it), so only the centre and the half extents change. Refuses any other
+    rotation rather than guessing an orientation."""
+    qx, qy, qz, qw = struct.unpack_from("<4f", n.blocks[body], 68)
+    assert abs(abs(qz) - 1) < 1e-4 or abs(abs(qw) - 1) < 1e-4, ("box body rotation is not 0 / 180 about z", qx, qy, qz, qw)
+    box = struct.unpack_from("<i", n.blocks[body], 0)[0]; assert n.btypes[box] == "bhkBoxShape", n.btypes[box]
+    lo, hi = P.min(0), P.max(0); c, h = (lo + hi) / 2, (hi - lo) / 2
+    before = dict(centre=np.round(np.array(struct.unpack_from("<3f", n.blocks[body], 52)) * HK, 3).tolist(), half=np.round(np.array(struct.unpack_from("<3f", n.blocks[box], 16)) * HK, 3).tolist())
+    struct.pack_into("<3f", n.blocks[body], 52, *(c / HK)); struct.pack_into("<3f", n.blocks[box], 16, *(h / HK))
+    return dict(before=before, after=dict(centre=np.round(c, 3).tolist(), half=np.round(h, 3).tolist()))
+
+def build_quiver(root):
+    """nordicarrow.nif (the AMMO's model) and nordicarrowflight.nif (the PROJ's) on vanilla's own structure: every shape
+    name, node, extra data, alpha property, tracer node and controller kept; our geometry spliced into vanilla's shapes
+    (identity shape transforms - gb_quiver's geometry is in the NIF root frame, as vanilla's shapes end up after theirs),
+    each with the plain TruePBR shader and its own texture set; the quiver's leather added as a second shape under
+    'ArrowQuiver'; the five arrows in the quiver go to Arrow1..Arrow5 by nearest position; collision boxes refitted."""
+    it = ITEMS["quiver"]; D = os.path.join(WORK, "quiver"); rep = {}
+    import winding
+    def shape(n, name): return [b for b in shapes_of(n) if n.name(b) == name][0]
+    def put(n, b, role, ts_reuse=None):
+        sn, sb = only_shape(os.path.join(D, f"dec_{role}.nif")); splice(n, b, geometry_tail(sn, sb))
+        sh = shader_of(n, b); tex = tex_paths("quiver", "arrow" if role.startswith("arrow") else role)
+        if ts_reuse is None: ts = len(n.blocks); n.btypes.append("BSShaderTextureSet"); n.blocks.append(texset_block(tex))
+        else: ts = ts_reuse; n.blocks[ts] = texset_block(tex)
+        set_shader(n, sh, ts, struct.unpack_from("<i", n.blocks[sh], 4)[0]); return ts
+    def centre_world(n, b):
+        V, _ = winding._tris_from_shape(n, b); _, t, r, s = n.transform(b)
+        W = (np.array(r, np.float64).reshape(3, 3) @ V.T).T * s + np.array(t); return (W.min(0) + W.max(0)) / 2
+    # ---- nordicarrow.nif
+    n = niflib.Nif(os.path.join(VAN, it["third"]))
+    van = {nm: centre_world(n, shape(n, nm)) for nm in ("Arrow1", "Arrow2", "Arrow3", "Arrow4", "Arrow5")}
+    ours = {r: (lambda V: (V.min(0) + V.max(0)) / 2)(np.load(os.path.join(D, f"dec_{r}.npz"))["V"].astype(np.float64)) for r in it["arrows_in_quiver"]}
+    # nearest pairs by the position across the quiver (x, z), greedily from the closest pair: the game's own order of
+    # which arrow goes first as the count drops stays where vanilla had it
+    pairs, free_v, free_o = {}, set(van), set(ours)
+    while free_v:
+        d, a, b = min((float(np.hypot(*(van[a][[0, 2]] - ours[b][[0, 2]]))), a, b) for a in free_v for b in free_o)
+        pairs[a] = b; free_v.discard(a); free_o.discard(b)
+    ts0 = texset_of(n, shader_of(n, shape(n, "ArrowQuiver:0")))      # vanilla's one shared set, reused for the quiver steel
+    put(n, shape(n, "ArrowQuiver:0"), "metal", ts_reuse=ts0)
+    put(n, shape(n, "Arrow:0"), "arrow")
+    for a, r in sorted(pairs.items()): put(n, shape(n, a), r)
+    ln, lb = only_shape(os.path.join(D, "dec_leather.nif"))
+    add_shape(n, shape(n, "ArrowQuiver:0"), geometry_tail(ln, lb), "TN_quiver_leather", tex_paths("quiver", "leather"), (0.0, 0.0, 0.0))
+    # collision: the root's body (the loose arrow) and ArrowQuiver's body (the quiver)
+    bodies = {}
+    for co in [i for i, t in enumerate(n.btypes) if t == "bhkCollisionObject"]:
+        node, _, body = struct.unpack_from("<iHi", n.blocks[co], 0); bodies[n.name(node)] = body
+    L = lambda *rs: np.concatenate([np.load(os.path.join(D, f"dec_{r}.npz"))["V"] for r in rs]).astype(np.float64)
+    coll = {"Arrow (root) - loose arrow": set_box(n, bodies["Arrow"], L("arrow")), "ArrowQuiver - quiver": set_box(n, bodies["ArrowQuiver"], L("metal", "leather"))}
+    out = os.path.join(root, MESH_REL, "quiver", "quiver.nif"); os.makedirs(os.path.dirname(out), exist_ok=True); n.save(out); niflib.Nif(out)
+    rep["third"] = dict(path=os.path.relpath(out, root), arrows=pairs, collision=coll, blocks=len(n.blocks))
+    # ---- nordicarrowflight.nif
+    f = niflib.Nif(os.path.join(VAN, it["flight"]))
+    b = shape(f, "SteelArrowFlight:0"); put(f, b, "arrow", ts_reuse=texset_of(f, shader_of(f, b)))
+    co = [i for i, t in enumerate(f.btypes) if t == "bhkCollisionObject"][0]; body = struct.unpack_from("<iHi", f.blocks[co], 0)[2]
+    fc = set_box(f, body, L("arrow"))
+    out2 = os.path.join(root, MESH_REL, "quiver", "arrowflight.nif"); f.save(out2); niflib.Nif(out2)
+    import shutil; p = os.path.join(root, r"meshes\dlc02\weapons\nordic", it["flight"]); os.makedirs(os.path.dirname(p), exist_ok=True); shutil.copy2(out2, p)
+    rep["flight"] = dict(path=os.path.relpath(out2, root), vanilla_path_copy=os.path.relpath(p, root), collision=fc, blocks=len(f.blocks),
+                         kept=[f.name(i) for i in range(len(f.blocks)) if f.btypes[i] in niflib.NODES or f.btypes[i] == "BSTriShape"])
+    return rep
+
 def build(item):
     it = ITEMS[item]; root = os.path.join(STAGE, item); rep = {}
+    if item == "quiver":
+        rep = build_quiver(root); json.dump(rep, open(os.path.join(WORK, item, "assemble_report.json"), "w"), indent=1)
+        print(item, json.dumps(rep)[:900]); return
     if item == "bow":
         rep["third"] = build_bow(os.path.join(root, MESH_REL, it["stem"], it["stem"] + ".nif"))
         # 1st-person: the STAT 1stPersonDLC2NordicBow points at the vanilla 3rd-person path, so the same file goes there
