@@ -15,6 +15,9 @@ TEX_REL = r"textures\pbr\TrulyNordic"
 METAL_T, WRAP_T = 11500, 3000
 
 def W(*p): return os.path.join(S2, *p)
+# ring pass (2026-11-12 after 1.1.1, the owner 08:35: "make the symbols all have the black filled ring"): repaint only, every
+# NIF byte for byte its 1.1.1 source - sheaths dagger v6 / saber C2 / straight v3 / greatsword v3 (the locket's triquetra on
+# the dark filled disc + polished ring), greatsword v5-sf (the pommel), bow v9 (both riser plates); set2 ring-pass-*.png
 ITEMS = {
     # sword A5i (approved 2026-11-12 00:01: "looks good"): A5h's flat-sided pommel with the crack inside the hook closed;
     # A5f's blade and tip engraving; the wrap is A5d's, unchanged. Layout record in work_sword_a5i\engraving_check.json.
@@ -23,7 +26,7 @@ ITEMS = {
     # 1.1.1 (2026-11-12): normals-only fix - carved faces' outline and creases given their own vertices
     # (set2\shading_fix_split.py --crease=35, real face dumps); geometry and maps identical
     "sword": dict(version="A5i-sf", sources=[W(r"work_sword_a5i_sf\A5I_metal.nif"), os.path.join(PLAN, r"A5\work\A5_wrap.nif")], orient=True, option=True,
-                  sheath=dict(version="saber C (falchion fit)", src=W(r"work_sheath_saber_fitC_sf\tn_sheath_saber_fitC.nif"), tex=W(r"work_sheath_saber_fitC_sf\tex\tn_sheath_saber_fitC")),
+                  sheath=dict(version="saber C2 (falchion fit, ringed symbol)", src=W(r"work_sheath_saber_fitC2\tn_sheath_saber_fitC2.nif"), tex=W(r"work_sheath_saber_fitC2\tex\tn_sheath_saber_fitC2")),
                   shapes={"metal": {"name": "NordicSwordA5", "tex": W(r"work_sword_a5i_sf\tex\nordicsworda5i")},
                           "wrap": {"name": "NordicWrapA5", "tex": None, "dds_from": r"D:\Modlists\Njordlinger\mods\Nordic Carved Redesign A (test)\textures\pbr\ApocryphaTest\NordicCarvedRedesignA5\nordicwrapa5"}},
                   third="nordicsword.nif", first="1stpersonnordicsword.nif", stem="sword", weap="DLC2NordicSword", fp_stat="03C353"),
@@ -31,7 +34,7 @@ ITEMS = {
     # 1.1.0 shading fix (2026-11-12): v1-sf = v1's NIF with the flat guard and pommel faces' outline vertices split from
     # their chamfers (set2\shading_fix_split.py, as bow v8) - geometry and maps identical; set2\shading-fix-1.1.0.png
     "sword2": dict(version="straight v1-sf", sources=[W(r"work_straightsword_sf\tn_straightsword.nif")], orient=True, option=True, path_stem="sword",
-                   sheath=dict(version="v2", src=W(r"work_sheath_straightsword_v2_sf\tn_sheath_straightsword_v2.nif"), tex=W(r"work_sheath_straightsword_v2_sf\tex\tn_sheath_straightsword_v2")),
+                   sheath=dict(version="v3 (ringed symbol)", src=W(r"work_sheath_straightsword_v3\tn_sheath_straightsword_v3.nif"), tex=W(r"work_sheath_straightsword_v3\tex\tn_sheath_straightsword_v3")),
                    shapes={"metal": {"name": "tn_straightsword", "tex": W(r"work_straightsword_sf\tex\tn_straightsword")}, "wrap": {"name": "TNStraightswordWrap", "tex": W(r"work_straightsword_sf\tex\tn_straightsword_wrap")}},
                    third="nordicsword.nif", first="1stpersonnordicsword.nif", stem="swordstraight", weap="DLC2NordicSword", fp_stat="03C353"),
     # v13 (approved 2026-11-11 23:57): v12's head (the owner's traced outline, 21:32; the same NIF, byte for byte) repainted
@@ -47,10 +50,10 @@ ITEMS = {
     # their chamfers (set2\shading_fix_split.py, as bow v8) - geometry and maps identical; set2\shading-fix-1.1.0.png
     # 1.1.1: the metal ships UNDECIMATED (target None): the game build's decimation stretched the blade's UVs 7-23x from
     # 15 to 85 % of its height (the ladder braid the owner saw); the work mesh's planar UVs are even (1.0x)
-    "greatsword": dict(version="v4-sf", sources=[W(r"work_gs4_sf\tn_greatsword.nif")], orient=True,
-                       sheath=dict(version="v2", src=W(r"work_sheath_greatsword_v2_sf\tn_sheath_greatsword_v2.nif"), tex=W(r"work_sheath_greatsword_v2_sf\tex\tn_sheath_greatsword_v2")),
-                       shapes={"metal": {"name": "tn_greatsword", "tex": W(r"work_gs4_sf\tex\tn_greatsword"), "target": None}, "wrap": {"name": "TNGreatswordWrap", "tex": W(r"work_gs4_sf\tex\tn_greatsword_wrap")},
-                               "wrap2": {"name": "TNGreatswordWrap2", "tex": W(r"work_gs4_sf\tex\tn_greatsword_wrap2"), "target": 1500}},
+    "greatsword": dict(version="v5-sf", sources=[W(r"work_gs5_sf\tn_greatsword.nif")], orient=True,
+                       sheath=dict(version="v3 (ringed symbol)", src=W(r"work_sheath_greatsword_v3\tn_sheath_greatsword_v3.nif"), tex=W(r"work_sheath_greatsword_v3\tex\tn_sheath_greatsword_v3")),
+                       shapes={"metal": {"name": "tn_greatsword", "tex": W(r"work_gs5_sf\tex\tn_greatsword"), "target": None}, "wrap": {"name": "TNGreatswordWrap", "tex": W(r"work_gs5_sf\tex\tn_greatsword_wrap")},
+                               "wrap2": {"name": "TNGreatswordWrap2", "tex": W(r"work_gs5_sf\tex\tn_greatsword_wrap2"), "target": 1500}},
                        third="nordicgreatsword.nif", first="1stpersonnordicgreatsword.nif", stem="greatsword", weap="DLC2NordicGreatsword", fp_stat="03C351"),
     # -sf (1.1.0 shading fix, round 2, 2026-11-12): the same NIF with its carved faces' outline AND creases (edge chamfers,
     # caps) given their own vertices (set2\shading_fix_split.py --crease=35); geometry and maps identical; set2\shading-fix-1.1.0.png
@@ -67,7 +70,7 @@ ITEMS = {
     # -sf (1.1.0 shading fix, round 2, 2026-11-12): the same NIF with its carved faces' outline AND creases (edge chamfers,
     # caps) given their own vertices (set2\shading_fix_split.py --crease=35); geometry and maps identical; set2\shading-fix-1.1.0.png
     "dagger": dict(version="v3-sf", sources=[W(r"work_dg3_sf\tn_dagger2.nif")], orient=True,
-                   sheath=dict(version="v5", src=W(r"work_sheath_dagger_v5_sf\tn_sheath_dagger_v5.nif"), tex=W(r"work_sheath_dagger_v5_sf\tex\tn_sheath_dagger_v5")),
+                   sheath=dict(version="v6 (ringed symbol)", src=W(r"work_sheath_dagger_v6\tn_sheath_dagger_v6.nif"), tex=W(r"work_sheath_dagger_v6\tex\tn_sheath_dagger_v6")),
                    shapes={"metal": {"name": "tn_dagger2", "tex": W(r"work_dg3_sf\tex\tn_dagger2")}, "wrap": {"name": "TNDagger2Wrap", "tex": W(r"work_dg3_sf\tex\tn_dagger2_wrap")}},
                    third="nordicdagger.nif", first="1stpersonnordicdagger.nif", stem="dagger", weap="DLC2NordicDagger", fp_stat="03C350"),
     # pointed maces (approved 2026-11-12 01:20: "mace looks good"): six-flanged v4 the default, classic v3 the option
@@ -83,9 +86,9 @@ ITEMS = {
                   third="nordicmace.nif", first="1stpersonnordicmace.nif", stem="macev2", weap="DLC2NordicMace", fp_stat="03C352", option=True),
     # v8 (2026-11-12): v2's limbs, grip and string; the riser plate redesigned (v3-v8) and its flat carved faces given
     # their own vertices (bow_v8_build.py: the surface gate passes, lean 0.3 deg p95 against v7's 24); skinned as before
-    "bow": dict(version="v8", sources=[W(r"work_bow8\tn_bow2.nif")], skinned=True,
-                shapes={"metal": {"name": "tn_bow2", "tex": W(r"work_bow8\tex\tn_bow2")}, "wrap": {"name": "TNBowWrap", "tex": W(r"work_bow8\tex\tn_bow2_wrap")},
-                        "string": {"name": "TNBowString", "tex": W(r"work_bow8\tex\tn_bow2_string"), "target": None}},
+    "bow": dict(version="v9", sources=[W(r"work_bow9\tn_bow2.nif")], skinned=True,
+                shapes={"metal": {"name": "tn_bow2", "tex": W(r"work_bow9\tex\tn_bow2")}, "wrap": {"name": "TNBowWrap", "tex": W(r"work_bow9\tex\tn_bow2_wrap")},
+                        "string": {"name": "TNBowString", "tex": W(r"work_bow9\tex\tn_bow2_string"), "target": None}},
                 third="nordicbow.nif", first=None, stem="bow", weap="DLC2NordicBow", fp_stat="03CA7C"),
     # 1.1.1 (2026-11-12): normals-only fix - carved faces' outline and creases given their own vertices
     # (set2\shading_fix_split.py --crease=35, real face dumps); geometry and maps identical
