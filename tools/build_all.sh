@@ -17,5 +17,5 @@ python -I "$T/assemble.py"
 python -I "$T/silhouette.py"
 python -I "$T/verify.py"
 python -I "$T/arrow_records.py"   # idempotent: adds the arrow records to the three plugins once
-python -I "$T/spear_records.py"   # idempotent: adds the spear records to the two Standalone plugins once
+python -I "$T/additional_records.py"   # writes the optional file's light plugin (both qualities) from additional_spec.py, from scratch
 python -I "$T/build-packages.py"
