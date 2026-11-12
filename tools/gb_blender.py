@@ -215,6 +215,23 @@ if C.get("orient"):
     for role, o in shapes.items():   # the npz dumps carry the oriented winding
         V, F, UV = arrays(o); np.savez(os.path.join(OUT, f"dec_{role}.npz"), V=V, F=F, UV=UV)
 
+# ------------------------------------------------------------------ the sheath ('Scb'): its own approved NIF, in the weapon's frame
+# Welded and given sharp edges like the weapon's shapes, never decimated (the sheaths are ~2-4k triangles), oriented on
+# its own (the blade inside it would block every ray of the weapon's vote, and the sheath's rays the weapon's).
+if C.get("sheath"):
+    before = set(bpy.data.objects); bpy.ops.import_scene.pynifly(filepath=C["sheath"])
+    new = [o for o in set(bpy.data.objects) - before]
+    sh_o = [o for o in new if o.type == "MESH"]
+    for o in new:
+        if o.type != "MESH": bpy.data.objects.remove(o)
+    assert len(sh_o) == 1, [o.name for o in sh_o]
+    sh_o = sh_o[0]; sh_o.name = "dec_sheath"
+    n0 = decimate(sh_o, None)
+    stats["sheath"] = {"source": C["sheath"], "tris_before": n0, "tris_after": tris_of(sh_o), "orient": orient_outward([sh_o])}
+    V, F, UV = arrays(sh_o); np.savez(os.path.join(OUT, "dec_sheath.npz"), V=V, F=F, UV=UV)
+    export_single(sh_o, os.path.join(OUT, "dec_sheath.nif"))
+    bpy.data.objects.remove(sh_o)
+
 # ------------------------------------------------------------------ blood shapes (from the decimated metal)
 for i, bl in enumerate(C.get("blood", [])):
     b = make_blood(shapes[C.get("blood_from", "metal")], bl["region"], bl["uvbox"], f"blood{i}")

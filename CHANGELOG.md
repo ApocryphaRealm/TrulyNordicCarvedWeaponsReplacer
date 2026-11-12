@@ -8,6 +8,23 @@ Written as changes happen, not reconstructed afterwards (rule 61). Each version 
 * **failed** - built but crashed or malfunctioned; the number was reclaimed
 * **scratch** - a hypothesis-test build that never held a real number
 
+## 1.1.0 - 2026-11-11 - untested
+
+### Added
+- Standalone files: the vanilla Nordic pieces stay untouched and the carved set is added as new items (Carved Nordic Sword, War Axe, Battleaxe, Greatsword, Warhammer, Dagger, Mace, Bow and Shield), forged and tempered where and as the Nordic pieces are. Two main files: Nordic quality (the Nordic pieces' stats and recipes) and Ebony quality (the ebony pieces' damage or armour, value, weight, material and recipes). One light plugin name for both, so the quality can be switched without losing the items.
+- Optional file: a straight one-handed sword (the greatsword's blade and upper hilt at one-hand size, with its own sheath) in place of the curved sword. Works over any main file.
+- Optional file: a clean shield - the crest as a plain carved disc with the boss in the middle, no points, spikes or straps. Works over any main file.
+- Sheaths: the curved sword, the straight sword, the greatsword and the dagger each have a carved sheath of black leather with a carved steel locket and tip. It stays on the hip or back when the weapon is drawn.
+
+### Changed
+- The release is four main files with no installer (Replacer - No ESP, Replacer - ESP, Standalone - Nordic quality, Standalone - Ebony quality) and three optional files (straight sword, classic mace, clean shield), in place of the one installer.
+- The classic mace is now an optional file that works over any main file.
+- The curved sword's blade engraving now runs all the way up to the point.
+- The battleaxe has a new head: a tall upper horn, one long curved cutting edge down to a single sharp beard point, and a curved back spike.
+
+### Fixed
+- The greatsword's leather wrap above the guard could be seen through: its faces pointed inward. Every face now points outward, and the build now refuses any model with faces wound the wrong way.
+
 ## 1.0.0 - 2026-11-10 - untested
 
 ### Added

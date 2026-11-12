@@ -129,6 +129,15 @@ def build(item):
         texconv(nsrc, tex_dir, name + "_n", "BC7_UNORM")
         texconv(base + "_rmaos.png", tex_dir, name + "_rmaos", "BC7_UNORM")
         rep[role] = name
+    if it.get("sheath"):   # the sheath's own maps (painted per part at its own densities: no normal fix)
+        base = it["sheath"]["tex"]; name = f"tn_{it['stem']}_sheath"
+        for suf in ("", "_n", "_rmaos"):
+            w, h = Image.open(base + suf + ".png").size
+            if max(w, h) > 2048: raise SystemExit(f"{base}{suf}.png is {w}x{h}, over 2048")
+        texconv(base + ".png", tex_dir, name, "BC7_UNORM_SRGB", srgb=True)
+        texconv(base + "_n.png", tex_dir, name + "_n", "BC7_UNORM")
+        texconv(base + "_rmaos.png", tex_dir, name + "_rmaos", "BC7_UNORM")
+        rep["sheath"] = name
     json.dump(rep, open(os.path.join(WORK, item, "textures_report.json"), "w"), indent=1)
     print(item, json.dumps(rep)[:600])
 

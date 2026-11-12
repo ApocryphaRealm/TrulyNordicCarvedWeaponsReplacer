@@ -1,44 +1,66 @@
 # Truly Nordic Carved Weapons Replacer
 
 New models for the Dragonborn Nordic weapons and shield: steel forged and carved in the Nordic way, with black leather
-wrapped grips and knotwork filling every face. Each weapon keeps what it is - its edges, its head, its silhouette - and
-is rebuilt to be realistic in proportion, thickness and construction.
+wrapped grips and knotwork filling every face, and carved sheaths for the swords and the dagger. Each weapon keeps what
+it is - its edges, its head, its silhouette - and is rebuilt to be realistic in proportion, thickness and construction.
 
-## What it changes
+## The models
 | Item | New look |
 |---|---|
-| Nordic Sword | single-edged curved blade, one-piece half guard sweeping up, hooked pommel, bold carved braid |
-| Nordic Battleaxe | steel haft forged in one piece with the head, carved knot fields on both faces, a forged knob pommel |
-| Nordic Greatsword | double-edged blade, carved guards and ricasso, two wrapped grips |
+| Nordic Sword | single-edged curved blade, one-piece half guard sweeping up, hooked pommel, a bold carved braid running to the point; a falchion-shaped sheath |
+| Nordic Battleaxe | a tall upper horn, one long curved cutting edge down to a single beard point, a curved back spike; steel haft forged with the head, carved knot fields, a forged knob pommel |
+| Nordic Greatsword | double-edged blade, carved guards and ricasso, two wrapped grips; a straight sheath on the back |
 | Nordic Warhammer | hammer face and curved pick, a triquetra ring centred on the face, a forged knob pommel |
 | Nordic War Axe | bearded blade with a square hammer poll, a triquetra at the widest point, a forged knob pommel |
-| Nordic Dagger | kukri form, a world serpent carved along the belly |
-| Nordic Mace | six-flanged head, a biting maw on every flange (installer option: the classic four-flanged mace) |
+| Nordic Dagger | kukri form, a world serpent carved along the belly; its own sheath |
+| Nordic Mace | six-flanged head, a biting maw on every flange |
 | Nordic Bow | all-steel bow, a triquetra on the riser; the string still draws and follows the arrow |
 | Nordic Shield | the carved crest filled out to the rim, the four points in place; sits on the arm and on the back where the vanilla shield does |
 
-Every enchanted variant uses the same model as its base weapon, so all of them change.
+The sheaths are black leather in one piece with a carved steel mouth and tip, and stay on the hip (the greatsword's on
+the back) when the weapon is drawn.
 
-## How it works
-- No plugin. The weapons' third-person, ground and inventory models are swapped per record by SkyPatcher
-  (`SKSE\Plugins\SkyPatcher\weapon\TrulyNordicCarvedWeaponsReplacer\`), matched by the weapon's first-person model, so
-  copies of these weapons added by other mods change too, and other mods that replace the vanilla Nordic meshes are left
-  alone.
-- The first-person models (which SkyPatcher cannot reach) and the shield (one model for every view) are loose files at
-  the vanilla paths. Put this mod below any other Nordic weapon or shield replacer.
-- Textures: our own TruePBR set (base colour, normal, RMAOS) at 2K, under `textures\pbr\ApocryphaTest\TrulyNordic\`.
+## The files
+Install ONE main file. There is no installer.
+
+| Main file | What it does |
+|---|---|
+| Replacer - No ESP | No plugin. SkyPatcher swaps the weapons' models per record (`SKSE\Plugins\SkyPatcher\weapon\TrulyNordicCarvedWeaponsReplacer\`), matched by the first-person model, so enchanted copies and copies other mods add change too. Needs SkyPatcher. |
+| Replacer - ESP | `TrulyNordicCarvedWeapons.esp`, a light plugin setting the models on the Nordic weapon records and their enchanted versions. No SkyPatcher. |
+| Standalone - Nordic quality | `TrulyNordicCarvedWeapons - Standalone.esp`, a light plugin that adds the set as new items and leaves the vanilla Nordic pieces alone. Each is forged where its Nordic counterpart is (same perk, materials and forge heading) and tempered the same way, with the Nordic piece's stats. |
+| Standalone - Ebony quality | The same plugin name and items with the matching ebony piece's damage or armour rating, value, weight, material keyword and recipes (ebony ingots, Ebony Smithing, the ebony heading). |
+
+Both Replacer files ship the first-person models and the shield as loose files at the vanilla paths (SkyPatcher cannot
+reach them): put the mod below any other Nordic weapon or shield replacer. The Standalone files ship every file at this
+mod's own paths and change no vanilla file.
+
+Standalone items: Carved Nordic Sword, Carved Nordic War Axe, Carved Nordic Battleaxe, Carved Nordic Greatsword, Carved
+Nordic Warhammer, Carved Nordic Dagger, Carved Nordic Mace, Carved Nordic Bow, Carved Nordic Shield.
+
+### Optional files
+Each swaps one model and works over any main file - install it after the main file so it overwrites the default.
+
+| Optional file | In place of |
+|---|---|
+| Straight sword | the curved sword: the greatsword's blade and upper hilt at one-hand size, with its own straight sheath |
+| Classic mace | the six-flanged mace: the vanilla mace's four-flanged shape with the same biting maw |
+| Clean shield | the carved shield: the crest as a plain carved disc with the boss in the middle, no points, spikes or straps |
+
+The alternate sits at the same path as the default in every main file. Each optional file carries a small FOMOD with no
+pages: its vanilla-path copy (the first-person model, or the shield) installs only when the Standalone plugin is not
+present, so it never changes a vanilla item under a Standalone install.
+
+Textures: our own TruePBR set (base colour, normal, RMAOS) at 2K, under `textures\pbr\ApocryphaTest\TrulyNordic\`.
 
 ## Requirements
 - Skyrim Special Edition or Anniversary Edition with the Dragonborn DLC (included in both).
-- SKSE64 and SkyPatcher.
+- SKSE64. SkyPatcher for the Replacer - No ESP file only.
 - A TruePBR-capable renderer: Community Shaders with its TruePBR support.
 
-## Installer
-- Default: everything, with the six-flanged mace.
-- Option: the classic mace (four flanges, the same biting maw).
-
 ## Building from source
-`tools\build_all.sh` runs the pipeline: `gb_blender.py` (Blender + PyNifly: decimation and checks, blood shapes, the
-bow's weights), `textures.py` (BC7 DDS), `assemble.py` (game NIFs on the vanilla structure), `verify.py` (read-back) and
-`build-fomod.py` (the installer package). The source models and maps come from the design work folder named in
-`tools\items.py`.
+`tools\build_all.sh` runs the pipeline: `gb_blender.py` (Blender + PyNifly: decimation and checks, face orientation,
+the sheaths, blood shapes, the bow's weights), `textures.py` (BC7 DDS), `assemble.py` (game NIFs on the vanilla
+structure, the sheath as the `Scb` shape), `silhouette.py`, `verify.py` (read-back: shader block, texture paths and the
+face-direction check of `winding.py`) and `build-packages.py` (the four main files and three optional files). The
+Standalone plugins are built with houseCARL from `standalone_spec.py` / `standalone_assign.py` / `standalone_finish.py`.
+The source models and maps come from the design work folder named in `tools\items.py`.

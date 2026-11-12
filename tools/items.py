@@ -15,14 +15,25 @@ METAL_T, WRAP_T = 11500, 3000
 
 def W(*p): return os.path.join(S2, *p)
 ITEMS = {
-    "sword": dict(version="A5d", sources=[os.path.join(PLAN, r"A5\work\A5_metal.nif"), os.path.join(PLAN, r"A5\work\A5_wrap.nif")],
-                  shapes={"metal": {"name": "NordicSwordA5", "tex": W(r"work_sword_ns\tex\nordicsworda5c_nsb")},
+    # sword A5f (2026-11-11 22:00): A5d's mesh, the tip engraving run up to the owner's point (only the maps change).
+    # option: the curved saber and the straight sword (sword2) are the installer's "Sword" step; both install at sword\sword.nif
+    # sheath: the shape named 'Scb' that the game leaves on the hip when the weapon is drawn (in the weapon's own frame)
+    "sword": dict(version="A5f", sources=[os.path.join(PLAN, r"A5\work\A5_metal.nif"), os.path.join(PLAN, r"A5\work\A5_wrap.nif")], orient=True, option=True,
+                  sheath=dict(version="saber C (falchion fit)", src=W(r"work_sheath_saber_fitC\tn_sheath_saber_fitC.nif"), tex=W(r"work_sheath_saber_fitC\tex\tn_sheath_saber_fitC")),
+                  shapes={"metal": {"name": "NordicSwordA5", "tex": W(r"work_sword_a5f\tex\nordicsworda5f")},
                           "wrap": {"name": "NordicWrapA5", "tex": None, "dds_from": r"D:\Modlists\Njordlinger\mods\Nordic Carved Redesign A (test)\textures\pbr\ApocryphaTest\NordicCarvedRedesignA5\nordicwrapa5"}},
                   third="nordicsword.nif", first="1stpersonnordicsword.nif", stem="sword", weap="DLC2NordicSword", fp_stat="03C353"),
-    "battleaxe": dict(version="v9", sources=[W(r"work_v9\tn_battleaxe.nif")], orient=True,   # v9: v8 with the straight pommel (2026-11-11)
-                      shapes={"metal": {"name": "TNBattleaxe", "tex": W(r"work_v9\tex\tn_battleaxe")}, "wrap": {"name": "TNBattleaxeWrap", "tex": W(r"work_v9\tex\tn_battleaxe_wrap")}},
+    # the straight sword (installer option, 2026-11-11): greatsword v3's blade and upper hilt as a one-hander
+    "sword2": dict(version="straight v1", sources=[W(r"work_straightsword\tn_straightsword.nif")], orient=True, option=True, path_stem="sword",
+                   sheath=dict(version="v2", src=W(r"work_sheath_straightsword_v2\tn_sheath_straightsword_v2.nif"), tex=W(r"work_sheath_straightsword_v2\tex\tn_sheath_straightsword_v2")),
+                   shapes={"metal": {"name": "tn_straightsword", "tex": W(r"work_straightsword\tex\tn_straightsword")}, "wrap": {"name": "TNStraightswordWrap", "tex": W(r"work_straightsword\tex\tn_straightsword_wrap")}},
+                   third="nordicsword.nif", first="1stpersonnordicsword.nif", stem="swordstraight", weap="DLC2NordicSword", fp_stat="03C353"),
+    "battleaxe": dict(version="v12", sources=[W(r"work_v12\tn_battleaxe.nif")], orient=True,   # v12: the owner's traced head (approved 2026-11-11 21:32)
+                      shapes={"metal": {"name": "TNBattleaxe", "tex": W(r"work_v12\tex\tn_battleaxe")}, "wrap": {"name": "TNBattleaxeWrap", "tex": W(r"work_v12\tex\tn_battleaxe_wrap")}},
                       third="nordicbattleaxe.nif", first="1stpersonnordicbattleaxe.nif", stem="battleaxe", weap="DLC2NordicBattleaxe", fp_stat="03C34F"),
-    "greatsword": dict(version="v3", sources=[W(r"work_gs3\tn_greatsword.nif")],
+    # orient: the ricasso wrap (TNGreatswordWrap2) came out of tn_lib wound inward on most of its faces (1.0.0)
+    "greatsword": dict(version="v3", sources=[W(r"work_gs3\tn_greatsword.nif")], orient=True,
+                       sheath=dict(version="v2", src=W(r"work_sheath_greatsword_v2\tn_sheath_greatsword_v2.nif"), tex=W(r"work_sheath_greatsword_v2\tex\tn_sheath_greatsword_v2")),
                        shapes={"metal": {"name": "tn_greatsword", "tex": W(r"work_gs3\tex\tn_greatsword")}, "wrap": {"name": "TNGreatswordWrap", "tex": W(r"work_gs3\tex\tn_greatsword_wrap")},
                                "wrap2": {"name": "TNGreatswordWrap2", "tex": W(r"work_gs3\tex\tn_greatsword_wrap2"), "target": 1500}},
                        third="nordicgreatsword.nif", first="1stpersonnordicgreatsword.nif", stem="greatsword", weap="DLC2NordicGreatsword", fp_stat="03C351"),
@@ -32,13 +43,14 @@ ITEMS = {
     "waraxe": dict(version="v3", sources=[W(r"work_wa3\tn_waraxe2.nif")], orient=True,   # added 2026-11-11 (the owner: "Did you add the Nordic War Axe?"); v3 = v2 with the straight pommel (00:28)
                    shapes={"metal": {"name": "tn_waraxe2", "tex": W(r"work_wa3\tex\tn_waraxe2")}, "wrap": {"name": "TNWaraxe2Wrap", "tex": W(r"work_wa3\tex\tn_waraxe2_wrap")}},
                    third="nordicwaraxe.nif", first="1stpersonnordiclwaraxe.nif", stem="waraxe", weap="DLC2NordicWarAxe", fp_stat="03C354"),
-    "dagger": dict(version="v3", sources=[W(r"work_dg3\tn_dagger2.nif")],
+    "dagger": dict(version="v3", sources=[W(r"work_dg3\tn_dagger2.nif")], orient=True,
+                   sheath=dict(version="v5", src=W(r"work_sheath_dagger_v5\tn_sheath_dagger_v5.nif"), tex=W(r"work_sheath_dagger_v5\tex\tn_sheath_dagger_v5")),
                    shapes={"metal": {"name": "tn_dagger2", "tex": W(r"work_dg3\tex\tn_dagger2")}, "wrap": {"name": "TNDagger2Wrap", "tex": W(r"work_dg3\tex\tn_dagger2_wrap")}},
                    third="nordicdagger.nif", first="1stpersonnordicdagger.nif", stem="dagger", weap="DLC2NordicDagger", fp_stat="03C350"),
-    "mace": dict(version="v3", sources=[W(r"work_mc3\tn_mace.nif")],
+    "mace": dict(version="v3", sources=[W(r"work_mc3\tn_mace.nif")], orient=True,
                  shapes={"metal": {"name": "tn_mace", "tex": W(r"work_mc3\tex\tn_mace")}, "wrap": {"name": "TNMaceWrap", "tex": W(r"work_mc3\tex\tn_mace_wrap")}},
                  third="nordicmace.nif", first="1stpersonnordicmace.nif", stem="mace", weap="DLC2NordicMace", fp_stat="03C352"),
-    "mace2": dict(version="v2", sources=[W(r"work_mc2\tn_mace.nif")],
+    "mace2": dict(version="v2", sources=[W(r"work_mc2\tn_mace.nif")], orient=True, path_stem="mace",
                   shapes={"metal": {"name": "tn_mace", "tex": W(r"work_mc2\tex\tn_mace")}, "wrap": {"name": "TNMaceWrap", "tex": W(r"work_mc2\tex\tn_mace_wrap")}},
                   third="nordicmace.nif", first="1stpersonnordicmace.nif", stem="macev2", weap="DLC2NordicMace", fp_stat="03C352", option=True),
     "bow": dict(version="v2", sources=[W(r"work_bow2\tn_bow2.nif")], skinned=True,
@@ -48,11 +60,15 @@ ITEMS = {
     "shield": dict(version="v4", sources=[W(r"work_sh4\tn_shield4.nif")], orient=True,   # v4: vanilla's placement and profile, faces outward (2026-11-11)
                    shapes={"metal": {"name": "tn_shield4_steel", "tex": W(r"work_sh4\tex\tn_shield4_steel"), "target": 18000}, "board": {"name": "tn_shield4_board", "tex": W(r"work_sh4\tex\tn_shield4_board"), "target": 2000}},
                    third=None, first=None, stem="shield", armo="DLC2ArmorNordicShield"),
+    # the clean shield (optional file, 2026-11-11 22:46): v4 with the crest as a plain carved disc - no spikes, points or straps
+    "shield2": dict(version="v5 clean", sources=[W(r"work_sh5_clean\tn_shield5.nif")], orient=True, option=True,
+                    shapes={"metal": {"name": "tn_shield5_steel", "tex": W(r"work_sh5_clean\tex\tn_shield5_steel"), "target": 18000}, "board": {"name": "tn_shield5_board", "tex": W(r"work_sh5_clean\tex\tn_shield5_board"), "target": 2000}},
+                    third=None, first=None, stem="shieldclean", armo="DLC2ArmorNordicShield"),
 }
 
 def vanilla_path(item, which):
     it = ITEMS[item]
-    if item == "shield": return VAN_SHIELD if which == "third" else None
+    if item.startswith("shield"): return VAN_SHIELD if which == "third" else None
     f = it.get(which); return os.path.join(VAN, f) if f else None
 
 def blender_config():
@@ -60,6 +76,7 @@ def blender_config():
     cfg = {}
     for k, it in ITEMS.items():
         c = {"out": os.path.join(WORK, k), "sources": it["sources"], "shapes": {}, "skinned": it.get("skinned", False), "orient": it.get("orient", False)}
+        if it.get("sheath"): c["sheath"] = it["sheath"]["src"]   # welded and oriented on its own, never decimated
         for role, sh in it["shapes"].items():
             t = sh.get("target", METAL_T if role == "metal" else WRAP_T)
             c["shapes"][role] = {"name": sh["name"], "target": t, "atlas_px": 2048 if role in ("metal", "board") else 512}

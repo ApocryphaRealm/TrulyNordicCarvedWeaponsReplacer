@@ -6,14 +6,15 @@ import os, sys, struct
 sys.path.insert(0, r"D:\Claude output\4. plans\nordic-double-bit-axe"); import niflib
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from items import WORK
+import winding
 STAGE = sys.argv[1] if len(sys.argv) > 1 else os.path.join(WORK, "stage")
-bad = 0; n_nif = 0
+bad = 0; n_nif = 0; WIND = []
 data_roots = [os.path.join(STAGE, d) for d in os.listdir(STAGE) if os.path.isdir(os.path.join(STAGE, d))] + [STAGE]
 def exists_any(rel): return any(os.path.isfile(os.path.join(r, rel)) for r in data_roots)
 for dp, _, fs in os.walk(STAGE):
     for f in fs:
         if not f.lower().endswith(".nif"): continue
-        p = os.path.join(dp, f); n = niflib.Nif(p); n_nif += 1; print("==", os.path.relpath(p, STAGE))
+        p = os.path.join(dp, f); n = niflib.Nif(p); n_nif += 1; print("==", os.path.relpath(p, STAGE)); our_shapes = set()
         for b, t in enumerate(n.btypes):
             if t != "BSTriShape": continue
             o = n.av_end(b, 0, [], []); sk, sh, al = struct.unpack_from("<3i", n.blocks[b], o + 16)
@@ -34,6 +35,16 @@ for dp, _, fs in os.walk(STAGE):
                 if typ != 0 or not pbr or [i for i, x in enumerate(paths) if x] != [0, 1, 5]: line += "  BAD SHADER/SLOTS"; bad += 1
                 line += f"  slots 0/1/5 {'all present' if not miss else 'MISSING ' + ', '.join(miss)}"; bad += len(miss)
             else: line += "  vanilla textures: " + ", ".join(x for x in paths if x)[:120]
+            if ours or "blood" in n.name(b).lower(): our_shapes.add(n.name(b))
             print(line)
+        # face direction (winding.py): no edge wound against its neighbour, no surface facing in - our shapes only
+        # (a shape kept from vanilla, e.g. the war axe's belt ring, is listed but not ours to fail)
+        rows, faults = winding.check_nif(n, ours=lambda nm: nm in our_shapes or "blood" in nm.lower())
+        for r in rows:
+            print(f"   winding {r['shape']}: {r['faces']} faces, {r['surfaces']} surfaces, edges against a neighbour {r['edges_against_neighbour']}, "
+                  f"surfaces facing in {r['surfaces_facing_in']} ({r['faces_facing_in']} faces){'' if r['ours'] else ' [vanilla shape]'}{'  WINDING FAULT' if r['fault'] else ''}")
+            WIND.append(dict(nif=os.path.relpath(p, STAGE), **r))
+        bad += faults
+import json; json.dump(WIND, open(os.path.join(STAGE, "..", "winding_report.json") if os.path.basename(STAGE) == "stage" else os.path.join(os.environ.get("TEMP", "."), "tncw_winding_report.json"), "w"), indent=1)
 print(f"RESULT {n_nif} NIFs:", "PASS" if bad == 0 else f"FAIL {bad}")
 sys.exit(1 if bad else 0)

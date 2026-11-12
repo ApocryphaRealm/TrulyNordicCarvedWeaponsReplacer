@@ -144,6 +144,12 @@ def build_static(item, which, out_path):
         if role == "metal": continue
         rn, rb = only_shape(os.path.join(D, f"dec_{role}.nif"))
         add_shape(n, main, geometry_tail(rn, rb), f"TN_{it['stem']}_{role}", tex_paths(item, role), off)
+    if it.get("sheath"):
+        # our sheath as the shape the game knows by name: 'Scb' is left on the sheath node when the weapon is drawn
+        assert not [b for b in shp if n.name(b) == "Scb"], f"{item}: vanilla already carries an Scb"
+        sn, sb = only_shape(os.path.join(D, "dec_sheath.nif"))
+        add_shape(n, main, geometry_tail(sn, sb), "Scb", tex_paths(item, "sheath"), off)
+        rep["sheath"] = it["sheath"]["version"]
     for i, b in enumerate(blood):
         bn, bb = only_shape(os.path.join(D, f"blood{min(i, 1)}.nif")); splice(n, b, geometry_tail(bn, bb), off)
     rep["blood_shapes"] = [n.name(b) for b in blood]
@@ -205,7 +211,7 @@ def build(item):
         # 1st-person: the STAT 1stPersonDLC2NordicBow points at the vanilla 3rd-person path, so the same file goes there
         import shutil; p = os.path.join(root, r"meshes\dlc02\weapons\nordic\nordicbow.nif"); os.makedirs(os.path.dirname(p), exist_ok=True)
         shutil.copy2(os.path.join(root, MESH_REL, it["stem"], it["stem"] + ".nif"), p); rep["first"] = "copy at meshes\\dlc02\\weapons\\nordic\\nordicbow.nif"
-    elif item == "shield":
+    elif item.startswith("shield"):
         rep["third"] = build_static(item, "third", os.path.join(root, r"meshes\dlc02\armor\nordicshield\nordicshield.nif"))
     else:
         rep["third"] = build_static(item, "third", os.path.join(root, MESH_REL, it["stem"], it["stem"] + ".nif"))
