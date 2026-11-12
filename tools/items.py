@@ -45,24 +45,34 @@ ITEMS = {
                        shapes={"metal": {"name": "tn_greatsword", "tex": W(r"work_gs4_sf\tex\tn_greatsword")}, "wrap": {"name": "TNGreatswordWrap", "tex": W(r"work_gs4_sf\tex\tn_greatsword_wrap")},
                                "wrap2": {"name": "TNGreatswordWrap2", "tex": W(r"work_gs4_sf\tex\tn_greatsword_wrap2"), "target": 1500}},
                        third="nordicgreatsword.nif", first="1stpersonnordicgreatsword.nif", stem="greatsword", weap="DLC2NordicGreatsword", fp_stat="03C351"),
-    "warhammer": dict(version="v2f", sources=[W(r"work_wh2f\tn_warhammer2.nif")], orient=True,   # v2f: v2e with the straight pommel (2026-11-11)
-                      shapes={"metal": {"name": "tn_warhammer2", "tex": W(r"work_wh2f\tex\tn_warhammer2")}, "wrap": {"name": "TNWarhammer2Wrap", "tex": W(r"work_wh2f\tex\tn_warhammer2_wrap")}},
+    # -sf (1.1.0 shading fix, round 2, 2026-11-12): the same NIF with its carved faces' outline AND creases (edge chamfers,
+    # caps) given their own vertices (set2\shading_fix_split.py --crease=35); geometry and maps identical; set2\shading-fix-1.1.0.png
+    "warhammer": dict(version="v2f-sf", sources=[W(r"work_wh2f_sf\tn_warhammer2.nif")], orient=True,   # v2f: v2e with the straight pommel (2026-11-11)
+                      shapes={"metal": {"name": "tn_warhammer2", "tex": W(r"work_wh2f_sf\tex\tn_warhammer2")}, "wrap": {"name": "TNWarhammer2Wrap", "tex": W(r"work_wh2f_sf\tex\tn_warhammer2_wrap")}},
                       third="nordicwarhammer.nif", first="1stpersonnordicwarhammer.nif", stem="warhammer", weap="DLC2NordicWarhammer", fp_stat="03C355"),
     # added 2026-11-11 (the owner: "Did you add the Nordic War Axe?"); v3 = v2 with the straight pommel (00:28);
     # v4 (approved 2026-11-12 00:12): v3's mesh (the same NIF) repainted to the engraving layout rule
-    "waraxe": dict(version="v4", sources=[W(r"work_wa4\tn_waraxe2.nif")], orient=True,
-                   shapes={"metal": {"name": "tn_waraxe2", "tex": W(r"work_wa4\tex\tn_waraxe2")}, "wrap": {"name": "TNWaraxe2Wrap", "tex": W(r"work_wa4\tex\tn_waraxe2_wrap")}},
+    # -sf (1.1.0 shading fix, round 2, 2026-11-12): the same NIF with its carved faces' outline AND creases (edge chamfers,
+    # caps) given their own vertices (set2\shading_fix_split.py --crease=35); geometry and maps identical; set2\shading-fix-1.1.0.png
+    "waraxe": dict(version="v4-sf", sources=[W(r"work_wa4_sf\tn_waraxe2.nif")], orient=True,
+                   shapes={"metal": {"name": "tn_waraxe2", "tex": W(r"work_wa4_sf\tex\tn_waraxe2")}, "wrap": {"name": "TNWaraxe2Wrap", "tex": W(r"work_wa4_sf\tex\tn_waraxe2_wrap")}},
                    third="nordicwaraxe.nif", first="1stpersonnordiclwaraxe.nif", stem="waraxe", weap="DLC2NordicWarAxe", fp_stat="03C354"),
-    "dagger": dict(version="v3", sources=[W(r"work_dg3\tn_dagger2.nif")], orient=True,
+    # -sf (1.1.0 shading fix, round 2, 2026-11-12): the same NIF with its carved faces' outline AND creases (edge chamfers,
+    # caps) given their own vertices (set2\shading_fix_split.py --crease=35); geometry and maps identical; set2\shading-fix-1.1.0.png
+    "dagger": dict(version="v3-sf", sources=[W(r"work_dg3_sf\tn_dagger2.nif")], orient=True,
                    sheath=dict(version="v5", src=W(r"work_sheath_dagger_v5\tn_sheath_dagger_v5.nif"), tex=W(r"work_sheath_dagger_v5\tex\tn_sheath_dagger_v5")),
-                   shapes={"metal": {"name": "tn_dagger2", "tex": W(r"work_dg3\tex\tn_dagger2")}, "wrap": {"name": "TNDagger2Wrap", "tex": W(r"work_dg3\tex\tn_dagger2_wrap")}},
+                   shapes={"metal": {"name": "tn_dagger2", "tex": W(r"work_dg3_sf\tex\tn_dagger2")}, "wrap": {"name": "TNDagger2Wrap", "tex": W(r"work_dg3_sf\tex\tn_dagger2_wrap")}},
                    third="nordicdagger.nif", first="1stpersonnordicdagger.nif", stem="dagger", weap="DLC2NordicDagger", fp_stat="03C350"),
     # pointed maces (approved 2026-11-12 01:20: "mace looks good"): six-flanged v4 the default, classic v3 the option
-    "mace": dict(version="six-flanged v4", sources=[W(r"work_mc4\tn_mace.nif")], orient=True,
-                 shapes={"metal": {"name": "tn_mace", "tex": W(r"work_mc4\tex\tn_mace")}, "wrap": {"name": "TNMaceWrap", "tex": W(r"work_mc4\tex\tn_mace_wrap")}},
+    # -sf (1.1.0 shading fix, round 2, 2026-11-12): the same NIF with its carved faces' outline AND creases (edge chamfers,
+    # caps) given their own vertices (set2\shading_fix_split.py --crease=35); geometry and maps identical; set2\shading-fix-1.1.0.png
+    "mace": dict(version="six-flanged v4-sf", sources=[W(r"work_mc4_sf\tn_mace.nif")], orient=True,
+                 shapes={"metal": {"name": "tn_mace", "tex": W(r"work_mc4_sf\tex\tn_mace")}, "wrap": {"name": "TNMaceWrap", "tex": W(r"work_mc4_sf\tex\tn_mace_wrap")}},
                  third="nordicmace.nif", first="1stpersonnordicmace.nif", stem="mace", weap="DLC2NordicMace", fp_stat="03C352"),
-    "mace2": dict(version="classic v3", sources=[W(r"work_mc2v3\tn_mace.nif")], orient=True, path_stem="mace",
-                  shapes={"metal": {"name": "tn_mace", "tex": W(r"work_mc2v3\tex\tn_mace")}, "wrap": {"name": "TNMaceWrap", "tex": W(r"work_mc2v3\tex\tn_mace_wrap")}},
+    # -sf (1.1.0 shading fix, round 2, 2026-11-12): the same NIF with its carved faces' outline AND creases (edge chamfers,
+    # caps) given their own vertices (set2\shading_fix_split.py --crease=35); geometry and maps identical; set2\shading-fix-1.1.0.png
+    "mace2": dict(version="classic v3-sf", sources=[W(r"work_mc2v3_sf\tn_mace.nif")], orient=True, path_stem="mace",
+                  shapes={"metal": {"name": "tn_mace", "tex": W(r"work_mc2v3_sf\tex\tn_mace")}, "wrap": {"name": "TNMaceWrap", "tex": W(r"work_mc2v3_sf\tex\tn_mace_wrap")}},
                   third="nordicmace.nif", first="1stpersonnordicmace.nif", stem="macev2", weap="DLC2NordicMace", fp_stat="03C352", option=True),
     # v8 (2026-11-12): v2's limbs, grip and string; the riser plate redesigned (v3-v8) and its flat carved faces given
     # their own vertices (bow_v8_build.py: the surface gate passes, lean 0.3 deg p95 against v7's 24); skinned as before
