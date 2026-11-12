@@ -110,7 +110,10 @@ ITEMS = {
     "quiver": dict(version="B4", sources=[W(r"work_final_quiverB4\tn_quiverB4.nif")], builder="gb_quiver",
                    shapes={"metal": {"name": "TNQuiver", "tex": W(r"work_final_quiverB4\tex\tn_quiverB4"), "target": None},
                            "leather": {"name": "TNQuiverLeather", "tex": W(r"work_final_quiverB4\tex\tn_quiverB4_soft"), "target": None},
-                           "arrow": {"name": "arrow", "tex": os.path.join(WORK, r"quiver\tex\tn_quiver_arrow"), "target": None}},
+                           "arrow": {"name": "arrow", "tex": os.path.join(WORK, r"quiver\tex\tn_quiver_arrow"), "target": None,
+                                     # the atlas is the quiver design's own arrow pixels (quiver_atlas.py): its faces are
+                                     # recorded in that design's engraving_check.json (engraving-layout gate)
+                                     "design": W(r"work_final_quiverB4")}},
                    arrows_in_quiver=["arrowq1", "arrowq2", "arrowq3", "arrowq4", "arrowq5"],
                    third="nordicarrow.nif", flight="nordicarrowflight.nif", first=None, stem="quiver",
                    ammo="Dragonborn.esm|2623B", proj="Dragonborn.esm|2623A"),
