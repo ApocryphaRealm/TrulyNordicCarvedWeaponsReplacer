@@ -14,6 +14,7 @@ For the tested release folder OLD and the renamed one NEW (each: the four packag
   * a byte search of every NEW file finds no 'ApocryphaTest'.
 Writes a markdown summary to the path given with --md. Exit 1 on any difference.
 Usage: python tools/rename_proof.py <OLD release folder> <NEW release folder> --md <out.md>
+       python tools/rename_proof.py - <release folder>     the reference check and the ApocryphaTest search alone
 """
 import os, sys, re, struct, hashlib, argparse, itertools
 HERE = os.path.dirname(os.path.abspath(__file__)); sys.path.insert(0, HERE)
@@ -43,9 +44,10 @@ def texsets(n):
     return out
 def main():
     ap = argparse.ArgumentParser(); ap.add_argument("old"); ap.add_argument("new"); ap.add_argument("--md"); a = ap.parse_args()
-    O, N = files(a.old), files(a.new); bad = []; stats = dict(files=0, dds_same=0, nif_same_but_paths=0, texpaths=0, esp=0, ini=0, xml=0, other_same=0)
+    # OLD "-": the reference check and the ApocryphaTest search alone (a later release)
+    O, N = (files(a.old) if a.old != "-" else {}), files(a.new); bad = []; stats = dict(files=0, dds_same=0, nif_same_but_paths=0, texpaths=0, esp=0, ini=0, xml=0, other_same=0)
     On = {norm(r): r for r in O}; Nn = {r.lower(): r for r in N}
-    if set(On) != set(Nn):
+    if a.old != "-" and set(On) != set(Nn):
         bad.append(f"file list differs: only old {sorted(set(On) - set(Nn))[:8]}, only new {sorted(set(Nn) - set(On))[:8]}")
     for k in sorted(set(On) & set(Nn)):
         po, pn = O[On[k]], N[Nn[k]]; ext = k.rsplit(".", 1)[-1]; stats["files"] += 1

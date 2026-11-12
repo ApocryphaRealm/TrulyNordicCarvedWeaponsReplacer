@@ -20,30 +20,36 @@ ITEMS = {
     # A5f's blade and tip engraving; the wrap is A5d's, unchanged. Layout record in work_sword_a5i\engraving_check.json.
     # option: the curved saber and the straight sword (sword2) are the installer's "Sword" step; both install at sword\sword.nif
     # sheath: the shape named 'Scb' that the game leaves on the hip when the weapon is drawn (in the weapon's own frame)
-    "sword": dict(version="A5i", sources=[W(r"work_sword_a5i\A5I_metal.nif"), os.path.join(PLAN, r"A5\work\A5_wrap.nif")], orient=True, option=True,
-                  sheath=dict(version="saber C (falchion fit)", src=W(r"work_sheath_saber_fitC\tn_sheath_saber_fitC.nif"), tex=W(r"work_sheath_saber_fitC\tex\tn_sheath_saber_fitC")),
-                  shapes={"metal": {"name": "NordicSwordA5", "tex": W(r"work_sword_a5i\tex\nordicsworda5i")},
+    # 1.1.1 (2026-11-12): normals-only fix - carved faces' outline and creases given their own vertices
+    # (set2\shading_fix_split.py --crease=35, real face dumps); geometry and maps identical
+    "sword": dict(version="A5i-sf", sources=[W(r"work_sword_a5i_sf\A5I_metal.nif"), os.path.join(PLAN, r"A5\work\A5_wrap.nif")], orient=True, option=True,
+                  sheath=dict(version="saber C (falchion fit)", src=W(r"work_sheath_saber_fitC_sf\tn_sheath_saber_fitC.nif"), tex=W(r"work_sheath_saber_fitC_sf\tex\tn_sheath_saber_fitC")),
+                  shapes={"metal": {"name": "NordicSwordA5", "tex": W(r"work_sword_a5i_sf\tex\nordicsworda5i")},
                           "wrap": {"name": "NordicWrapA5", "tex": None, "dds_from": r"D:\Modlists\Njordlinger\mods\Nordic Carved Redesign A (test)\textures\pbr\ApocryphaTest\NordicCarvedRedesignA5\nordicwrapa5"}},
                   third="nordicsword.nif", first="1stpersonnordicsword.nif", stem="sword", weap="DLC2NordicSword", fp_stat="03C353"),
     # the straight sword (installer option, 2026-11-11): greatsword v3's blade and upper hilt as a one-hander
     # 1.1.0 shading fix (2026-11-12): v1-sf = v1's NIF with the flat guard and pommel faces' outline vertices split from
     # their chamfers (set2\shading_fix_split.py, as bow v8) - geometry and maps identical; set2\shading-fix-1.1.0.png
     "sword2": dict(version="straight v1-sf", sources=[W(r"work_straightsword_sf\tn_straightsword.nif")], orient=True, option=True, path_stem="sword",
-                   sheath=dict(version="v2", src=W(r"work_sheath_straightsword_v2\tn_sheath_straightsword_v2.nif"), tex=W(r"work_sheath_straightsword_v2\tex\tn_sheath_straightsword_v2")),
+                   sheath=dict(version="v2", src=W(r"work_sheath_straightsword_v2_sf\tn_sheath_straightsword_v2.nif"), tex=W(r"work_sheath_straightsword_v2_sf\tex\tn_sheath_straightsword_v2")),
                    shapes={"metal": {"name": "tn_straightsword", "tex": W(r"work_straightsword_sf\tex\tn_straightsword")}, "wrap": {"name": "TNStraightswordWrap", "tex": W(r"work_straightsword_sf\tex\tn_straightsword_wrap")}},
                    third="nordicsword.nif", first="1stpersonnordicsword.nif", stem="swordstraight", weap="DLC2NordicSword", fp_stat="03C353"),
     # v13 (approved 2026-11-11 23:57): v12's head (the owner's traced outline, 21:32; the same NIF, byte for byte) repainted
     # to the engraving layout rule - layout records in work_v13\engraving_check.json pass engraving-layout-gate
-    "battleaxe": dict(version="v13", sources=[W(r"work_v13\tn_battleaxe.nif")], orient=True,
-                      shapes={"metal": {"name": "TNBattleaxe", "tex": W(r"work_v13\tex\tn_battleaxe")}, "wrap": {"name": "TNBattleaxeWrap", "tex": W(r"work_v13\tex\tn_battleaxe_wrap")}},
+    # v14 (1.1.1): one flat carved cheek per side, the polished bevel takes the taper (battleaxe_build_v14.py), the flat
+    # faces with their own vertices, the back spike's weave in the head's frame (battleaxe_paint_v14.py); set2\battleaxe-v14-*.png
+    "battleaxe": dict(version="v14", sources=[W(r"work_v14\tn_battleaxe.nif")], orient=True,
+                      shapes={"metal": {"name": "TNBattleaxe", "tex": W(r"work_v14\tex\tn_battleaxe")}, "wrap": {"name": "TNBattleaxeWrap", "tex": W(r"work_v14\tex\tn_battleaxe_wrap")}},
                       third="nordicbattleaxe.nif", first="1stpersonnordicbattleaxe.nif", stem="battleaxe", weap="DLC2NordicBattleaxe", fp_stat="03C34F"),
     # orient: the ricasso wrap (TNGreatswordWrap2) came out of tn_lib wound inward on most of its faces (1.0.0)
     # v4 (approved 2026-11-12 01:14: "Greatsword looks good"): v3 with the lower-guard medallion on a level boss;
     # v4-sf (1.1.0 shading fix, 2026-11-12): v4's NIF with the flat guard / boss / pommel faces' outline vertices split from
     # their chamfers (set2\shading_fix_split.py, as bow v8) - geometry and maps identical; set2\shading-fix-1.1.0.png
+    # 1.1.1: the metal ships UNDECIMATED (target None): the game build's decimation stretched the blade's UVs 7-23x from
+    # 15 to 85 % of its height (the ladder braid the owner saw); the work mesh's planar UVs are even (1.0x)
     "greatsword": dict(version="v4-sf", sources=[W(r"work_gs4_sf\tn_greatsword.nif")], orient=True,
-                       sheath=dict(version="v2", src=W(r"work_sheath_greatsword_v2\tn_sheath_greatsword_v2.nif"), tex=W(r"work_sheath_greatsword_v2\tex\tn_sheath_greatsword_v2")),
-                       shapes={"metal": {"name": "tn_greatsword", "tex": W(r"work_gs4_sf\tex\tn_greatsword")}, "wrap": {"name": "TNGreatswordWrap", "tex": W(r"work_gs4_sf\tex\tn_greatsword_wrap")},
+                       sheath=dict(version="v2", src=W(r"work_sheath_greatsword_v2_sf\tn_sheath_greatsword_v2.nif"), tex=W(r"work_sheath_greatsword_v2_sf\tex\tn_sheath_greatsword_v2")),
+                       shapes={"metal": {"name": "tn_greatsword", "tex": W(r"work_gs4_sf\tex\tn_greatsword"), "target": None}, "wrap": {"name": "TNGreatswordWrap", "tex": W(r"work_gs4_sf\tex\tn_greatsword_wrap")},
                                "wrap2": {"name": "TNGreatswordWrap2", "tex": W(r"work_gs4_sf\tex\tn_greatsword_wrap2"), "target": 1500}},
                        third="nordicgreatsword.nif", first="1stpersonnordicgreatsword.nif", stem="greatsword", weap="DLC2NordicGreatsword", fp_stat="03C351"),
     # -sf (1.1.0 shading fix, round 2, 2026-11-12): the same NIF with its carved faces' outline AND creases (edge chamfers,
@@ -61,7 +67,7 @@ ITEMS = {
     # -sf (1.1.0 shading fix, round 2, 2026-11-12): the same NIF with its carved faces' outline AND creases (edge chamfers,
     # caps) given their own vertices (set2\shading_fix_split.py --crease=35); geometry and maps identical; set2\shading-fix-1.1.0.png
     "dagger": dict(version="v3-sf", sources=[W(r"work_dg3_sf\tn_dagger2.nif")], orient=True,
-                   sheath=dict(version="v5", src=W(r"work_sheath_dagger_v5\tn_sheath_dagger_v5.nif"), tex=W(r"work_sheath_dagger_v5\tex\tn_sheath_dagger_v5")),
+                   sheath=dict(version="v5", src=W(r"work_sheath_dagger_v5_sf\tn_sheath_dagger_v5.nif"), tex=W(r"work_sheath_dagger_v5_sf\tex\tn_sheath_dagger_v5")),
                    shapes={"metal": {"name": "tn_dagger2", "tex": W(r"work_dg3_sf\tex\tn_dagger2")}, "wrap": {"name": "TNDagger2Wrap", "tex": W(r"work_dg3_sf\tex\tn_dagger2_wrap")}},
                    third="nordicdagger.nif", first="1stpersonnordicdagger.nif", stem="dagger", weap="DLC2NordicDagger", fp_stat="03C350"),
     # pointed maces (approved 2026-11-12 01:20: "mace looks good"): six-flanged v4 the default, classic v3 the option
@@ -81,12 +87,14 @@ ITEMS = {
                 shapes={"metal": {"name": "tn_bow2", "tex": W(r"work_bow8\tex\tn_bow2")}, "wrap": {"name": "TNBowWrap", "tex": W(r"work_bow8\tex\tn_bow2_wrap")},
                         "string": {"name": "TNBowString", "tex": W(r"work_bow8\tex\tn_bow2_string"), "target": None}},
                 third="nordicbow.nif", first=None, stem="bow", weap="DLC2NordicBow", fp_stat="03CA7C"),
-    "shield": dict(version="v4", sources=[W(r"work_sh4\tn_shield4.nif")], orient=True,   # v4: vanilla's placement and profile, faces outward (2026-11-11)
-                   shapes={"metal": {"name": "tn_shield4_steel", "tex": W(r"work_sh4\tex\tn_shield4_steel"), "target": 18000}, "board": {"name": "tn_shield4_board", "tex": W(r"work_sh4\tex\tn_shield4_board"), "target": 2000}},
+    # 1.1.1 (2026-11-12): normals-only fix - carved faces' outline and creases given their own vertices
+    # (set2\shading_fix_split.py --crease=35, real face dumps); geometry and maps identical
+    "shield": dict(version="v4-sf", sources=[W(r"work_sh4_sf\tn_shield4.nif")], orient=True,   # v4: vanilla's placement and profile, faces outward (2026-11-11)
+                   shapes={"metal": {"name": "tn_shield4_steel", "tex": W(r"work_sh4_sf\tex\tn_shield4_steel"), "target": 18000}, "board": {"name": "tn_shield4_board", "tex": W(r"work_sh4_sf\tex\tn_shield4_board"), "target": 2000}},
                    third=None, first=None, stem="shield", armo="DLC2ArmorNordicShield"),
     # the clean shield (optional file, 2026-11-11 22:46): v4 with the crest as a plain carved disc - no spikes, points or straps
-    "shield2": dict(version="v5 clean", sources=[W(r"work_sh5_clean\tn_shield5.nif")], orient=True, option=True,
-                    shapes={"metal": {"name": "tn_shield5_steel", "tex": W(r"work_sh5_clean\tex\tn_shield5_steel"), "target": 18000}, "board": {"name": "tn_shield5_board", "tex": W(r"work_sh5_clean\tex\tn_shield5_board"), "target": 2000}},
+    "shield2": dict(version="v5 clean-sf", sources=[W(r"work_sh5_clean_sf\tn_shield5.nif")], orient=True, option=True,
+                    shapes={"metal": {"name": "tn_shield5_steel", "tex": W(r"work_sh5_clean_sf\tex\tn_shield5_steel"), "target": 18000}, "board": {"name": "tn_shield5_board", "tex": W(r"work_sh5_clean_sf\tex\tn_shield5_board"), "target": 2000}},
                     third=None, first=None, stem="shieldclean", armo="DLC2ArmorNordicShield"),
 }
 

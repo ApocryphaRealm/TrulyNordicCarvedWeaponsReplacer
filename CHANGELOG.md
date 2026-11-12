@@ -8,6 +8,16 @@ Written as changes happen, not reconstructed afterwards (rule 61). Each version 
 * **failed** - built but crashed or malfunctioned; the number was reclaimed
 * **scratch** - a hypothesis-test build that never held a real number
 
+## 1.1.1 - 2026-11-12 - untested
+
+### Fixed
+- The curved sword's guard and pommel, the steel fittings of every sheath and the shields' crest points shade evenly; their edges were smoothed into the faces beside them.
+- The battleaxe's carved cheek is one flat surface on each side, so the carving no longer bunches or streaks on the upper horn where it joins the blade; the polished bevel along the edge now takes the taper.
+- The greatsword's carved braid is even all the way to the point; the in-game model had stretched it into a ladder from half way up the blade. The greatsword's blade is no longer simplified for the game, so its texture lies exactly as designed.
+
+### Changed
+- The battleaxe's triquetra sits on a dark disc inside a polished ring, as on the war axe and warhammer, with a slightly finer weave round it; the back spike's weave now runs the same way as the rest of the head.
+
 ## 1.1.0 - 2026-11-11 - untested
 
 ### Added
