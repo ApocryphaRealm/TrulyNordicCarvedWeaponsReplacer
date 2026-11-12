@@ -122,9 +122,9 @@ STEPS = [  # (step, group, [(option, item, folder, image, description, default)]
          "The greatsword's double-edged blade and upper hilt at one-hand size, in a straight carved sheath of its own.", False)]),
     ("Mace", "Nordic Mace model", [
         ("Six-flanged mace (default)", "mace", "20 Mace - Six-flanged", "mace-six-flanged.jpg",
-         "A working six-flanged head, a beast's biting maw carved on every flange face.", True),
+         "A working six-flanged head with pointed striking edges, a beast's biting maw carved on every flange face.", True),
         ("Classic mace", "mace2", "21 Mace - Classic", "mace-classic.jpg",
-         "The vanilla mace's four-flanged shape, rebuilt and carved with the same biting maw.", False)]),
+         "The vanilla mace's four-flanged shape, rebuilt with pointed striking edges and carved with the same biting maw.", False)]),
     ("Shield", "Nordic Shield model", [
         ("Carved shield (default)", "shield", "30 Shield - Carved", "shield-carved.jpg",
          "The carved crest filled out to the rim, with its spikes, its four points and the steel straps at the bottom.", True),

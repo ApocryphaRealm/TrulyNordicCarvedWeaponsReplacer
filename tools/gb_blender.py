@@ -65,6 +65,24 @@ def decimate(o, target):
     select_only(o); bpy.ops.object.mode_set(mode="EDIT"); bpy.ops.mesh.select_all(action="SELECT")
     bpy.ops.mesh.remove_doubles(threshold=0.0005, use_sharp_edge_from_normals=True)
     bpy.ops.object.mode_set(mode="OBJECT")
+    # zero-area slivers (the slab builders' tessellation leaves collinear triangles along straight outline runs, e.g.
+    # greatsword v4's upper guard back: 35) carry an arbitrary normal and a 180-degree corner, so Blender's angle-weighted
+    # vertex normal can flip at their middle vertex once a flat face has its own vertices - dissolved here
+    bm = bmesh.new(); bm.from_mesh(o.data); nf = len(bm.faces)
+    bmesh.ops.dissolve_degenerate(bm, dist=1e-5, edges=bm.edges[:])
+    stats.setdefault("degenerate_dissolved", {})[o.name] = nf - len(bm.faces); bm.to_mesh(o.data); bm.free(); o.data.update()
+    # NORMAL SEAMS (1.1.0 shading fix, 2026-11-12): where the source NIF stores a point twice with different normals
+    # (bow v8's riser, the _sf greatsword / straight sword: a flat carved face's own outline vertices, split from its
+    # chamfer so the face keeps its own normals), the weld above merged the copies and marked the edge sharp from the
+    # normals - but PyNifly writes ONE normal per vertex, so a sharp edge is only kept by splitting the vertex. Recorded
+    # here as position pairs, protected from the collapse like a UV seam, and split again after the decimation.
+    pk = lambda v: tuple(round(c, 5) for c in v.co)
+    shp = o.data.attributes.get("sharp_edge"); nseam = set(); nseam_v = set()
+    if shp:
+        for e in o.data.edges:
+            if shp.data[e.index].value:
+                a_, b_ = (pk(o.data.vertices[i]) for i in e.vertices); nseam.add(frozenset((a_, b_))); nseam_v.update(e.vertices)
+    stats.setdefault("normal_seam_edges", {})[o.name] = len(nseam)
     n0 = tris_of(o)
     if target and n0 > target:
         # UV seams are protected: every vertex on an edge whose two faces disagree on a UV is put in group 'seam',
@@ -77,6 +95,7 @@ def decimate(o, target):
             if (a[uvl].uv - b.link_loop_next[uvl].uv).length > 1e-5 or (a.link_loop_next[uvl].uv - b[uvl].uv).length > 1e-5:
                 seam.update(v.index for v in e.verts)
         bm.free()
+        seam |= nseam_v
         g = o.vertex_groups.new(name="seam"); g.add(sorted(seam), 1.0, "REPLACE")
         stats.setdefault("seam_verts", {})[o.name] = len(seam)
         m = o.modifiers.new("dec", "DECIMATE"); m.decimate_type = "COLLAPSE"; m.ratio = target / n0; m.use_collapse_triangulate = True
@@ -94,7 +113,19 @@ def decimate(o, target):
     for e in bm.edges:
         if len(e.link_faces) == 2 and e.calc_face_angle(0) > 0.87: sharp.data[e.index].value = True
     bm.free(); me.update()
+    NSEAM[o.name] = nseam
     return n0
+
+NSEAM = {}
+def split_normal_seams(o):
+    """The normal seams recorded by decimate() split again - each side keeps its own vertices, so its own normals.
+    Run AFTER orient_outward: split first, a flat face would be an island of its own and could be voted the wrong way."""
+    nseam = NSEAM.get(o.name)
+    if not nseam: return
+    me = o.data; bm = bmesh.new(); bm.from_mesh(me)
+    cut = [e for e in bm.edges if frozenset(tuple(round(c, 5) for c in v.co) for v in e.verts) in nseam]
+    bmesh.ops.split_edges(bm, edges=cut); bm.to_mesh(me); bm.free(); me.update()
+    stats.setdefault("normal_seam_split", {})[o.name] = {"recorded": len(nseam), "split_after_decimation": len(cut)}
 
 def export_single(o, path):
     select_only(o)
@@ -215,6 +246,8 @@ if C.get("orient"):
     for role, o in shapes.items():   # the npz dumps carry the oriented winding
         V, F, UV = arrays(o); np.savez(os.path.join(OUT, f"dec_{role}.npz"), V=V, F=F, UV=UV)
 
+for o in shapes.values(): split_normal_seams(o)   # after the orientation (1.1.0 shading fix)
+
 # ------------------------------------------------------------------ the sheath ('Scb'): its own approved NIF, in the weapon's frame
 # Welded and given sharp edges like the weapon's shapes, never decimated (the sheaths are ~2-4k triangles), oriented on
 # its own (the blade inside it would block every ray of the weapon's vote, and the sheath's rays the weapon's).
@@ -228,6 +261,7 @@ if C.get("sheath"):
     sh_o = sh_o[0]; sh_o.name = "dec_sheath"
     n0 = decimate(sh_o, None)
     stats["sheath"] = {"source": C["sheath"], "tris_before": n0, "tris_after": tris_of(sh_o), "orient": orient_outward([sh_o])}
+    split_normal_seams(sh_o)
     V, F, UV = arrays(sh_o); np.savez(os.path.join(OUT, "dec_sheath.npz"), V=V, F=F, UV=UV)
     export_single(sh_o, os.path.join(OUT, "dec_sheath.nif"))
     bpy.data.objects.remove(sh_o)

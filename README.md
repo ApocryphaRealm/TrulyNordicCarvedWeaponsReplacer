@@ -9,12 +9,12 @@ it is - its edges, its head, its silhouette - and is rebuilt to be realistic in 
 |---|---|
 | Nordic Sword | single-edged curved blade, one-piece half guard sweeping up, hooked pommel, a bold carved braid running to the point; a falchion-shaped sheath |
 | Nordic Battleaxe | a tall upper horn, one long curved cutting edge down to a single beard point, a curved back spike; steel haft forged with the head, carved knot fields, a forged knob pommel |
-| Nordic Greatsword | double-edged blade, carved guards and ricasso, two wrapped grips; a straight sheath on the back |
+| Nordic Greatsword | double-edged blade, carved guards and ricasso, a triquetra medallion on a level boss at the lower guard, two wrapped grips; a straight sheath on the back |
 | Nordic Warhammer | hammer face and curved pick, a triquetra ring centred on the face, a forged knob pommel |
 | Nordic War Axe | bearded blade with a square hammer poll, a triquetra at the widest point, a forged knob pommel |
 | Nordic Dagger | kukri form, a world serpent carved along the belly; its own sheath |
-| Nordic Mace | six-flanged head, a biting maw on every flange |
-| Nordic Bow | all-steel bow, a triquetra on the riser; the string still draws and follows the arrow |
+| Nordic Mace | six-flanged head with pointed striking edges, a biting maw on every flange |
+| Nordic Bow | all-steel bow, a carved riser plate (a triquetra in a woven field inside a braid border) and a braid band along the riser; the string still draws and follows the arrow |
 | Nordic Shield | the carved crest filled out to the rim, the four points in place; sits on the arm and on the back where the vanilla shield does |
 
 The sheaths are black leather in one piece with a carved steel mouth and tip, and stay on the hip (the greatsword's on
@@ -23,7 +23,7 @@ the back) when the weapon is drawn.
 ## The files
 Install ONE of the four main files. Each has its own installer with three choices, each shown with a picture: the
 sword (curved saber, the default, or a straight sword), the mace (six-flanged, the default, or the classic four-flanged
-one) and the shield (carved, the default, or clean). Only the chosen model is installed, at the one path every record
+one, both with pointed striking edges) and the shield (carved, the default, or clean). Only the chosen model is installed, at the one path every record
 uses, so nothing is left over. To change a choice later, reinstall and pick again.
 
 | Main file | What it does |

@@ -25,9 +25,11 @@ ITEMS = {
                           "wrap": {"name": "NordicWrapA5", "tex": None, "dds_from": r"D:\Modlists\Njordlinger\mods\Nordic Carved Redesign A (test)\textures\pbr\ApocryphaTest\NordicCarvedRedesignA5\nordicwrapa5"}},
                   third="nordicsword.nif", first="1stpersonnordicsword.nif", stem="sword", weap="DLC2NordicSword", fp_stat="03C353"),
     # the straight sword (installer option, 2026-11-11): greatsword v3's blade and upper hilt as a one-hander
-    "sword2": dict(version="straight v1", sources=[W(r"work_straightsword\tn_straightsword.nif")], orient=True, option=True, path_stem="sword",
+    # 1.1.0 shading fix (2026-11-12): v1-sf = v1's NIF with the flat guard and pommel faces' outline vertices split from
+    # their chamfers (set2\shading_fix_split.py, as bow v8) - geometry and maps identical; set2\shading-fix-1.1.0.png
+    "sword2": dict(version="straight v1-sf", sources=[W(r"work_straightsword_sf\tn_straightsword.nif")], orient=True, option=True, path_stem="sword",
                    sheath=dict(version="v2", src=W(r"work_sheath_straightsword_v2\tn_sheath_straightsword_v2.nif"), tex=W(r"work_sheath_straightsword_v2\tex\tn_sheath_straightsword_v2")),
-                   shapes={"metal": {"name": "tn_straightsword", "tex": W(r"work_straightsword\tex\tn_straightsword")}, "wrap": {"name": "TNStraightswordWrap", "tex": W(r"work_straightsword\tex\tn_straightsword_wrap")}},
+                   shapes={"metal": {"name": "tn_straightsword", "tex": W(r"work_straightsword_sf\tex\tn_straightsword")}, "wrap": {"name": "TNStraightswordWrap", "tex": W(r"work_straightsword_sf\tex\tn_straightsword_wrap")}},
                    third="nordicsword.nif", first="1stpersonnordicsword.nif", stem="swordstraight", weap="DLC2NordicSword", fp_stat="03C353"),
     # v13 (approved 2026-11-11 23:57): v12's head (the owner's traced outline, 21:32; the same NIF, byte for byte) repainted
     # to the engraving layout rule - layout records in work_v13\engraving_check.json pass engraving-layout-gate
@@ -35,10 +37,13 @@ ITEMS = {
                       shapes={"metal": {"name": "TNBattleaxe", "tex": W(r"work_v13\tex\tn_battleaxe")}, "wrap": {"name": "TNBattleaxeWrap", "tex": W(r"work_v13\tex\tn_battleaxe_wrap")}},
                       third="nordicbattleaxe.nif", first="1stpersonnordicbattleaxe.nif", stem="battleaxe", weap="DLC2NordicBattleaxe", fp_stat="03C34F"),
     # orient: the ricasso wrap (TNGreatswordWrap2) came out of tn_lib wound inward on most of its faces (1.0.0)
-    "greatsword": dict(version="v3", sources=[W(r"work_gs3\tn_greatsword.nif")], orient=True,
+    # v4 (approved 2026-11-12 01:14: "Greatsword looks good"): v3 with the lower-guard medallion on a level boss;
+    # v4-sf (1.1.0 shading fix, 2026-11-12): v4's NIF with the flat guard / boss / pommel faces' outline vertices split from
+    # their chamfers (set2\shading_fix_split.py, as bow v8) - geometry and maps identical; set2\shading-fix-1.1.0.png
+    "greatsword": dict(version="v4-sf", sources=[W(r"work_gs4_sf\tn_greatsword.nif")], orient=True,
                        sheath=dict(version="v2", src=W(r"work_sheath_greatsword_v2\tn_sheath_greatsword_v2.nif"), tex=W(r"work_sheath_greatsword_v2\tex\tn_sheath_greatsword_v2")),
-                       shapes={"metal": {"name": "tn_greatsword", "tex": W(r"work_gs3\tex\tn_greatsword")}, "wrap": {"name": "TNGreatswordWrap", "tex": W(r"work_gs3\tex\tn_greatsword_wrap")},
-                               "wrap2": {"name": "TNGreatswordWrap2", "tex": W(r"work_gs3\tex\tn_greatsword_wrap2"), "target": 1500}},
+                       shapes={"metal": {"name": "tn_greatsword", "tex": W(r"work_gs4_sf\tex\tn_greatsword")}, "wrap": {"name": "TNGreatswordWrap", "tex": W(r"work_gs4_sf\tex\tn_greatsword_wrap")},
+                               "wrap2": {"name": "TNGreatswordWrap2", "tex": W(r"work_gs4_sf\tex\tn_greatsword_wrap2"), "target": 1500}},
                        third="nordicgreatsword.nif", first="1stpersonnordicgreatsword.nif", stem="greatsword", weap="DLC2NordicGreatsword", fp_stat="03C351"),
     "warhammer": dict(version="v2f", sources=[W(r"work_wh2f\tn_warhammer2.nif")], orient=True,   # v2f: v2e with the straight pommel (2026-11-11)
                       shapes={"metal": {"name": "tn_warhammer2", "tex": W(r"work_wh2f\tex\tn_warhammer2")}, "wrap": {"name": "TNWarhammer2Wrap", "tex": W(r"work_wh2f\tex\tn_warhammer2_wrap")}},
@@ -52,15 +57,18 @@ ITEMS = {
                    sheath=dict(version="v5", src=W(r"work_sheath_dagger_v5\tn_sheath_dagger_v5.nif"), tex=W(r"work_sheath_dagger_v5\tex\tn_sheath_dagger_v5")),
                    shapes={"metal": {"name": "tn_dagger2", "tex": W(r"work_dg3\tex\tn_dagger2")}, "wrap": {"name": "TNDagger2Wrap", "tex": W(r"work_dg3\tex\tn_dagger2_wrap")}},
                    third="nordicdagger.nif", first="1stpersonnordicdagger.nif", stem="dagger", weap="DLC2NordicDagger", fp_stat="03C350"),
-    "mace": dict(version="v3", sources=[W(r"work_mc3\tn_mace.nif")], orient=True,
-                 shapes={"metal": {"name": "tn_mace", "tex": W(r"work_mc3\tex\tn_mace")}, "wrap": {"name": "TNMaceWrap", "tex": W(r"work_mc3\tex\tn_mace_wrap")}},
+    # pointed maces (approved 2026-11-12 01:20: "mace looks good"): six-flanged v4 the default, classic v3 the option
+    "mace": dict(version="six-flanged v4", sources=[W(r"work_mc4\tn_mace.nif")], orient=True,
+                 shapes={"metal": {"name": "tn_mace", "tex": W(r"work_mc4\tex\tn_mace")}, "wrap": {"name": "TNMaceWrap", "tex": W(r"work_mc4\tex\tn_mace_wrap")}},
                  third="nordicmace.nif", first="1stpersonnordicmace.nif", stem="mace", weap="DLC2NordicMace", fp_stat="03C352"),
-    "mace2": dict(version="v2", sources=[W(r"work_mc2\tn_mace.nif")], orient=True, path_stem="mace",
-                  shapes={"metal": {"name": "tn_mace", "tex": W(r"work_mc2\tex\tn_mace")}, "wrap": {"name": "TNMaceWrap", "tex": W(r"work_mc2\tex\tn_mace_wrap")}},
+    "mace2": dict(version="classic v3", sources=[W(r"work_mc2v3\tn_mace.nif")], orient=True, path_stem="mace",
+                  shapes={"metal": {"name": "tn_mace", "tex": W(r"work_mc2v3\tex\tn_mace")}, "wrap": {"name": "TNMaceWrap", "tex": W(r"work_mc2v3\tex\tn_mace_wrap")}},
                   third="nordicmace.nif", first="1stpersonnordicmace.nif", stem="macev2", weap="DLC2NordicMace", fp_stat="03C352", option=True),
-    "bow": dict(version="v2", sources=[W(r"work_bow2\tn_bow2.nif")], skinned=True,
-                shapes={"metal": {"name": "tn_bow2", "tex": W(r"work_bow2\tex\tn_bow2")}, "wrap": {"name": "TNBowWrap", "tex": W(r"work_bow2\tex\tn_bow2_wrap")},
-                        "string": {"name": "TNBowString", "tex": W(r"work_bow2\tex\tn_bow2_string"), "target": None}},
+    # v8 (2026-11-12): v2's limbs, grip and string; the riser plate redesigned (v3-v8) and its flat carved faces given
+    # their own vertices (bow_v8_build.py: the surface gate passes, lean 0.3 deg p95 against v7's 24); skinned as before
+    "bow": dict(version="v8", sources=[W(r"work_bow8\tn_bow2.nif")], skinned=True,
+                shapes={"metal": {"name": "tn_bow2", "tex": W(r"work_bow8\tex\tn_bow2")}, "wrap": {"name": "TNBowWrap", "tex": W(r"work_bow8\tex\tn_bow2_wrap")},
+                        "string": {"name": "TNBowString", "tex": W(r"work_bow8\tex\tn_bow2_string"), "target": None}},
                 third="nordicbow.nif", first=None, stem="bow", weap="DLC2NordicBow", fp_stat="03CA7C"),
     "shield": dict(version="v4", sources=[W(r"work_sh4\tn_shield4.nif")], orient=True,   # v4: vanilla's placement and profile, faces outward (2026-11-11)
                    shapes={"metal": {"name": "tn_shield4_steel", "tex": W(r"work_sh4\tex\tn_shield4_steel"), "target": 18000}, "board": {"name": "tn_shield4_board", "tex": W(r"work_sh4\tex\tn_shield4_board"), "target": 2000}},

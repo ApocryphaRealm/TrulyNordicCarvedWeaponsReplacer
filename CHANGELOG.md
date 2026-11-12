@@ -18,11 +18,15 @@ Written as changes happen, not reconstructed afterwards (rule 61). Each version 
 - Sheaths: the curved sword, the straight sword, the greatsword and the dagger each have a carved sheath of black leather with a carved steel locket and tip. It stays on the hip or back when the weapon is drawn.
 
 ### Changed
+- Both maces have pointed striking edges: the six-flanged mace (the default) and the classic four-flanged one (the installer option).
+- The greatsword's lower-guard medallion sits on a level boss.
+- The bow's riser is carved anew: a steel plate with a triquetra in a woven field inside a braid border, and a braid band running along the riser. It is still skinned to the vanilla bow's bones, so the string draws and follows the arrow.
 - The release is four main files (Replacer - No ESP, Replacer - ESP, Standalone - Nordic quality, Standalone - Ebony quality), each with its own installer that asks for the sword, the mace and the shield; the ESP / No ESP choice is now the choice of file.
 - The curved sword's blade engraving now runs all the way up to the point.
 - The battleaxe has a new head: a tall upper horn, one long curved cutting edge down to a single sharp beard point, and a curved back spike.
 
 ### Fixed
+- The flat carved faces of the greatsword's guards and pommel, the straight sword's guard and pommel and the bow's riser looked uneven under light, like a cushion, because their edges were smoothed into the bevel round them. They now shade flat; the shape and the carving are unchanged.
 - The greatsword's leather wrap above the guard could be seen through: its faces pointed inward. Every face now points outward, and the build now refuses any model with faces wound the wrong way.
 
 ## 1.0.0 - 2026-11-10 - untested
