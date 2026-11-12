@@ -15,13 +15,13 @@ METAL_T, WRAP_T = 11500, 3000
 
 def W(*p): return os.path.join(S2, *p)
 ITEMS = {
-    # sword A5h (approved 2026-11-11 23:48: "looks good keep it"): A5f's blade and tip engraving with the clip-free
-    # flat-sided pommel; the wrap is A5d's, unchanged. (Was A5f: A5d's mesh with the tip engraving run to the owner's point.)
+    # sword A5i (approved 2026-11-12 00:01: "looks good"): A5h's flat-sided pommel with the crack inside the hook closed;
+    # A5f's blade and tip engraving; the wrap is A5d's, unchanged. Layout record in work_sword_a5i\engraving_check.json.
     # option: the curved saber and the straight sword (sword2) are the installer's "Sword" step; both install at sword\sword.nif
     # sheath: the shape named 'Scb' that the game leaves on the hip when the weapon is drawn (in the weapon's own frame)
-    "sword": dict(version="A5h", sources=[W(r"work_sword_a5h\A5H_metal.nif"), os.path.join(PLAN, r"A5\work\A5_wrap.nif")], orient=True, option=True,
+    "sword": dict(version="A5i", sources=[W(r"work_sword_a5i\A5I_metal.nif"), os.path.join(PLAN, r"A5\work\A5_wrap.nif")], orient=True, option=True,
                   sheath=dict(version="saber C (falchion fit)", src=W(r"work_sheath_saber_fitC\tn_sheath_saber_fitC.nif"), tex=W(r"work_sheath_saber_fitC\tex\tn_sheath_saber_fitC")),
-                  shapes={"metal": {"name": "NordicSwordA5", "tex": W(r"work_sword_a5h\tex\nordicsworda5h")},
+                  shapes={"metal": {"name": "NordicSwordA5", "tex": W(r"work_sword_a5i\tex\nordicsworda5i")},
                           "wrap": {"name": "NordicWrapA5", "tex": None, "dds_from": r"D:\Modlists\Njordlinger\mods\Nordic Carved Redesign A (test)\textures\pbr\ApocryphaTest\NordicCarvedRedesignA5\nordicwrapa5"}},
                   third="nordicsword.nif", first="1stpersonnordicsword.nif", stem="sword", weap="DLC2NordicSword", fp_stat="03C353"),
     # the straight sword (installer option, 2026-11-11): greatsword v3's blade and upper hilt as a one-hander
