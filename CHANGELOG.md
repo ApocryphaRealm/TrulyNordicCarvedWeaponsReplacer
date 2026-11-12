@@ -8,6 +8,21 @@ Written as changes happen, not reconstructed afterwards (rule 61). Each version 
 * **failed** - built but crashed or malfunctioned; the number was reclaimed
 * **scratch** - a hypothesis-test build that never held a real number
 
+## 1.2.0 - 2026-11-12 - untested
+
+### Added
+- Nordic arrows and quiver, carved anew: black fletching and barbed steel heads, in a carved leather quiver whose collar plate carries the triquetra on a dark disc inside a polished ring. The arrows drop out of the quiver on the back as the count falls, and the nocked arrow and the arrow in flight are the same carved arrow.
+- Replacer files: the Nordic arrow takes the new quiver by its record (through SkyPatcher in No ESP, through the plugin in ESP), and the arrow in flight is a loose model at the vanilla path.
+- Standalone files: Carved Nordic Arrows as new items with their own projectile, forged at the forge like the Nordic arrows; the Ebony quality file gives them the ebony arrow numbers and forges them from firewood and an ebony ingot with Ebony Smithing.
+- New optional file, Additional Weapons: carved weapons the game does not have, in their own light plugin, installed beside any main file. The first is a carved spear with the triquetra on a dark ring at its head, carried on the back, forged and tempered, at Nordic or Ebony quality (an installer choice).
+- Additional Weapons installer step, Spear animations: the spear uses the battleaxe moveset by default; the second choice adds the WeapTypeHalberd, 000WeapTypeSoS and WeapTypeSpear keywords to it through Keyword Item Distributor, so spear animation packs pick it up.
+
+### Changed
+- Every carved Norse symbol now sits on a dark filled disc inside a polished ring: the lockets of the dagger, curved sword, straight sword and greatsword sheaths, the greatsword pommel and both plates of the bow riser. The models are unchanged; only the carving is repainted.
+
+### Known
+- The arrow in flight ships as a loose file at the vanilla path; when another mod also replaces it, give this mod the higher priority (lower in the Mod Organizer 2 list) for the carved arrow to show.
+
 ## 1.1.1 - 2026-11-12 - untested
 
 ### Fixed
