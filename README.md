@@ -40,7 +40,7 @@ mod's own paths and change no vanilla file.
 Standalone items: Carved Nordic Sword, Carved Nordic War Axe, Carved Nordic Battleaxe, Carved Nordic Greatsword, Carved
 Nordic Warhammer, Carved Nordic Dagger, Carved Nordic Mace, Carved Nordic Bow, Carved Nordic Shield.
 
-Textures: our own TruePBR set (base colour, normal, RMAOS) at 2K, under `textures\pbr\ApocryphaTest\TrulyNordic\`.
+Textures: our own TruePBR set (base colour, normal, RMAOS) at 2K, under `textures\pbr\TrulyNordic\`.
 
 ## Requirements
 - Skyrim Special Edition or Anniversary Edition with the Dragonborn DLC (included in both).

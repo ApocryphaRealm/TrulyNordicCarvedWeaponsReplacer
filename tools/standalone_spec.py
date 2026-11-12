@@ -8,7 +8,7 @@
 # Run: python -I standalone_spec.py <out dir>
 import json, os, sys
 OUT = sys.argv[1]; os.makedirs(OUT, exist_ok=True)
-M = "ApocryphaTest\\TrulyNordic"          # model paths are relative to meshes\
+M = "TrulyNordic"          # model paths are relative to meshes\
 DB, SK = "Dragonborn.esm", "Skyrim.esm"
 def D(x): return f"{x}:{DB}"
 def S(x): return f"{x}:{SK}"

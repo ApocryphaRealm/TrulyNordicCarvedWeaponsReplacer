@@ -18,6 +18,7 @@ Written as changes happen, not reconstructed afterwards (rule 61). Each version 
 - Sheaths: the curved sword, the straight sword, the greatsword and the dagger each have a carved sheath of black leather with a carved steel locket and tip. It stays on the hip or back when the weapon is drawn.
 
 ### Changed
+- Asset folder renamed: the models are under meshes\TrulyNordic and the textures under textures\pbr\TrulyNordic (the files themselves are unchanged).
 - Both maces have pointed striking edges: the six-flanged mace (the default) and the classic four-flanged one (the installer option).
 - The greatsword's lower-guard medallion sits on a level boss.
 - The bow's riser is carved anew: a steel plate with a triquetra in a woven field inside a braid border, and a braid band running along the riser. It is still skinned to the vanilla bow's bones, so the string draws and follows the arrow.

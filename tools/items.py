@@ -9,8 +9,9 @@ VAN = os.path.join(PLAN, r"set\work\vanilla\meshes\dlc02\weapons\nordic")
 VAN_SHIELD = os.path.join(S2, r"work_sh1\vanilla\meshes\dlc02\armor\nordicshield\nordicshield.nif")
 WORK = os.path.join(PLAN, r"package\work")
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-MESH_REL = r"meshes\ApocryphaTest\TrulyNordic"
-TEX_REL = r"textures\pbr\ApocryphaTest\TrulyNordic"
+# the shipped asset folders (1.1.0, 2026-11-12: the "ApocryphaTest" level dropped; every build script reads these two)
+MESH_REL = r"meshes\TrulyNordic"
+TEX_REL = r"textures\pbr\TrulyNordic"
 METAL_T, WRAP_T = 11500, 3000
 
 def W(*p): return os.path.join(S2, *p)
