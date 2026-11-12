@@ -43,8 +43,10 @@ ITEMS = {
     "warhammer": dict(version="v2f", sources=[W(r"work_wh2f\tn_warhammer2.nif")], orient=True,   # v2f: v2e with the straight pommel (2026-11-11)
                       shapes={"metal": {"name": "tn_warhammer2", "tex": W(r"work_wh2f\tex\tn_warhammer2")}, "wrap": {"name": "TNWarhammer2Wrap", "tex": W(r"work_wh2f\tex\tn_warhammer2_wrap")}},
                       third="nordicwarhammer.nif", first="1stpersonnordicwarhammer.nif", stem="warhammer", weap="DLC2NordicWarhammer", fp_stat="03C355"),
-    "waraxe": dict(version="v3", sources=[W(r"work_wa3\tn_waraxe2.nif")], orient=True,   # added 2026-11-11 (the owner: "Did you add the Nordic War Axe?"); v3 = v2 with the straight pommel (00:28)
-                   shapes={"metal": {"name": "tn_waraxe2", "tex": W(r"work_wa3\tex\tn_waraxe2")}, "wrap": {"name": "TNWaraxe2Wrap", "tex": W(r"work_wa3\tex\tn_waraxe2_wrap")}},
+    # added 2026-11-11 (the owner: "Did you add the Nordic War Axe?"); v3 = v2 with the straight pommel (00:28);
+    # v4 (approved 2026-11-12 00:12): v3's mesh (the same NIF) repainted to the engraving layout rule
+    "waraxe": dict(version="v4", sources=[W(r"work_wa4\tn_waraxe2.nif")], orient=True,
+                   shapes={"metal": {"name": "tn_waraxe2", "tex": W(r"work_wa4\tex\tn_waraxe2")}, "wrap": {"name": "TNWaraxe2Wrap", "tex": W(r"work_wa4\tex\tn_waraxe2_wrap")}},
                    third="nordicwaraxe.nif", first="1stpersonnordiclwaraxe.nif", stem="waraxe", weap="DLC2NordicWarAxe", fp_stat="03C354"),
     "dagger": dict(version="v3", sources=[W(r"work_dg3\tn_dagger2.nif")], orient=True,
                    sheath=dict(version="v5", src=W(r"work_sheath_dagger_v5\tn_sheath_dagger_v5.nif"), tex=W(r"work_sheath_dagger_v5\tex\tn_sheath_dagger_v5")),
