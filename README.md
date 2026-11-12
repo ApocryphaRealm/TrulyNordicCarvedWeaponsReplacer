@@ -21,7 +21,10 @@ The sheaths are black leather in one piece with a carved steel mouth and tip, an
 the back) when the weapon is drawn.
 
 ## The files
-Install ONE main file. There is no installer.
+Install ONE of the four main files. Each has its own installer with three choices, each shown with a picture: the
+sword (curved saber, the default, or a straight sword), the mace (six-flanged, the default, or the classic four-flanged
+one) and the shield (carved, the default, or clean). Only the chosen model is installed, at the one path every record
+uses, so nothing is left over. To change a choice later, reinstall and pick again.
 
 | Main file | What it does |
 |---|---|
@@ -37,19 +40,6 @@ mod's own paths and change no vanilla file.
 Standalone items: Carved Nordic Sword, Carved Nordic War Axe, Carved Nordic Battleaxe, Carved Nordic Greatsword, Carved
 Nordic Warhammer, Carved Nordic Dagger, Carved Nordic Mace, Carved Nordic Bow, Carved Nordic Shield.
 
-### Optional files
-Each swaps one model and works over any main file - install it after the main file so it overwrites the default.
-
-| Optional file | In place of |
-|---|---|
-| Straight sword | the curved sword: the greatsword's blade and upper hilt at one-hand size, with its own straight sheath |
-| Classic mace | the six-flanged mace: the vanilla mace's four-flanged shape with the same biting maw |
-| Clean shield | the carved shield: the crest as a plain carved disc with the boss in the middle, no points, spikes or straps |
-
-The alternate sits at the same path as the default in every main file. Each optional file carries a small FOMOD with no
-pages: its vanilla-path copy (the first-person model, or the shield) installs only when the Standalone plugin is not
-present, so it never changes a vanilla item under a Standalone install.
-
 Textures: our own TruePBR set (base colour, normal, RMAOS) at 2K, under `textures\pbr\ApocryphaTest\TrulyNordic\`.
 
 ## Requirements
@@ -61,6 +51,6 @@ Textures: our own TruePBR set (base colour, normal, RMAOS) at 2K, under `texture
 `tools\build_all.sh` runs the pipeline: `gb_blender.py` (Blender + PyNifly: decimation and checks, face orientation,
 the sheaths, blood shapes, the bow's weights), `textures.py` (BC7 DDS), `assemble.py` (game NIFs on the vanilla
 structure, the sheath as the `Scb` shape), `silhouette.py`, `verify.py` (read-back: shader block, texture paths and the
-face-direction check of `winding.py`) and `build-packages.py` (the four main files and three optional files). The
+face-direction check of `winding.py`) and `build-packages.py` (the four main files, each with its installer and a picture for every model option). The
 Standalone plugins are built with houseCARL from `standalone_spec.py` / `standalone_assign.py` / `standalone_finish.py`.
 The source models and maps come from the design work folder named in `tools\items.py`.

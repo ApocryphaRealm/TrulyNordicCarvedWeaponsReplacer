@@ -12,13 +12,13 @@ Written as changes happen, not reconstructed afterwards (rule 61). Each version 
 
 ### Added
 - Standalone files: the vanilla Nordic pieces stay untouched and the carved set is added as new items (Carved Nordic Sword, War Axe, Battleaxe, Greatsword, Warhammer, Dagger, Mace, Bow and Shield), forged and tempered where and as the Nordic pieces are. Two main files: Nordic quality (the Nordic pieces' stats and recipes) and Ebony quality (the ebony pieces' damage or armour, value, weight, material and recipes). One light plugin name for both, so the quality can be switched without losing the items.
-- Optional file: a straight one-handed sword (the greatsword's blade and upper hilt at one-hand size, with its own sheath) in place of the curved sword. Works over any main file.
-- Optional file: a clean shield - the crest as a plain carved disc with the boss in the middle, no points, spikes or straps. Works over any main file.
+- Installer choice: a straight one-handed sword (the greatsword's blade and upper hilt at one-hand size, with its own sheath) in place of the curved sword, in every main file.
+- Installer choice: a clean shield - the crest as a plain carved disc with the boss in the middle, no points, spikes or straps - in every main file.
+- Every choice in the installers shows a picture of the model it installs.
 - Sheaths: the curved sword, the straight sword, the greatsword and the dagger each have a carved sheath of black leather with a carved steel locket and tip. It stays on the hip or back when the weapon is drawn.
 
 ### Changed
-- The release is four main files with no installer (Replacer - No ESP, Replacer - ESP, Standalone - Nordic quality, Standalone - Ebony quality) and three optional files (straight sword, classic mace, clean shield), in place of the one installer.
-- The classic mace is now an optional file that works over any main file.
+- The release is four main files (Replacer - No ESP, Replacer - ESP, Standalone - Nordic quality, Standalone - Ebony quality), each with its own installer that asks for the sword, the mace and the shield; the ESP / No ESP choice is now the choice of file.
 - The curved sword's blade engraving now runs all the way up to the point.
 - The battleaxe has a new head: a tall upper horn, one long curved cutting edge down to a single sharp beard point, and a curved back spike.
 
