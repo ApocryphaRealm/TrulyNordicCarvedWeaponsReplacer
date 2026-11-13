@@ -213,6 +213,18 @@ ITEMS = {
                                "leather": {"name": "TNBoltQuiverSoft", "tex": W(r"work_xbow_boltquiverB\tex\tn_boltquiverB_soft"), "target": None},
                                "bolt": {"name": "bolt", "tex": os.path.join(WORK, r"boltquiver\tex\tn_boltquiver_bolt"), "target": None, "design": W(r"work_xbow_boltquiverB")}},
                        third="steelbolt.nif", flight="boltprojectile.nif", first=None, stem="boltquiver", van_dir=VAN_XBOW),
+    # the crossbow B3 (2026-11-13; the owner 06:38 "Do b for now", 07:16 "if the animated crossbow won't work, just ship it
+    # unanimated for now"): set2\work_xbow_crossbowB3 (steel catch, B's boss on its own dark ring). A NEW item for the
+    # Additional Weapons file, built by gb_crossbow.py on vanilla Dawnguard crossbow.nif: skinned to vanilla's bones - the
+    # prod limbs and string take vanilla's weights (draw / reload as vanilla), the lever, catch and the rest are rigid on
+    # CrossbowRoot (the trigger does not move: vanilla moves TriggerCtrl only through its Havok animations). One NIF for
+    # third and first person (vanilla's 1stPersonCrossbow STAT names the same file).
+    "crossbow": dict(version="B3 (still trigger)", sources=[W(r"work_xbow_crossbowB3\tn_crossbowB3.nif"), W(r"work_xbow_crossbowB3\tn_crossbowB3_cocked.nif")],
+                     builder="gb_crossbow",
+                     shapes={"metal": {"name": "metal", "tex": W(r"work_xbow_crossbowB3\tex\tn_crossbowB3"), "target": None, "design": W(r"work_xbow_crossbowB3")},
+                             "soft": {"name": "soft", "tex": W(r"work_xbow_crossbowB3\tex\tn_crossbowB3_soft"), "target": None},
+                             "wrap": {"name": "wrap", "tex": W(r"work_gs5_sf\tex\tn_greatsword_wrap"), "target": None}},
+                     third="crossbow.nif", first=None, stem="crossbow", van_dir=VAN_XBOW),
 }
 
 def vanilla_path(item, which):
@@ -224,6 +236,8 @@ def blender_config():
     probe = json.load(open(os.path.join(WORK, "vanilla_probe.json")))
     cfg = {}
     for k, it in ITEMS.items():
+        if it.get("builder") == "gb_crossbow":   # gb_crossbow.py: the design NIFs, vanilla's skinned crossbow
+            cfg[k] = {"out": os.path.join(WORK, k), "sources": it["sources"], "vanilla": os.path.join(it["van_dir"], it["third"])}; continue
         if it.get("builder") in ("gb_quiver", "gb_boltquiver"):   # gb_quiver.py / gb_boltquiver.py: sources and out only (no blood, no decimation)
             cfg[k] = {"out": os.path.join(WORK, k), "sources": it["sources"], "shapes": {r: {"name": sh["name"]} for r, sh in it["shapes"].items()}}
             if it.get("van_dir"): cfg[k]["vanilla"] = {w: os.path.join(it["van_dir"], it[w]) for w in ("third", "flight")}

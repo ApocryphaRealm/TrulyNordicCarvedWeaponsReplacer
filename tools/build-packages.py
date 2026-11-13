@@ -171,6 +171,9 @@ def place(item, dest, kind):
         if kind != "additional": fail(f"{item} is a new item - the optional {AS.NAME} file only")
         s, d = third(item); put(s, os.path.join(dest, d))
         fp = os.path.join(MESH_REL, at(item), "1stperson" + at(item) + ".nif"); put(os.path.join(STAGE, item, fp), os.path.join(dest, fp))
+    elif item == "crossbow":             # the crossbow (2026-11-13): one NIF for third and first person, our own path
+        if kind != "additional": fail(f"{item} is a new item - the optional {AS.NAME} file only")
+        rel = os.path.join(MESH_REL, "crossbow", "crossbow.nif"); put(os.path.join(STAGE, item, rel), os.path.join(dest, rel))
     elif item == "boltquiver":           # the bolt quiver / bolts (2026-11-13): the optional file only, our own paths
         if kind != "additional": fail(f"{item} is a new item - the optional {AS.NAME} file only")
         for f in ("boltquiver.nif", "boltflight.nif"):

@@ -315,8 +315,53 @@ def build_boltquiver(root):
                          kept=[f.name(i) for i in range(len(f.blocks)) if f.btypes[i] in niflib.NODES or f.btypes[i] == "BSTriShape"])
     return rep
 
+def build_crossbow(out_path):
+    """crossbow.nif on vanilla Dawnguard crossbow.nif's own structure: the root, BSBehaviorGraphExtraData, BSInvMarker,
+    BSXFlags, Prn 'WeaponBow', every bone node and its transform, the 7 NiTransformControllers / interpolators / data
+    kept byte for byte; vanilla's one skinned shape Crossbow:0 replaced by our three (metal, soft, wrap - gb_crossbow.py's
+    skinned.nif), each with its NiSkinInstance (vanilla's type), NiSkinData and NiSkinPartition, the skin bones
+    re-pointed at vanilla's own bone nodes by name; the plain TruePBR shader with SLSF1 Skinned; the convex hull rebuilt."""
+    item = "crossbow"; it = ITEMS[item]; n = niflib.Nif(os.path.join(it["van_dir"], it["third"]))
+    s = niflib.Nif(os.path.join(WORK, item, "skinned.nif"))
+    bones_v = {n.name(b): b for b, t in enumerate(n.btypes) if t == "NiNode"}
+    main = [b for b in shapes_of(n) if n.name(b) == "Crossbow:0"][0]
+    ne0 = struct.unpack_from("<I", n.blocks[main], 4)[0]; vflags = struct.unpack_from("<I", n.blocks[main], 8 + 4 * ne0 + 4)[0]
+    vskin = n.i32(main, n.av_end(main, 0, [], []) + 16); vdata, vpart = struct.unpack_from("<ii", n.blocks[vskin], 0)
+    src_sh = {s.name(b): b for b in shapes_of(s)}; rep = {}
+    for role in ("metal", "soft", "wrap"):
+        sb = src_sh[role]; so = s.av_end(sb, 0, [], []); sk = s.i32(sb, so + 16); sd, sp = struct.unpack_from("<ii", s.blocks[sk], 0)
+        assert s.btypes[sk] in ("NiSkinInstance", "BSDismemberSkinInstance"), s.btypes[sk]
+        if role == "metal":
+            idx_shape, idx_skin, idx_data, idx_part = main, vskin, vdata, vpart
+            sh = shader_of(n, main); ts = texset_of(n, sh); nm = struct.unpack_from("<i", n.blocks[main], 0)[0]
+        else:
+            idx_shape, idx_skin, idx_data, idx_part = (len(n.blocks) + i for i in range(4))
+            for t in ("BSTriShape", "NiSkinInstance", "NiSkinData", "NiSkinPartition"): n.btypes.append(t); n.blocks.append(bytearray())
+            ts = len(n.blocks); n.btypes.append("BSShaderTextureSet"); n.blocks.append(bytearray())
+            sh = len(n.blocks); n.btypes.append("BSLightingShaderProperty"); n.blocks.append(bytearray(T_PLAIN))
+            nm = new_string(n, f"TN_crossbow_{role}"); append_child(n, parent_of(n, main), idx_shape)
+        blk = bytearray(s.blocks[sb]); struct.pack_into("<i", blk, 0, nm); struct.pack_into("<3i", blk, so + 16, idx_skin, sh, -1)
+        n.btypes[idx_shape] = "BSTriShape"; n.blocks[idx_shape] = blk
+        k = bytearray(s.blocks[sk]); nb = struct.unpack_from("<I", k, 12)[0]; k = k[:16 + 4 * nb]     # NiSkinInstance (vanilla's type)
+        struct.pack_into("<iii", k, 0, idx_data, idx_part, 0); names = []
+        for j in range(nb):
+            nmj = s.name(struct.unpack_from("<i", k, 16 + 4 * j)[0]); names.append(nmj); struct.pack_into("<i", k, 16 + 4 * j, bones_v[nmj])
+        n.btypes[idx_skin] = "NiSkinInstance"; n.blocks[idx_skin] = k
+        n.btypes[idx_data] = "NiSkinData"; n.blocks[idx_data] = bytearray(s.blocks[sd])
+        n.btypes[idx_part] = "NiSkinPartition"; n.blocks[idx_part] = bytearray(s.blocks[sp])
+        n.blocks[ts] = texset_block(tex_paths(item, role)); set_shader(n, sh, ts, struct.unpack_from("<i", n.blocks[sh], 4)[0] if role == "metal" else -1)
+        fo = n.net_end(sh, 4, [], []); f1 = struct.unpack_from("<I", n.blocks[sh], fo)[0]; struct.pack_into("<I", n.blocks[sh], fo, f1 | 0x2)   # SLSF1 Skinned
+        ne = struct.unpack_from("<I", n.blocks[idx_shape], 4)[0]; struct.pack_into("<I", n.blocks[idx_shape], 8 + 4 * ne + 4, vflags)       # vanilla's NiAVObject flags
+        rep[role] = {"bones": names}
+    rep["collision"] = rewrite_collision(n, item, (0.0, 0.0, 0.0))
+    os.makedirs(os.path.dirname(out_path), exist_ok=True); n.save(out_path); niflib.Nif(out_path)
+    rep["blocks"] = len(n.blocks); rep["path"] = out_path; return rep
+
 def build(item):
     it = ITEMS[item]; root = os.path.join(STAGE, item); rep = {}
+    if item == "crossbow":
+        rep = build_crossbow(os.path.join(root, MESH_REL, "crossbow", "crossbow.nif")); json.dump(rep, open(os.path.join(WORK, item, "assemble_report.json"), "w"), indent=1)
+        print(item, json.dumps(rep)[:900]); return
     if item == "boltquiver":
         rep = build_boltquiver(root); json.dump(rep, open(os.path.join(WORK, item, "assemble_report.json"), "w"), indent=1)
         print(item, json.dumps(rep)[:900]); return

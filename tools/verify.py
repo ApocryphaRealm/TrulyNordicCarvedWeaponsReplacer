@@ -109,6 +109,36 @@ if "boltquiver" in ITEMS and os.path.isdir(os.path.join(STAGE, "boltquiver")):
             if t == "BSTriShape" and (n.name(b).startswith("Arrow") or n.name(b).startswith("SteelBoltFlight")) and n.name(b) != "ArrowQuiver:1":
                 sh = struct.unpack_from("<i", n.blocks[b], n.av_end(b, 0, [], []) + 20)[0]; ts = n.i32(sh, n.ref_offsets(sh)[0][-1]); ok = b"tn_boltquiver_bolt.dds" in bytes(n.blocks[ts])
                 print(f"   {nf} {n.name(b)}: one shape, texture set {'tn_boltquiver_bolt' if ok else 'NOT THE BOLT ATLAS'}"); bad += 0 if ok else 1
+# the crossbow (2026-11-13) on vanilla Dawnguard crossbow.nif: the same node tree (bones at vanilla's transforms), the
+# behaviour graph block, BSX, BSInvMarker, Prn and the 7 animation controllers byte for byte; only TN_crossbow_soft /
+# TN_crossbow_wrap added; every shape skinned (NiSkinInstance) to vanilla's own bone nodes
+if "crossbow" in ITEMS and os.path.isdir(os.path.join(STAGE, "crossbow")):
+    itc = ITEMS["crossbow"]; pth = os.path.join(STAGE, "crossbow", r"meshes\TrulyNordic\crossbow\crossbow.nif")
+    stray = [os.path.join(dp, f2) for dp, _, fs2 in os.walk(os.path.join(STAGE, "crossbow")) for f2 in fs2 if "\\dlc01\\" in os.path.join(dp, f2).lower()]
+    if stray: print("== crossbow: VANILLA PATH STAGED", stray); bad += 1
+    a, v = niflib.Nif(pth), niflib.Nif(os.path.join(itc["van_dir"], itc["third"])); ta, tv = tree(a), tree(v)
+    extra = {f"{tv[0]}/BSTriShape:TN_crossbow_soft", f"{tv[0]}/BSTriShape:TN_crossbow_wrap"}
+    miss = [x for x in tv if x not in ta]; more = [x for x in ta if x not in tv and x not in extra]
+    KEEPC = {"BSBehaviorGraphExtraData", "BSXFlags", "BSInvMarker", "NiStringExtraData", "NiTransformController", "NiTransformInterpolator", "NiTransformData"}
+    kv = sorted((t, bytes(v.blocks[i])) for i, t in enumerate(v.btypes) if t in KEEPC); ka = sorted((t, bytes(a.blocks[i])) for i, t in enumerate(a.btypes) if t in KEEPC)
+    vn = {v.name(i): v.transform(i)[1:3] for i, t in enumerate(v.btypes) if t in niflib.NODES}; moved = []
+    for i, t in enumerate(a.btypes):
+        if t in niflib.NODES and a.name(i) in vn:
+            tt, rr = a.transform(i)[1:3]
+            if max(abs(x - y) for x, y in zip(list(tt) + list(rr), list(vn[a.name(i)][0]) + list(vn[a.name(i)][1]))) > 1e-4: moved.append(a.name(i))
+    skins = []
+    for b, t in enumerate(a.btypes):
+        if t == "BSTriShape":
+            sk = struct.unpack_from("<i", a.blocks[b], a.av_end(b, 0, [], []) + 16)[0]
+            ok = sk >= 0 and a.btypes[sk] == "NiSkinInstance"
+            bn = [a.name(struct.unpack_from("<i", a.blocks[sk], 16 + 4 * j)[0]) for j in range(struct.unpack_from("<I", a.blocks[sk], 12)[0])] if ok else []
+            ok = ok and all(x in vn for x in bn); skins.append((a.name(b), bn if ok else "NOT SKINNED TO VANILLA'S BONES"))
+            if not ok: bad += 1
+    ctl = sum(1 for t in a.btypes if t == "NiTransformController")
+    line = (f"== structure crossbow.nif vs vanilla crossbow.nif: {len(tv)} vanilla nodes/shapes, missing {miss or 0}, added {more or 0} (allowed: soft, wrap); "
+            f"kept blocks {len(kv)} {'byte for byte' if kv == ka else 'DIFFER'} ({ctl} controllers); bone transforms moved {moved or 0}; skins {skins}")
+    if miss or more or kv != ka or moved or ctl != 7: line += "  STRUCTURE FAULT"; bad += 1
+    print(line)
 # the NEW items (the spear 2026-11-12, the halberd 2026-11-13) on vanilla's two-handed axe NIFs - the same node tree,
 # extra data (BSX, BSInvMarker in 1st person, Prn 'WeaponBack'), blood shapes' shaders and alpha byte for byte; only
 # TN_<stem>_shaft / TN_<stem>_wrap added under the root; both files at our own path and nothing of the item's at a vanilla

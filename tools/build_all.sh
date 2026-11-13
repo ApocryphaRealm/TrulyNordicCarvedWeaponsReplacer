@@ -16,6 +16,8 @@ python -I "$T/quiver_atlas.py"
 python -I "$T/boltquiver_frames.py"
 "$B" --background --factory-startup --python-exit-code 1 --python "$T/gb_boltquiver.py" -- "$CFG" boltquiver > "$(dirname "$CFG")/blender_boltquiver.log" 2>&1
 python -I "$T/quiver_atlas.py" boltquiver
+# the crossbow (2026-11-13): skinned to vanilla Dawnguard crossbow.nif's bones (limbs + string), the rest rigid
+"$B" --background --factory-startup --python-exit-code 1 --python "$T/gb_crossbow.py" -- "$CFG" crossbow > "$(dirname "$CFG")/blender_crossbow.log" 2>&1
 python -I "$T/textures.py"
 python -I "$T/assemble.py"
 python -I "$T/silhouette.py"

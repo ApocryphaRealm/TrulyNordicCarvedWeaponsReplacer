@@ -104,6 +104,22 @@ ADDITIONAL = [
              dict(sig="COBJ", fid=0x80A, edid="TNCW_Bolt_Recipe", template=("standalone", "TNCW_NordicArrow_Recipe"),
                   retarget={"CNAM": "TNCW_Bolt"}, set={"NAM1": 10}),
          ]),
+    # the crossbow B3 (2026-11-13; the owner 06:38 "Do b for now", 07:16 "just ship it unanimated for now" - the trigger
+    # stays still, the limbs and string draw as vanilla's): a copy of Dawnguard's DLC1CrossBow (animation type crossbow,
+    # its sounds, impact set, keywords) and its first-person STAT 1stPersonCrossbow, both pointed at our one NIF (vanilla's
+    # STAT names the same file as the WEAP). Stats between the crossbow (value 120, weight 14, damage 19, crit 9) and the
+    # dwarven crossbow (350, 20, 22, 11) at Nordic quality, above both at Ebony. Recipes: the Standalone's bow recipe and
+    # temper of that quality (its materials, perk and benches), pointed at the crossbow.
+    dict(item="crossbow", image="halberd.jpg",
+         records=[
+             dict(sig="STAT", fid=0x80B, edid="TNCW_Crossbow_1st", template=("Dawnguard.esm", "1stPersonCrossbow"),
+                  set={"MODL": r"TrulyNordic\crossbow\crossbow.nif"}),
+             dict(sig="WEAP", fid=0x80C, edid="TNCW_Crossbow", template=("Dawnguard.esm", "DLC1CrossBow"),
+                  set={"FULL": "Carved Nordic Crossbow", "MODL": r"TrulyNordic\crossbow\crossbow.nif", "OBND": (-27, -28, -3, 27, 29, 7),
+                       "stats": {"nordic": (240, 17.0, 20, 10, 1.0, 1.0), "ebony": (900, 19.0, 25, 12, 1.0, 1.0)}}),
+             dict(sig="COBJ", fid=0x80D, edid="TNCW_Crossbow_Recipe", template=("standalone", "TNCW_Bow_Recipe"), retarget={"CNAM": "TNCW_Crossbow"}),
+             dict(sig="COBJ", fid=0x80E, edid="TNCW_Crossbow_Temper", template=("standalone", "TNCW_Bow_Temper"), retarget={"CNAM": "TNCW_Crossbow"}),
+         ]),
 ]
 
 def check():
