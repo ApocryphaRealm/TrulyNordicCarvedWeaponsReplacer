@@ -93,10 +93,22 @@ ITEMS = {
                    third="nordicwaraxe.nif", first="1stpersonnordiclwaraxe.nif", stem="waraxe", weap="DLC2NordicWarAxe", fp_stat="03C354"),
     # -sf (1.1.0 shading fix, round 2, 2026-11-12): the same NIF with its carved faces' outline AND creases (edge chamfers,
     # caps) given their own vertices (set2\shading_fix_split.py --crease=35); geometry and maps identical; set2\shading-fix-1.1.0.png
-    "dagger": dict(version="v3-sf", sources=[W(r"work_dg3_sf\tn_dagger2.nif")], orient=True,
+    # v4B (2026-11-13, the owner 05:15: "instead of the dragon and animal bite art it uses the same art as the other weapons";
+    # 06:11: "The new dagger design should be the default option from now on, and the current version should be an additional
+    # option"; his pick 06:25: "Option b but shrink the symbol and outline so its within the engraving area and doesnt interrupt
+    # the edges"): REPAINT ONLY of v3-sf - the NIF byte for byte; the blade flat's serpent replaced by outline + weave + the
+    # triquetra (R 1.10) on the standard dark disc + polished ring with a 0.81 weave margin to the inset (set2\dagger_v4_paint.py
+    # B); maps outside the blade island + 25 px = v3-sf's. The serpent v3-sf is the installer option "dagger2".
+    "dagger": dict(version="v4B", sources=[W(r"work_dg4B\tn_dagger2.nif")], orient=True,
                    sheath=dict(version="v6 (ringed symbol)", src=W(r"work_sheath_dagger_v6\tn_sheath_dagger_v6.nif"), tex=W(r"work_sheath_dagger_v6\tex\tn_sheath_dagger_v6")),
-                   shapes={"metal": {"name": "tn_dagger2", "tex": W(r"work_dg3_sf\tex\tn_dagger2")}, "wrap": {"name": "TNDagger2Wrap", "tex": W(r"work_dg3_sf\tex\tn_dagger2_wrap")}},
+                   shapes={"metal": {"name": "tn_dagger2", "tex": W(r"work_dg4B\tex\tn_dagger2")}, "wrap": {"name": "TNDagger2Wrap", "tex": W(r"work_dg4B\tex\tn_dagger2_wrap")}},
                    third="nordicdagger.nif", first="1stpersonnordicdagger.nif", stem="dagger", weap="DLC2NordicDagger", fp_stat="03C350"),
+    # the serpent dagger (v3-sf, the default until 2026-11-13) - the installer's alternate: its own texture folder (stem
+    # daggerv2), installed at the shared dagger\dagger.nif like mace2; the same sheath
+    "dagger2": dict(version="v3-sf (serpent)", sources=[W(r"work_dg3_sf\tn_dagger2.nif")], orient=True, path_stem="dagger",
+                    sheath=dict(version="v6 (ringed symbol)", src=W(r"work_sheath_dagger_v6\tn_sheath_dagger_v6.nif"), tex=W(r"work_sheath_dagger_v6\tex\tn_sheath_dagger_v6")),
+                    shapes={"metal": {"name": "tn_dagger2", "tex": W(r"work_dg3_sf\tex\tn_dagger2")}, "wrap": {"name": "TNDagger2Wrap", "tex": W(r"work_dg3_sf\tex\tn_dagger2_wrap")}},
+                    third="nordicdagger.nif", first="1stpersonnordicdagger.nif", stem="daggerv2", weap="DLC2NordicDagger", fp_stat="03C350", option=True),
     # pointed maces (approved 2026-11-12 01:20: "mace looks good"): six-flanged v4 the default, classic v3 the option
     # -sf (1.1.0 shading fix, round 2, 2026-11-12): the same NIF with its carved faces' outline AND creases (edge chamfers,
     # caps) given their own vertices (set2\shading_fix_split.py --crease=35); geometry and maps identical; set2\shading-fix-1.1.0.png

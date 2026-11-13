@@ -140,6 +140,13 @@ STEPS = [  # (step, group, [(option, item, folder, image, description, default)]
          "The carved crest filled out to the rim, with its spikes, its four points and the steel straps at the bottom.", True),
         ("Clean shield", "shield2", "31 Shield - Clean", "shield-clean.jpg",
          "The same round shield with the crest as a plain carved disc: the circle of braid and weave and the boss in the middle, nothing sticking out.", False)]),
+    # 2026-11-13, the owner 06:11: "The new dagger design should be the default option from now on, and the current version
+    # should be an additional option that they can use."
+    ("Dagger", "Nordic Dagger model", [
+        ("Carved dagger (default)", "dagger", "40 Dagger - Carved", "dagger-carved.jpg",
+         "The kukri-shaped dagger with its blade carved like the rest of the set: the weave filling the flat and a triquetra on a dark disc inside a polished ring.", True),
+        ("Serpent dagger", "dagger2", "41 Dagger - Serpent", "dagger-serpent.jpg",
+         "The same dagger with a Jormungandr world serpent coiling along the blade and biting toward the point.", False)]),
 ]
 ALTERNATED = {o[1] for _, _, opts in STEPS for o in opts}
 CORE = [i for i in DEFAULT if i not in ALTERNATED]
