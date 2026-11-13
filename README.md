@@ -13,7 +13,7 @@ it is - its edges, its head, its silhouette - and is rebuilt to be realistic in 
 | Nordic Warhammer | hammer face and curved pick, a triquetra ring centred on the face, a forged knob pommel |
 | Nordic War Axe | bearded blade with a square hammer poll, a triquetra at the widest point, a forged knob pommel |
 | Nordic Dagger | kukri form, a world serpent carved along the belly; its own sheath |
-| Nordic Mace | six-flanged head with pointed striking edges, a biting maw on every flange |
+| Nordic Mace | six-flanged head with pointed striking edges, every flange carved with weave and a ringed triquetra |
 | Nordic Bow | all-steel bow, a carved riser plate (a triquetra in a woven field inside a braid border) and a braid band along the riser; the string still draws and follows the arrow |
 | Nordic Shield | the carved crest filled out to the rim, the four points in place; sits on the arm and on the back where the vanilla shield does |
 
