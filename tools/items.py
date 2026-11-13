@@ -60,7 +60,8 @@ ITEMS = {
     # v2g-knurl (2026-11-12, the owner 20:05: "for the war axe and war hammer, I want the gnarling to be the entire face of the
     # hammerhead"): v2f-sf's NIF with ONLY the hammer's striking face (x -15.3; the other end is the pick) replaced, spliced at
     # the byte level (set2\knurl_full_geom.py + knurl_splice.py): 10 x 10 modelled pyramids edge to edge (0.58 x 0.54 pitch,
-    # 0.28 high, tips level with the old face plane), own vertices, UVs on the haft's plain steel; every other vertex record,
+    # 0.28 high, tips level with the old face plane; the pocket walls 0.005 inside the outline behind a hair-line rim, as a
+    # wall on the outline would be coplanar with the square head's sides), own vertices, UVs on the haft's plain steel; every other vertex record,
     # triangle and map pixel is v2f-sf's (work_wh2g_sf\splice_proof.json); set2\axes-knurl-v2.jpg
     "warhammer": dict(version="v2g-knurl", sources=[W(r"work_wh2g_sf\tn_warhammer2.nif")], orient=True,   # v2f: v2e with the straight pommel (2026-11-11)
                       shapes={"metal": {"name": "tn_warhammer2", "tex": W(r"work_wh2g_sf\tex\tn_warhammer2")}, "wrap": {"name": "TNWarhammer2Wrap", "tex": W(r"work_wh2g_sf\tex\tn_warhammer2_wrap")}},
