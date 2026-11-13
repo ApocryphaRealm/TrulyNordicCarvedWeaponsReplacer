@@ -29,10 +29,12 @@ def only_shape(path):
     n = niflib.Nif(path); s = shapes_of(n); assert len(s) == 1, (path, s); return n, s[0]
 def geometry_tail(n, b):
     o = n.av_end(b, 0, [], []); tail = bytearray(n.blocks[b][o:]); struct.pack_into("<3i", tail, 16, -1, -1, -1); return tail
-def splice(n, b, tail, off=(0.0, 0.0, 0.0)):
+def splice(n, b, tail, off=(0.0, 0.0, 0.0), rot=None):
+    """off: the shape's translation; rot: its rotation (3x3, applied as R @ p + off, stored row-major), identity if None"""
     o = n.av_end(b, 0, [], []); head = bytearray(n.blocks[b][:o]); refs = struct.unpack_from("<3i", n.blocks[b], o + 16)
     t_off = n.transform(b)[0]
-    struct.pack_into("<3f", head, t_off, *off); struct.pack_into("<9f", head, t_off + 12, 1, 0, 0, 0, 1, 0, 0, 0, 1)
+    R = (1, 0, 0, 0, 1, 0, 0, 0, 1) if rot is None else tuple(float(x) for x in np.asarray(rot).reshape(9))
+    struct.pack_into("<3f", head, t_off, *off); struct.pack_into("<9f", head, t_off + 12, *R)
     struct.pack_into("<f", head, t_off + 48, 1.0)
     new = head + tail; struct.pack_into("<3i", new, o + 16, *refs); n.blocks[b] = new
 def texset_block(paths):
@@ -62,21 +64,30 @@ def new_string(n, s):
 def append_child(n, parent, child):
     kids, off = n.children(parent); blk = n.blocks[parent]
     n.blocks[parent] = blk[:off] + struct.pack("<I", len(kids) + 1) + blk[off + 4:off + 4 + 4 * len(kids)] + struct.pack("<i", child) + blk[off + 4 + 4 * len(kids):]
-def add_shape(n, main, tail, name, texset, off):
+def add_shape(n, main, tail, name, texset, off, rot=None):
     o = n.av_end(main, 0, [], []); head = bytearray(n.blocks[main][:o]); struct.pack_into("<i", head, 0, new_string(n, name))
     ts = len(n.blocks); n.btypes.append("BSShaderTextureSet"); n.blocks.append(texset_block(texset))
     sh = len(n.blocks); n.btypes.append("BSLightingShaderProperty"); n.blocks.append(bytearray(T_PLAIN))
     set_shader(n, sh, ts, -1)
     sb = len(n.blocks); n.btypes.append("BSTriShape"); n.blocks.append(head + tail)
-    struct.pack_into("<3i", n.blocks[sb], o + 16, -1, sh, -1); splice(n, sb, tail, off)
+    struct.pack_into("<3i", n.blocks[sb], o + 16, -1, sh, -1); splice(n, sb, tail, off, rot)
     struct.pack_into("<3i", n.blocks[sb], n.av_end(sb, 0, [], []) + 16, -1, sh, -1)
     append_child(n, parent_of(n, main), sb); return sb
 
-def hull_points(item, off):
+def hip_xf(item, which):
+    """The sheathed placement of a third-person NIF (items.py 'hip'): rotation R and translation t with p' = R p + t,
+    a turn of rot_x_deg about the weapon's x axis through the pivot, then the shift. Identity for any other case."""
+    h = ITEMS[item].get("hip")
+    if which != "third" or not h: return None, np.zeros(3)
+    a = math.radians(h["rot_x_deg"]); c, s = math.cos(a), math.sin(a)
+    R = np.array([[1, 0, 0], [0, c, -s], [0, s, c]]); piv = np.array(h["pivot"], np.float64)
+    return R, piv - R @ piv + np.array(h["shift"], np.float64)
+def hull_points(item, off, rot=None):
     P = []
     for role in ITEMS[item]["shapes"]:
         P.append(np.load(os.path.join(WORK, item, f"dec_{role}.npz"))["V"])
-    P = np.concatenate(P).astype(np.float64) + np.array(off)
+    P = np.concatenate(P).astype(np.float64)
+    P = (P if rot is None else P @ np.asarray(rot).T) + np.array(off)
     h = ConvexHull(P); Q = P[h.vertices]
     if len(Q) > 40:   # farthest-point sampling of the hull's own vertices, then the hull of those
         sel = [int(np.argmax(Q[:, 1])), int(np.argmin(Q[:, 1]))]; d = np.minimum(np.linalg.norm(Q - Q[sel[0]], axis=1), np.linalg.norm(Q - Q[sel[1]], axis=1))
@@ -84,7 +95,7 @@ def hull_points(item, off):
             i = int(np.argmax(d)); sel.append(i); d = np.minimum(d, np.linalg.norm(Q - Q[i], axis=1))
         Q = Q[sel]
     return Q, P
-def rewrite_collision(n, item, off):
+def rewrite_collision(n, item, off, rot=None):
     cv = [b for b, t in enumerate(n.btypes) if t == "bhkConvexVerticesShape"]
     if not cv: return "kept vanilla (" + ",".join(sorted({t for t in n.btypes if t.startswith("bhk")})) + ")"
     b = cv[0]; blk = n.blocks[b]
@@ -110,7 +121,7 @@ def rewrite_collision(n, item, off):
                   [2 * (qx * qy + qz * qw), 1 - 2 * (qx * qx + qz * qz), 2 * (qy * qz - qx * qw)],
                   [2 * (qx * qz - qy * qw), 2 * (qy * qz + qx * qw), 1 - 2 * (qx * qx + qy * qy)]])
     Rr = R; R = NR @ Rr; t = NR @ t + NT          # body frame inside the node frame inside the world
-    Q, P = hull_points(item, off)
+    Q, P = hull_points(item, off, rot)
     L = ((Q - t) @ R) / HK                       # world -> the rigid body's frame, Havok units
     h = ConvexHull(L); eq = {}
     for e in h.equations: eq[tuple(np.round(e, 4))] = e
@@ -134,27 +145,30 @@ def offset_1st(item):
 
 def build_static(item, which, out_path):
     it = ITEMS[item]; off = (0.0, 0.0, 0.0) if which == "third" else offset_1st(item)
+    rot, t_hip = hip_xf(item, which)
+    if rot is not None: off = tuple(float(x) for x in np.array(off) + t_hip)
     n = niflib.Nif(vanilla_path(item, which)); D = os.path.join(WORK, item); rep = {"offset": off}
+    if rot is not None: rep["hip"] = dict(it["hip"], shape_rotation=np.round(rot, 6).tolist(), shape_translation=np.round(off, 4).tolist())
     shp = shapes_of(n); blood = [b for b in shp if "blood" in n.name(b).lower()]
     main = [b for b in shp if b not in blood and n.name(b) != "Scb"]; assert len(main) == 1, [n.name(b) for b in shp]; main = main[0]
     mn, mb = only_shape(os.path.join(D, "dec_metal.nif")); tail = geometry_tail(mn, mb)
-    splice(n, main, tail, off); sh = shader_of(n, main); ts = texset_of(n, sh)
+    splice(n, main, tail, off, rot); sh = shader_of(n, main); ts = texset_of(n, sh)
     n.blocks[ts] = texset_block(tex_paths(item, "metal")); set_shader(n, sh, ts, struct.unpack_from("<i", n.blocks[sh], 4)[0])
     for role in it["shapes"]:
         if role == "metal": continue
         rn, rb = only_shape(os.path.join(D, f"dec_{role}.nif"))
-        add_shape(n, main, geometry_tail(rn, rb), f"TN_{it['stem']}_{role}", tex_paths(item, role), off)
+        add_shape(n, main, geometry_tail(rn, rb), f"TN_{it['stem']}_{role}", tex_paths(item, role), off, rot)
     if it.get("sheath"):
         # our sheath as the shape the game knows by name: 'Scb' is left on the sheath node when the weapon is drawn
         assert not [b for b in shp if n.name(b) == "Scb"], f"{item}: vanilla already carries an Scb"
         sn, sb = only_shape(os.path.join(D, "dec_sheath.nif"))
-        add_shape(n, main, geometry_tail(sn, sb), "Scb", tex_paths(item, "sheath"), off)
+        add_shape(n, main, geometry_tail(sn, sb), "Scb", tex_paths(item, "sheath"), off, rot)
         rep["sheath"] = it["sheath"]["version"]
     for i, b in enumerate(blood):
-        bn, bb = only_shape(os.path.join(D, f"blood{min(i, 1)}.nif")); splice(n, b, geometry_tail(bn, bb), off)
+        bn, bb = only_shape(os.path.join(D, f"blood{min(i, 1)}.nif")); splice(n, b, geometry_tail(bn, bb), off, rot)
     rep["blood_shapes"] = [n.name(b) for b in blood]
     rep["kept_vanilla_shapes"] = [n.name(b) for b in shp if n.name(b) == "Scb"]
-    rep["collision"] = rewrite_collision(n, item, off)
+    rep["collision"] = rewrite_collision(n, item, off, rot)
     os.makedirs(os.path.dirname(out_path), exist_ok=True); n.save(out_path); niflib.Nif(out_path)
     rep["blocks"] = len(n.blocks); return rep
 

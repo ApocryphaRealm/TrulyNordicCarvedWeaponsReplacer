@@ -25,7 +25,14 @@ ITEMS = {
     # sheath: the shape named 'Scb' that the game leaves on the hip when the weapon is drawn (in the weapon's own frame)
     # 1.1.1 (2026-11-12): normals-only fix - carved faces' outline and creases given their own vertices
     # (set2\shading_fix_split.py --crease=35, real face dumps); geometry and maps identical
-    "sword": dict(version="A5i-sf", sources=[W(r"work_sword_a5i_sf\A5I_metal.nif"), os.path.join(PLAN, r"A5\work\A5_wrap.nif")], orient=True, option=True,
+# hip (2026-11-13, the owner 05:15: "The saber clips into the armor, hiding it a little"): the THIRD-person NIF's every shape
+# (and the collision hull) turned -4 deg about the weapon's x axis through the grip centre and moved 1.25 out along -z, so
+# the sheathed weapon hangs out from the hip (WeaponSword: local -z is away from the thigh, +y down the blade); the
+# grip stays in the fist (the pivot is the grip; the grip centre goes from z +0.67 to -0.58, inside vanilla's own 0.67
+# off-centre). Scored against XPMSSE + steel / Nord plate / Nordic carved cuirasses (the owner's), slices of the
+# weapon fully behind the armour from the side: Nordic carved 9 -> 6 (vanilla steel sheath 6), buried depth sum
+# 21.5 -> 6.0 (vanilla 6.8). The first-person NIF is not moved (its sheath never shows; the blade stays straight in view).
+    "sword": dict(hip=dict(rot_x_deg=-4.0, pivot=[-0.28, -2.98, 0.67], shift=[0.0, 0.0, -1.25]), version="A5i-sf", sources=[W(r"work_sword_a5i_sf\A5I_metal.nif"), os.path.join(PLAN, r"A5\work\A5_wrap.nif")], orient=True, option=True,
                   sheath=dict(version="saber C2 (falchion fit, ringed symbol)", src=W(r"work_sheath_saber_fitC2\tn_sheath_saber_fitC2.nif"), tex=W(r"work_sheath_saber_fitC2\tex\tn_sheath_saber_fitC2")),
                   shapes={"metal": {"name": "NordicSwordA5", "tex": W(r"work_sword_a5i_sf\tex\nordicsworda5i")},
                           "wrap": {"name": "NordicWrapA5", "tex": None, "dds_from": r"D:\Modlists\Njordlinger\mods\Nordic Carved Redesign A (test)\textures\pbr\ApocryphaTest\NordicCarvedRedesignA5\nordicwrapa5"}},
@@ -33,7 +40,8 @@ ITEMS = {
     # the straight sword (installer option, 2026-11-11): greatsword v3's blade and upper hilt as a one-hander
     # 1.1.0 shading fix (2026-11-12): v1-sf = v1's NIF with the flat guard and pommel faces' outline vertices split from
     # their chamfers (set2\shading_fix_split.py, as bow v8) - geometry and maps identical; set2\shading-fix-1.1.0.png
-    "sword2": dict(version="straight v1-sf", sources=[W(r"work_straightsword_sf\tn_straightsword.nif")], orient=True, option=True, path_stem="sword",
+    # hip: as the saber's (same clip: Nordic carved 9 hidden slices / depth sum 19.0 -> 5 / 3.9), pivot its own grip centre
+    "sword2": dict(hip=dict(rot_x_deg=-4.0, pivot=[0.0, -4.02, 0.67], shift=[0.0, 0.0, -1.25]), version="straight v1-sf", sources=[W(r"work_straightsword_sf\tn_straightsword.nif")], orient=True, option=True, path_stem="sword",
                    sheath=dict(version="v3 (ringed symbol)", src=W(r"work_sheath_straightsword_v3\tn_sheath_straightsword_v3.nif"), tex=W(r"work_sheath_straightsword_v3\tex\tn_sheath_straightsword_v3")),
                    shapes={"metal": {"name": "tn_straightsword", "tex": W(r"work_straightsword_sf\tex\tn_straightsword")}, "wrap": {"name": "TNStraightswordWrap", "tex": W(r"work_straightsword_sf\tex\tn_straightsword_wrap")}},
                    third="nordicsword.nif", first="1stpersonnordicsword.nif", stem="swordstraight", weap="DLC2NordicSword", fp_stat="03C353"),
