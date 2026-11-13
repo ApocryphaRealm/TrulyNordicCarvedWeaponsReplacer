@@ -133,3 +133,11 @@ def check():
     assert len(inis) == len(set(inis)), "two items ship the same KID ini name"
     assert all("_KID" in i for i in inis)
 check()
+
+# Items built but held out of the release (the owner 2026-11-13 09:14: "post whatever we have for the Nordic equipment mod
+# without the crossbow and bolts" - the crossbow is being reworked after his in-game test). Every consumer (plugin
+# records, package, FOMOD steps) reads ADDITIONAL, so a held item ships nothing; remove it from HOLD to ship it again.
+# TN_HOLD="" in the environment ships everything (for building and testing the held items).
+import os as _os
+HOLD = {"crossbow", "boltquiver"} if _os.environ.get("TN_HOLD") is None else set(filter(None, _os.environ["TN_HOLD"].split(",")))
+ADDITIONAL = [it for it in ADDITIONAL if it["item"] not in HOLD]
