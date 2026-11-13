@@ -38,8 +38,10 @@ Both Replacer files ship the first-person models and the shield as loose files a
 reach them): put the mod below any other Nordic weapon or shield replacer. The Standalone files ship every file at this
 mod's own paths and change no vanilla file.
 
-Standalone items: Carved Nordic Sword, Carved Nordic War Axe, Carved Nordic Battleaxe, Carved Nordic Greatsword, Carved
-Nordic Warhammer, Carved Nordic Dagger, Carved Nordic Mace, Carved Nordic Bow, Carved Nordic Shield.
+Standalone items (the same names at Nordic and Ebony quality): Carved Nordic Sword, Carved Nordic War Axe, Carved Nordic
+Battleaxe, Carved Nordic Greatsword, Carved Nordic Warhammer, Carved Nordic Dagger, Carved Nordic Mace, Carved Nordic
+Bow, Carved Nordic Shield, Carved Nordic Arrow. The installer's model choices (saber or straight sword, and so on) change
+only the model, not the name.
 
 Optional file, Additional Weapons: carved weapons the game does not have, in their own light plugin
 (`TrulyNordicCarvedWeapons - Additional Weapons.esp`), installed beside any main file, at Nordic or Ebony quality.
