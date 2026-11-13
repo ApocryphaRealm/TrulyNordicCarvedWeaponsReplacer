@@ -20,7 +20,12 @@ import plugin_records as P
 import additional_spec as S
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SA = "TrulyNordicCarvedWeapons - Standalone.esp"
-TEMPLATE_SOURCES = {"standalone": lambda q: os.path.join(REPO, "plugin", f"standalone-{q}", SA)}
+DLC = r"D:\Modlists\Njordlinger\mods\Base Game DLC Content"      # the Bethesda DLC masters (read-only)
+# a template source: "standalone" (that quality's Standalone plugin) or a Bethesda master by file name (2026-11-13, the
+# bolts and the crossbow from Dawnguard.esm); a master template's references to its OWN other records stay references
+# into that master (it becomes one of ours), except those to another template of the same item (-> the new record)
+TEMPLATE_SOURCES = {"standalone": lambda q: os.path.join(REPO, "plugin", f"standalone-{q}", SA),
+                    "Dawnguard.esm": lambda q: os.path.join(DLC, "Dawnguard.esm")}
 def out_path(q): return os.path.join(REPO, "plugin", S.QUALITIES[q][0], S.PLUGIN)
 
 # FormID fields by record type (byte offsets; None = an array of FormIDs). Layouts per the Skyrim SE record definitions
@@ -29,10 +34,16 @@ FIDS = {"STAT": {"DNAM": [4]},
         "WEAP": {"EITM": [0], "ETYP": [0], "BIDS": [0], "BAMT": [0], "KWDA": None, "INAM": [0], "WNAM": [0], "SNAM": [0],
                  "XNAM": [0], "NAM7": [0], "TNAM": [0], "UNAM": [0], "NAM9": [0], "NAM8": [0], "CNAM": [0], "YNAM": [0],
                  "ZNAM": [0], "CRDT": [16]},
-        "COBJ": {"CNTO": [0], "CNAM": [0], "BNAM": [0]}}
+        "COBJ": {"CNTO": [0], "CNAM": [0], "BNAM": [0]},
+        # AMMO DATA: projectile at +0; PROJ DATA: light, muzzle flash light, explosion, sound, ... (plugin_records.FIDS)
+        "AMMO": {"YNAM": [0], "ZNAM": [0], "KWDA": None, "DATA": [0]},
+        "PROJ": {"DATA": [16, 20, 36, 40, 56, 60, 64, 84, 88]}}
 PLAIN = {"STAT": {"EDID", "OBND", "MODL", "MODT"},
          "WEAP": {"EDID", "OBND", "FULL", "MODL", "MODT", "KSIZ", "DATA", "DNAM", "VNAM", "DESC", "EAMT"},
-         "COBJ": {"EDID", "COCT", "NAM1"}}
+         "COBJ": {"EDID", "COCT", "NAM1"},
+         "AMMO": {"EDID", "OBND", "FULL", "MODL", "MODT", "KSIZ"},
+         "PROJ": {"EDID", "OBND", "FULL", "MODL", "MODT", "NAM1", "NAM2", "VNAM"}}
+LSTRING = {"FULL", "DESC"}     # a localized master holds these as string ids: FULL is written from the table, DESC dropped
 CTDA_P1_FORM = {74: True, 448: True, 659: False}   # GetGlobalValue, HasPerk (param 1 a FormID); EPTemperingItemIsEnchanted
 
 def edid(d): return next((sd[:-1].decode() for s, sd in P.subrecords(d) if s == "EDID"), "")
@@ -42,11 +53,16 @@ def by_edid(pl, label, e):
         if edid(d) == e: return bytearray(h), [list(x) for x in P.subrecords(d)]
     raise KeyError(f"{label} {e} not in {pl.path}")
 
-def relay(src, sig, subs, remap):
-    """every FormID field of one template record through remap(v); refuses an unknown subrecord"""
+def relay(src, sig, subs, remap, rec=None):
+    """every FormID field of one template record through remap(v); refuses an unknown subrecord. A subrecord the table
+    retargets (rec["retarget"]) is passed through untouched here and rewritten by apply_set."""
     out = []
     for s, sd in subs:
         sd = bytearray(sd)
+        if rec and s in rec.get("retarget", {}): out.append([s, bytes(sd)]); continue
+        if s in LSTRING and src.localized:
+            if s == "FULL": out.append([s, bytes(sd)])      # replaced by the table's FULL (apply_set refuses a record without one)
+            continue
         if s in FIDS[sig]:
             offs = FIDS[sig][s]
             for o in (range(0, len(sd), 4) if offs is None else offs):
@@ -61,7 +77,11 @@ def relay(src, sig, subs, remap):
         out.append([s, bytes(sd)])
     return out
 
-def apply_set(q, rec, subs):
+def apply_set(q, rec, subs, new_fid=None, src=None):
+    if src is not None and src.localized and any(x[0] == "FULL" for x in subs) and "FULL" not in rec.get("set", {}):
+        raise SystemExit(f"{rec['edid']}: its template's FULL is a string id of {src.name} - the table must give a FULL")
+    for k, e in rec.get("retarget", {}).items():   # a FormID field pointed at another record of ours, by its EditorID
+        P.set_sub(subs, k, struct.pack("<I", new_fid(e)))
     for k, v in rec.get("set", {}).items():
         if k in ("FULL", "MODL"): P.set_sub(subs, k, P.zs(v))
         elif k == "OBND": P.set_sub(subs, k, struct.pack("<6h", *v))
@@ -71,6 +91,10 @@ def apply_set(q, rec, subs):
             for x in subs:
                 if x[0] == "DNAM": dn = bytearray(x[1]); struct.pack_into("<ff", dn, 4, spd, reach); x[1] = bytes(dn)
                 if x[0] == "CRDT": cr = bytearray(x[1]); struct.pack_into("<H", cr, 0, crit); x[1] = bytes(cr)
+        elif k == "ammo":     # AMMO DATA: projectile, flags (0 = a bolt: the "non-bolt" bit 0x4 clear), damage, value, weight
+            dmg, val, wt = v[q]; dd = bytearray(next(x[1] for x in subs if x[0] == "DATA"))
+            struct.pack_into("<fIf", dd, 8, dmg, val, wt); P.set_sub(subs, "DATA", bytes(dd))
+        elif k == "NAM1": P.set_sub(subs, "NAM1", struct.pack("<H", v))
         else: raise SystemExit(f"{rec['edid']}: unknown set key {k}")
     P.set_sub(subs, "EDID", P.zs(rec["edid"]))
 
@@ -93,11 +117,15 @@ def build(q):
             i = v >> 24; names = src.masters + [src.name]
             if i >= len(names): raise SystemExit(f"{v:08X}: index past {src.name}'s masters")
             if names[i] == src.name:
-                if (v & 0xFFFFFF) not in own: raise SystemExit(f"{v:08X} points at a record of {src.name} that is not one of this item's templates")
+                if (v & 0xFFFFFF) in own: return v
+                if src.name in S.MASTER_ORDER: used.add(src.name); return v
+                raise SystemExit(f"{v:08X} points at a record of {src.name} that is not one of this item's templates")
             else: used.add(names[i])
             return v
         return f
-    for rec, src, h, subs, own in plan: relay(src, rec["sig"], subs, collect(src, own))
+    for rec, src, h, subs, own in plan:
+        relay(src, rec["sig"], subs, collect(src, own), rec)
+        if src.name in S.MASTER_ORDER: used.add(src.name)     # a master template's record keeps its master's FormID space
     extra = sorted(used - set(S.MASTER_ORDER))
     if extra: raise SystemExit(f"references into {extra} - not a Bethesda master in MASTER_ORDER (never master our own plugins)")
     masters = [m for m in S.MASTER_ORDER if m in used]
@@ -113,12 +141,13 @@ def build(q):
         def f(v):
             if v == 0: return 0
             nm = (src.masters + [src.name])[v >> 24]
-            if nm == src.name: return own_idx | own[v & 0xFFFFFF]
+            if nm == src.name and (v & 0xFFFFFF) in own: return own_idx | own[v & 0xFFFFFF]
             return (masters.index(nm) << 24) | (v & 0xFFFFFF)
         return f
     top = 0x7FF
+    by_edid_new = {r["edid"]: r["fid"] for it in S.ADDITIONAL for r in it["records"]}
     for rec, src, h, subs, own in plan:
-        out = relay(src, rec["sig"], subs, remap(src, own)); apply_set(q, rec, out)
+        out = relay(src, rec["sig"], subs, remap(src, own), rec); apply_set(q, rec, out, lambda e: own_idx | by_edid_new[e], src)
         h = bytearray(h); struct.pack_into("<I", h, 12, own_idx | rec["fid"]); pl.add(rec["sig"], h, P.pack_subs(out))
         top = max(top, rec["fid"])
     pl.bump_next_id(top + 1); pl.save(tmp); os.replace(tmp, out_path(q))

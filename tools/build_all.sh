@@ -12,6 +12,10 @@ done
 # the quiver / arrows: their own Blender step (no decimation; the arrows cut out of the quiver onto one arrow atlas)
 "$B" --background --factory-startup --python-exit-code 1 --python "$T/gb_quiver.py" -- "$CFG" quiver > "$(dirname "$CFG")/blender_quiver.log" 2>&1
 python -I "$T/quiver_atlas.py"
+# the bolt quiver / bolts (2026-11-13): vanilla Dawnguard steelbolt / boltprojectile frames, then the same Blender + atlas steps
+python -I "$T/boltquiver_frames.py"
+"$B" --background --factory-startup --python-exit-code 1 --python "$T/gb_boltquiver.py" -- "$CFG" boltquiver > "$(dirname "$CFG")/blender_boltquiver.log" 2>&1
+python -I "$T/quiver_atlas.py" boltquiver
 python -I "$T/textures.py"
 python -I "$T/assemble.py"
 python -I "$T/silhouette.py"

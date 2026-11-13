@@ -3,15 +3,16 @@
 # rectangle in <WORK>\quiver\arrow_atlas_plan.json from the steel or soft map to its place, byte for byte, for the
 # albedo, both normal conventions and RMAOS. Unused space is black albedo / flat normal / rough non-metal.
 # Proof: each copied rectangle is compared back with its source (0 px may differ); written to arrow_atlas_proof.json.
-# Run: python -I quiver_atlas.py
+# Run: python -I quiver_atlas.py [quiver|boltquiver]
 import os, sys, json
 import numpy as np
 from PIL import Image
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from items import ITEMS, WORK
-it = ITEMS["quiver"]; D_ = os.path.join(WORK, "quiver"); plan = json.load(open(os.path.join(D_, "arrow_atlas_plan.json")))
+K = sys.argv[1] if len(sys.argv) > 1 else "quiver"   # 2026-11-13: also "boltquiver" (the bolt atlas, role "bolt")
+it = ITEMS[K]; D_ = os.path.join(WORK, K); plan = json.load(open(os.path.join(D_, "arrow_atlas_plan.json")))
 SRC = {"steel": it["shapes"]["metal"]["tex"], "soft": it["shapes"]["leather"]["tex"]}
-dst = it["shapes"]["arrow"]["tex"]; os.makedirs(os.path.dirname(dst), exist_ok=True); N = plan["size"]
+dst = it["shapes"][it.get("atlas_role", "arrow")]["tex"]; os.makedirs(os.path.dirname(dst), exist_ok=True); N = plan["size"]
 FILL = {"": (0, 0, 0), "_n": (128, 128, 255), "_n_gl": (128, 128, 255), "_rmaos": (230, 0, 255, 128)}
 proof = {"size": N, "rectangles": len(plan["rects"]), "maps": {}}
 for suf, fill in FILL.items():

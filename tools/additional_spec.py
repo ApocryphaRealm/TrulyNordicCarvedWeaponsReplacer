@@ -88,6 +88,22 @@ ADDITIONAL = [
                           "and Simple Dodge's halberd dodge set, which looks for the same keyword. Requires Animated Armoury (NewArmoury.esp) "
                           "and Keyword Item Distributor (KID); without them this option does nothing."),
                   keywords=[("WeapTypeHalberd", "Animated Armoury (NewArmoury.esp) halberd")])),
+    # the bolts (2026-11-13; the owner 06:36 "make sure we have a crossbow and bolt models in the upload"): bolt quiver B
+    # and its barbed bolts (items.py "boltquiver"). The AMMO and its PROJ are copies of Dawnguard's steel bolt
+    # (DLC1BoltSteel / DLC1BoltSteelProjectile: the bolt flag - the "non-bolt" bit clear - its speed, gravity, sounds and
+    # impact data), so the plugin masters Dawnguard.esm. Damage between the steel bolt (10) and the dwarven bolt (14) at
+    # Nordic quality, higher at Ebony; the weight of both (0.1). The recipe is the Standalone's Carved Nordic Arrow recipe
+    # of that quality (its materials, perk and forge) making 10 bolts, as Dawnguard's bolt recipes do.
+    dict(item="boltquiver", image="halberd.jpg",
+         records=[
+             dict(sig="PROJ", fid=0x808, edid="TNCW_BoltProjectile", template=("Dawnguard.esm", "DLC1BoltSteelProjectile"),
+                  set={"FULL": "Carved Nordic Bolt", "MODL": r"TrulyNordic\boltquiver\boltflight.nif"}),
+             dict(sig="AMMO", fid=0x809, edid="TNCW_Bolt", template=("Dawnguard.esm", "DLC1BoltSteel"),
+                  set={"FULL": "Carved Nordic Bolt", "MODL": r"TrulyNordic\boltquiver\boltquiver.nif",
+                       "ammo": {"nordic": (12.0, 2, 0.1), "ebony": (16.0, 6, 0.1)}}),
+             dict(sig="COBJ", fid=0x80A, edid="TNCW_Bolt_Recipe", template=("standalone", "TNCW_NordicArrow_Recipe"),
+                  retarget={"CNAM": "TNCW_Bolt"}, set={"NAM1": 10}),
+         ]),
 ]
 
 def check():

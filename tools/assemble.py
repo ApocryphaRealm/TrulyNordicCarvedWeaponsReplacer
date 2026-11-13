@@ -284,8 +284,42 @@ def build_quiver(root):
                          kept=[f.name(i) for i in range(len(f.blocks)) if f.btypes[i] in niflib.NODES or f.btypes[i] == "BSTriShape"])
     return rep
 
+def build_boltquiver(root):
+    """boltquiver.nif (the bolt AMMO's model) and boltflight.nif (its PROJ's) on vanilla Dawnguard steelbolt.nif /
+    boltprojectile.nif's own structure: every node, shape name, transform, extra data, alpha property, the tracer's effect
+    shaders, controller and the collision kept byte for byte (vanilla's boxes fit ours: case 16.2 long vs 16.8, bolt 21.0
+    vs 21.1); our geometry spliced into vanilla's shapes WITH vanilla's own shape transforms (gb_boltquiver.py moved it
+    into each shape's local frame); each shape the plain TruePBR shader; the case's leather a second shape under
+    ArrowQuiver in ArrowQuiver:1's frame. Paths: meshes\\TrulyNordic\\boltquiver\\ (a new item - nothing at a vanilla path)."""
+    D = os.path.join(WORK, "boltquiver"); it = ITEMS["boltquiver"]; rep = {}
+    def shape(n, name): return [b for b in shapes_of(n) if n.name(b) == name][0]
+    def put(n, b, role, ts):
+        sn, sb = only_shape(os.path.join(D, f"dec_{role}.nif")); _, t, r, _s = n.transform(b)
+        splice(n, b, geometry_tail(sn, sb), tuple(t), np.array(r, np.float64).reshape(3, 3))
+        sh = shader_of(n, b); set_shader(n, sh, ts, struct.unpack_from("<i", n.blocks[sh], 4)[0])
+    def new_ts(n, role):
+        ts = len(n.blocks); n.btypes.append("BSShaderTextureSet"); n.blocks.append(texset_block(tex_paths("boltquiver", role))); return ts
+    n = niflib.Nif(os.path.join(it["van_dir"], it["third"]))
+    ts_q = texset_of(n, shader_of(n, shape(n, "ArrowQuiver:1"))); n.blocks[ts_q] = texset_block(tex_paths("boltquiver", "metal"))   # vanilla's one shared set -> the case steel
+    ts_b = new_ts(n, "bolt")                                                                                                   # one set for every bolt
+    put(n, shape(n, "ArrowQuiver:1"), "metal", ts_q); put(n, shape(n, "Arrow:0"), "bolt", ts_b)
+    for k in range(1, 5): put(n, shape(n, f"Arrow{k}"), f"Arrow{k}", ts_b)
+    qb = shape(n, "ArrowQuiver:1"); _, t, r, _s = n.transform(qb); ln, lb = only_shape(os.path.join(D, "dec_leather.nif"))
+    add_shape(n, qb, geometry_tail(ln, lb), "TN_boltquiver_leather", tex_paths("boltquiver", "leather"), tuple(t), np.array(r, np.float64).reshape(3, 3))
+    out = os.path.join(root, MESH_REL, "boltquiver", "boltquiver.nif"); os.makedirs(os.path.dirname(out), exist_ok=True); n.save(out); niflib.Nif(out)
+    rep["third"] = dict(path=os.path.relpath(out, root), blocks=len(n.blocks), slots=json.load(open(os.path.join(D, "blender_stats.json")))["slots"], collision="kept vanilla (two bhkBoxShape)")
+    f = niflib.Nif(os.path.join(it["van_dir"], it["flight"])); b = shape(f, "SteelBoltFlight:0")
+    ts = texset_of(f, shader_of(f, b)); f.blocks[ts] = texset_block(tex_paths("boltquiver", "bolt")); put(f, b, "flight", ts)
+    out2 = os.path.join(root, MESH_REL, "boltquiver", "boltflight.nif"); f.save(out2); niflib.Nif(out2)
+    rep["flight"] = dict(path=os.path.relpath(out2, root), blocks=len(f.blocks), collision="kept vanilla (bhkBoxShape)",
+                         kept=[f.name(i) for i in range(len(f.blocks)) if f.btypes[i] in niflib.NODES or f.btypes[i] == "BSTriShape"])
+    return rep
+
 def build(item):
     it = ITEMS[item]; root = os.path.join(STAGE, item); rep = {}
+    if item == "boltquiver":
+        rep = build_boltquiver(root); json.dump(rep, open(os.path.join(WORK, item, "assemble_report.json"), "w"), indent=1)
+        print(item, json.dumps(rep)[:900]); return
     if item == "quiver":
         rep = build_quiver(root); json.dump(rep, open(os.path.join(WORK, item, "assemble_report.json"), "w"), indent=1)
         print(item, json.dumps(rep)[:900]); return

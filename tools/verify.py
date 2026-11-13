@@ -80,6 +80,35 @@ if "quiver" in ITEMS and os.path.isdir(os.path.join(STAGE, "quiver")):
             sh = struct.unpack_from("<i", n.blocks[b], n.av_end(b, 0, [], []) + 20)[0]; ts = n.i32(sh, n.ref_offsets(sh)[0][-1]); tb = bytes(n.blocks[ts])
             ok = b"tn_quiver_arrow.dds" in tb
             print(f"   {n.name(b)}: one shape, texture set {'tn_quiver_arrow' if ok else 'NOT THE ARROW ATLAS'}"); bad += 0 if ok else 1
+# the bolt quiver / bolts (2026-11-13) on vanilla Dawnguard's steelbolt.nif / boltprojectile.nif: the same check, plus the
+# collision kept byte for byte and every node and shape at vanilla's own transform; each bolt shape on the bolt atlas
+if "boltquiver" in ITEMS and os.path.isdir(os.path.join(STAGE, "boltquiver")):
+    qd = os.path.join(STAGE, "boltquiver", r"meshes\TrulyNordic\boltquiver"); itb = ITEMS["boltquiver"]
+    stray = [os.path.join(dp, f2) for dp, _, fs2 in os.walk(os.path.join(STAGE, "boltquiver")) for f2 in fs2 if "\\dlc01\\" in os.path.join(dp, f2).lower()]
+    if stray: print("== boltquiver: VANILLA PATH STAGED", stray); bad += 1
+    KEEPB = KEEP | {"bhkBoxShape", "bhkRigidBodyT", "BSValueNode"}
+    for ours_f, van_f, extra in (("boltquiver.nif", itb["third"], {"/BSFadeNode:ArrowRoot/NiNode:Arrow/NiNode:ArrowQuiver/BSTriShape:TN_boltquiver_leather"}),
+                                 ("boltflight.nif", itb["flight"], set())):
+        a, v = niflib.Nif(os.path.join(qd, ours_f)), niflib.Nif(os.path.join(itb["van_dir"], van_f)); ta, tv = tree(a), tree(v)
+        miss = [x for x in tv if x not in ta]; more = [x for x in ta if x not in tv and x not in extra]
+        kv = sorted((t, bytes(v.blocks[i])) for i, t in enumerate(v.btypes) if t in KEEPB)
+        ka = sorted((t, bytes(a.blocks[i])) for i, t in enumerate(a.btypes) if t in KEEPB)
+        moved = []
+        vn = {v.name(i): v.transform(i)[1:3] for i, t in enumerate(v.btypes) if t in niflib.NODES or t == "BSTriShape"}
+        for i, t in enumerate(a.btypes):
+            if (t in niflib.NODES or t == "BSTriShape") and a.name(i) in vn:
+                tt, rr = a.transform(i)[1:3]
+                if max(abs(x - y) for x, y in zip(list(tt) + list(rr), list(vn[a.name(i)][0]) + list(vn[a.name(i)][1]))) > 1e-4: moved.append(a.name(i))
+        line = (f"== structure {ours_f} vs vanilla {van_f}: {len(tv)} vanilla nodes/shapes, missing {miss or 0}, added {more or 0} (allowed: {sorted(extra) or 'none'}); "
+                f"kept blocks {len(kv)} {'byte for byte' if kv == ka else 'DIFFER'}; transforms moved {moved or 0}")
+        if miss or more or kv != ka or moved: line += "  STRUCTURE FAULT"; bad += 1
+        print(line)
+    for nf in ("boltquiver.nif", "boltflight.nif"):
+        n = niflib.Nif(os.path.join(qd, nf))
+        for b, t in enumerate(n.btypes):
+            if t == "BSTriShape" and (n.name(b).startswith("Arrow") or n.name(b).startswith("SteelBoltFlight")) and n.name(b) != "ArrowQuiver:1":
+                sh = struct.unpack_from("<i", n.blocks[b], n.av_end(b, 0, [], []) + 20)[0]; ts = n.i32(sh, n.ref_offsets(sh)[0][-1]); ok = b"tn_boltquiver_bolt.dds" in bytes(n.blocks[ts])
+                print(f"   {nf} {n.name(b)}: one shape, texture set {'tn_boltquiver_bolt' if ok else 'NOT THE BOLT ATLAS'}"); bad += 0 if ok else 1
 # the NEW items (the spear 2026-11-12, the halberd 2026-11-13) on vanilla's two-handed axe NIFs - the same node tree,
 # extra data (BSX, BSInvMarker in 1st person, Prn 'WeaponBack'), blood shapes' shaders and alpha byte for byte; only
 # TN_<stem>_shaft / TN_<stem>_wrap added under the root; both files at our own path and nothing of the item's at a vanilla
