@@ -80,19 +80,20 @@ if "quiver" in ITEMS and os.path.isdir(os.path.join(STAGE, "quiver")):
             sh = struct.unpack_from("<i", n.blocks[b], n.av_end(b, 0, [], []) + 20)[0]; ts = n.i32(sh, n.ref_offsets(sh)[0][-1]); tb = bytes(n.blocks[ts])
             ok = b"tn_quiver_arrow.dds" in tb
             print(f"   {n.name(b)}: one shape, texture set {'tn_quiver_arrow' if ok else 'NOT THE ARROW ATLAS'}"); bad += 0 if ok else 1
-# the spear (2026-11-12): a NEW item on vanilla's two-handed axe NIFs - the same node tree, extra data (BSX, BSInvMarker in
-# 1st person, Prn 'WeaponBack'), blood shapes' shaders and alpha byte for byte; only TN_spear_shaft / TN_spear_wrap added
-# under the root; both files at our own path and nothing of the spear's at a vanilla path; undecimated (triangles =
-# the design NIF's after the weld)
-if "spear" in ITEMS and os.path.isdir(os.path.join(STAGE, "spear")):
-    sd = os.path.join(STAGE, "spear"); it = ITEMS["spear"]
+# the NEW items (the spear 2026-11-12, the halberd 2026-11-13) on vanilla's two-handed axe NIFs - the same node tree,
+# extra data (BSX, BSInvMarker in 1st person, Prn 'WeaponBack'), blood shapes' shaders and alpha byte for byte; only
+# TN_<stem>_shaft / TN_<stem>_wrap added under the root; both files at our own path and nothing of the item's at a vanilla
+# path; undecimated (triangles = the design NIF's after the weld)
+for nk in [k for k, it_ in ITEMS.items() if it_.get("new_item")]:
+    if not os.path.isdir(os.path.join(STAGE, nk)): continue
+    sd = os.path.join(STAGE, nk); it = ITEMS[nk]; st = it["stem"]
     van_paths = [os.path.relpath(os.path.join(dp, f), sd) for dp, _, fs in os.walk(sd) for f in fs if "\\dlc02\\" in os.path.join(dp, f).lower()]
-    if van_paths: print("== spear: VANILLA PATH STAGED", van_paths); bad += 1
-    for ours_f, van_f in (("spear.nif", it["third"]), ("1stpersonspear.nif", it["first"])):
-        pth = os.path.join(sd, r"meshes\TrulyNordic\spear", ours_f)
-        if not os.path.isfile(pth): print("== spear: MISSING", ours_f); bad += 1; continue
+    if van_paths: print(f"== {nk}: VANILLA PATH STAGED", van_paths); bad += 1
+    for ours_f, van_f in ((f"{st}.nif", it["third"]), (f"1stperson{st}.nif", it["first"])):
+        pth = os.path.join(sd, "meshes", "TrulyNordic", st, ours_f)
+        if not os.path.isfile(pth): print(f"== {nk}: MISSING", ours_f); bad += 1; continue
         a, v = niflib.Nif(pth), niflib.Nif(os.path.join(VAN, van_f)); ta, tv = tree(a), tree(v)
-        root = tv[0]; extra = {f"{root}/BSTriShape:TN_spear_shaft", f"{root}/BSTriShape:TN_spear_wrap"}
+        root = tv[0]; extra = {f"{root}/BSTriShape:TN_{st}_shaft", f"{root}/BSTriShape:TN_{st}_wrap"}
         miss = [x for x in tv if x not in ta]; more = [x for x in ta if x not in tv and x not in extra]
         kv = [(t, bytes(v.blocks[i])) for i, t in enumerate(v.btypes) if t in KEEP and t != "bhkCollisionObject"]
         ka = [(t, bytes(a.blocks[i])) for i, t in enumerate(a.btypes) if t in KEEP and t != "bhkCollisionObject"]

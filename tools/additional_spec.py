@@ -63,6 +63,31 @@ ADDITIONAL = [
                   keywords=[("WeapTypeHalberd", "Animated Armoury (NewArmoury.esp) halberd"),
                             ("000WeapTypeSoS", "Spear of Skyrim"),
                             ("WeapTypeSpear", "Spear movement animation / Animated Armoury spear")])),
+    # the halberd (2026-11-13; the owner 04:25 "option a for the halberd", 04:26 "match animated armory length" - design A2,
+    # 163 long). A two-handed axe like the battleaxe it is built on. Stats (helper's pick, beside the battleaxe and the
+    # spear): heavier and dearer than the battleaxe, the battleaxe's damage and critical, a little slower (0.65), the
+    # longest reach of the set (1.5) for its length.
+    dict(item="halberd", image="halberd.jpg",
+         records=[
+             dict(sig="STAT", fid=0x804, edid="TNCW_Halberd_1st", template=("standalone", "TNCW_Battleaxe_1st"),
+                  set={"MODL": r"TrulyNordic\halberd\1stpersonhalberd.nif"}),
+             dict(sig="WEAP", fid=0x805, edid="TNCW_Halberd", template=("standalone", "TNCW_Battleaxe"),
+                  set={"FULL": "Carved Nordic Halberd", "MODL": r"TrulyNordic\halberd\halberd.nif", "OBND": (-19, -29, -2, 13, 135, 2),
+                       "stats": {"nordic": (680, 24.0, 21, 11, 0.65, 1.5), "ebony": (1650, 27.0, 23, 11, 0.65, 1.5)}}),
+             dict(sig="COBJ", fid=0x806, edid="TNCW_Halberd_Recipe", template=("standalone", "TNCW_Battleaxe_Recipe")),
+             dict(sig="COBJ", fid=0x807, edid="TNCW_Halberd_Temper", template=("standalone", "TNCW_Battleaxe_Temper")),
+         ],
+         # Animated Armoury's halberd keyword (NewArmoury.esp 0xE4580): its halberd moveset, and Simple Dodge's
+         # "Halberd (Animated Armoury)" OAR set, which keys on the same keyword (IsEquippedHasKeyword NewArmoury.esp E4580)
+         kid=dict(weap="TNCW_Halberd", ini=PLUGIN[:-4] + " - Halberd_KID.ini",
+                  step="Halberd animations", group="Carved Nordic Halberd moveset", folder="41 Halberd - Animation pack keywords",
+                  default=("Battleaxe moveset (default)",
+                           "The halberd uses the battleaxe animations, the game's own two-handed axe moveset. Choose this if you do not use Animated Armoury."),
+                  option=("Animated Armoury halberd moveset (keyword via KID)",
+                          "Gives the halberd Animated Armoury's halberd keyword (WeapTypeHalberd), so Animated Armoury's halberd moveset plays - "
+                          "and Simple Dodge's halberd dodge set, which looks for the same keyword. Requires Animated Armoury (NewArmoury.esp) "
+                          "and Keyword Item Distributor (KID); without them this option does nothing."),
+                  keywords=[("WeapTypeHalberd", "Animated Armoury (NewArmoury.esp) halberd")])),
 ]
 
 def check():

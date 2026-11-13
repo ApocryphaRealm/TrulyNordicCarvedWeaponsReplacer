@@ -160,6 +160,18 @@ ITEMS = {
                           "wrap": {"name": "TNSpearWrap", "tex": W(r"work_gs5_sf\tex\tn_greatsword_wrap"), "target": None}},
                   blood_region=[[-4.8, 66.0, -2.5], [4.8, 104.5, 2.5]],
                   third="nordicbattleaxe.nif", first="1stpersonnordicbattleaxe.nif", stem="spear"),
+    # the halberd (2026-11-13; the owner 04:25 "option a for the halberd", 04:26 "match animated armory length"): design A2 =
+    # option A (bearded blade: braid perimeter + weave + medallion; straight back spike and narrow leaf top blade, one
+    # straight braid each) with the haft below the grip shortened so the whole is 163.0 long, Animated Armoury's halberd
+    # length (set2\halberd_build.py A2; work_halberd_NOTES.md). A NEW item on vanilla's two-handed axe NIFs, built as the
+    # spear: undecimated, its own first-person file, the grip wrap and the binding on the greatsword's wrap maps as in the
+    # approved renders. Blood: the blade, the back spike and the top blade (blood_region).
+    "halberd": dict(version="A2", new_item=True, sources=[W(r"work_halberdA2\tn_halberdA2.nif")], orient=True,
+                    shapes={"metal": {"name": "TNHalberd", "tex": W(r"work_halberdA2\tex\tn_halberdA2"), "target": None, "design": W(r"work_halberdA2")},
+                            "shaft": {"name": "TNHalberdShaft_0", "tex": W(r"work_halberdA2\tex\tn_halberdA2_soft"), "target": None},
+                            "wrap": {"name": "TNHalberdWrap", "tex": W(r"work_gs5_sf\tex\tn_greatsword_wrap"), "target": None}},
+                    blood_region=[[-18.8, 73.6, -2.0], [13.3, 135.0, 2.0]],
+                    third="nordicbattleaxe.nif", first="1stpersonnordicbattleaxe.nif", stem="halberd"),
 }
 
 def vanilla_path(item, which):
