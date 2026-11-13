@@ -40,6 +40,15 @@ mod's own paths and change no vanilla file.
 Standalone items: Carved Nordic Sword, Carved Nordic War Axe, Carved Nordic Battleaxe, Carved Nordic Greatsword, Carved
 Nordic Warhammer, Carved Nordic Dagger, Carved Nordic Mace, Carved Nordic Bow, Carved Nordic Shield.
 
+Optional file, Additional Weapons: carved weapons the game does not have, in their own light plugin
+(`TrulyNordicCarvedWeapons - Additional Weapons.esp`), installed beside any main file, at Nordic or Ebony quality.
+- **Carved Nordic Spear:** a winged spear with the triquetra on its head.
+- **Carved Nordic Halberd:** a bearded blade with a triquetra, a carved back spike and a top blade, 163 units long.
+
+Both are forged and tempered like the battleaxe and use the battleaxe moveset unless an installer step adds the keywords
+that animation packs look for, through Keyword Item Distributor: spear packs, or Animated Armoury's halberd (which also
+gives Simple Dodge's halberd dodge set).
+
 Textures: our own TruePBR set (base colour, normal, RMAOS) at 2K, under `textures\pbr\TrulyNordic\`.
 
 ## Requirements
