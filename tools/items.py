@@ -219,10 +219,10 @@ ITEMS = {
     # prod limbs and string take vanilla's weights (draw / reload as vanilla), the lever, catch and the rest are rigid on
     # CrossbowRoot (the trigger does not move: vanilla moves TriggerCtrl only through its Havok animations). One NIF for
     # third and first person (vanilla's 1stPersonCrossbow STAT names the same file).
-    "crossbow": dict(version="B3 (still trigger)", sources=[W(r"work_xbow_crossbowB3\tn_crossbowB3.nif"), W(r"work_xbow_crossbowB3\tn_crossbowB3_cocked.nif")],
+    "crossbow": dict(version="B4 (still trigger; v4 after the 07:41 test)", sources=[W(r"work_xbow_crossbowB4\tn_crossbowB4.nif"), W(r"work_xbow_crossbowB4\tn_crossbowB4_cocked.nif")],
                      builder="gb_crossbow",
-                     shapes={"metal": {"name": "metal", "tex": W(r"work_xbow_crossbowB3\tex\tn_crossbowB3"), "target": None, "design": W(r"work_xbow_crossbowB3")},
-                             "soft": {"name": "soft", "tex": W(r"work_xbow_crossbowB3\tex\tn_crossbowB3_soft"), "target": None},
+                     shapes={"metal": {"name": "metal", "tex": W(r"work_xbow_crossbowB4\tex\tn_crossbowB4"), "target": None, "design": W(r"work_xbow_crossbowB4")},
+                             "soft": {"name": "soft", "tex": W(r"work_xbow_crossbowB4\tex\tn_crossbowB4_soft"), "target": None},
                              "wrap": {"name": "wrap", "tex": W(r"work_gs5_sf\tex\tn_greatsword_wrap"), "target": None}},
                      third="crossbow.nif", first=None, stem="crossbow", van_dir=VAN_XBOW),
 }

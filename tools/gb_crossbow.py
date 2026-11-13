@@ -1,9 +1,11 @@
-# Truly Nordic Carved Weapons Replacer - the Blender half of the CROSSBOW game build (2026-11-13, design B3,
-# set2\work_xbow_crossbowB3). The owner 07:16 (via Main Agent): "if the animated crossbow won't work, just ship it
+# Truly Nordic Carved Weapons Replacer - the Blender half of the CROSSBOW game build (2026-11-13, design B4 - v4 after the owner's 07:41 test -
+# set2\work_xbow_crossbowB4; was B3). The owner 07:16 (via Main Agent): "if the animated crossbow won't work, just ship it
 # unanimated for now" - vanilla's trigger and string nut (TriggerCtrl, RollerNutTriggerCtrl) move only through the
 # behaviour graph's Havok animations, which are not re-keyed here, so:
-#   * the prod limbs and the string take vanilla's bone weights (nearest-face interpolated transfer from vanilla
-#     Crossbow:0, as the bow) - the draw and the reload bend and pull them as vanilla's;
+#   * the prod limbs take vanilla's LIMB weights (nearest face among vanilla's limb faces only) and the string vanilla's
+#     string scheme as a function of x (v4, see vanilla_string_weights) - the draw and the reload bend and pull them
+#     as vanilla's (vanilla's Havok clips crossbow_reload / _release move the limbs, StringR / StringL and
+#     CockingMechanismCtrl; nothing of ours is on CockingMechanismCtrl);
 #   * the lever, the catch and every other part (stock, lock box and plates, prod block, stirrup, wrap) are weighted
 #     100 % to CrossbowRoot - they stay still. A part keeps the transferred weights only if it reaches past |x| 8
 #     (the limbs start at vanilla's R01/L01 heads, |x| 2.97; the prod block's plates stay within |x| 6).
@@ -65,17 +67,33 @@ VG = [g for g in stats["vanilla_groups"] if not g.startswith("SBP_")]
 ROOT = [g for g in VG if g.lower() == "crossbowroot"]; assert ROOT, VG; ROOT = ROOT[0]
 MECH = {"CockingMechanismCtrl", "TriggerCtrl", "RollerNutTriggerCtrl"}
 STRINGB = {"StringR", "StringL"}
-# vanilla's string: the faces whose three vertices are dominated by StringR / StringL - our string takes its weights
-# from these alone (nearest-face from the whole mesh put our straight string, 0.4 in front of vanilla's, on the limbs)
-vstr = vmesh.copy(); vstr.data = vmesh.data.copy(); vstr.name = "vanilla_string"; bpy.context.collection.objects.link(vstr)
-def dominant(o, v):
-    gs = [g for g in v.groups if not o.vertex_groups[g.group].name.startswith("SBP_") and g.weight > 0]
-    return o.vertex_groups[max(gs, key=lambda g: g.weight).group].name if gs else None
-dv = [dominant(vstr, v) for v in vstr.data.vertices]
+LIMBB = {"CrossBowBone_R01", "CrossBowBone_R02", "CrossBowBone_L01", "CrossBowBone_L02"}
+# v4 (2026-11-13, after the owner's 07:41 test - "it tears the mesh and texture" going from unloaded to loaded, "stray
+# artifacts floating where the string would be"): the B3 build took the PROD's weights by nearest face from the whole
+# vanilla mesh; the limbs' rear halves lay nearest vanilla's string, got string weights, the string bones were stripped
+# and 1,760 limb vertices fell to CrossbowRoot - in the Havok draw the front half bent and the rear half stayed (4.1
+# units of stretch at crossbow_reload frame 57; set2\work_xbow_fix1113\lbs_check.py). Now:
+#   * the prod takes its weights only from vanilla's LIMB faces (every vertex at least half on the four limb bones);
+#   * the string takes vanilla's string scheme as an explicit function of x (vanilla_string_weights below).
+vlimb = vmesh.copy(); vlimb.data = vmesh.data.copy(); vlimb.name = "vanilla_limbs"; bpy.context.collection.objects.link(vlimb)
+def limb_share(o, v):
+    return sum(g.weight for g in v.groups if o.vertex_groups[g.group].name in LIMBB)
+lv = [limb_share(vlimb, v) for v in vlimb.data.vertices]
 import bmesh
-bm = bmesh.new(); bm.from_mesh(vstr.data); bm.faces.ensure_lookup_table()
-bmesh.ops.delete(bm, geom=[f for f in bm.faces if not all(dv[v.index] in STRINGB for v in f.verts)], context="FACES")
-stats["vanilla_string_faces"] = len(bm.faces); bm.to_mesh(vstr.data); bm.free()
+bm = bmesh.new(); bm.from_mesh(vlimb.data); bm.faces.ensure_lookup_table()
+bmesh.ops.delete(bm, geom=[f for f in bm.faces if not all(lv[v.index] >= 0.5 for v in f.verts)], context="FACES")
+stats["vanilla_limb_faces"] = len(bm.faces); bm.to_mesh(vlimb.data); bm.free()
+def vanilla_string_weights(x):
+    """vanilla crossbow.nif's own string weights as a function of x (vanilla frame; StringR / R02 on -x): the middle
+    50 / 50 StringR / StringL blending to 1.0 on its own side by |x| 1.8, 0.1 limb (R02 / L02) from |x| 23.9, 0.75 limb
+    on the loop round the tip (|x| >= 25.6)"""
+    ax = abs(x); own, oth, lb = ("StringR", "StringL", "CrossBowBone_R02") if x < 0 else ("StringL", "StringR", "CrossBowBone_L02")
+    w_oth = 0.5 * (1.0 - min(1.0, ax / 1.8))
+    w_lb = 0.0 if ax < 23.9 else (0.1 if ax < 24.9 else 0.1 + 0.65 * min(1.0, (ax - 24.9) / 0.7))
+    w = {own: 1.0 - w_oth - w_lb}
+    if w_oth > 1e-4: w[oth] = w_oth
+    if w_lb > 0: w[lb] = w_lb
+    return w
 def transfer(o, src, idx=None):
     select_only(o); m = o.modifiers.new("dt", "DATA_TRANSFER"); m.object = src; m.use_vert_data = True
     m.data_types_verts = {"VGROUP_WEIGHTS"}; m.vert_mapping = "POLYINTERP_NEAREST"
@@ -106,17 +124,23 @@ for role, o in roles.items():
         if a != b: par[a] = b
     P = np.array([list(v.co) for v in me.vertices]); comp = np.array([find(i) for i in range(len(P))])
     gi = {g.name: g.index for g in o.vertex_groups}; rigid = 0; limb = 0; dom = {}
-    strings = 0
+    strings = 0; limb_idx = []
     for c in np.unique(comp):
         idx = np.where(comp == c)[0]
         if np.abs(P[idx, 0]).max() < LIMB_X:
             for g in VG:
                 if g != ROOT: o.vertex_groups[g].remove(idx.tolist())
             o.vertex_groups[ROOT].add(idx.tolist(), 1.0, "REPLACE"); rigid += 1
-        elif role == "soft":     # a soft part reaching the prod tips is the string: vanilla's string faces' weights
-            transfer(o, vstr, idx.tolist()); renorm(o, idx, set(VG) - MECH); strings += 1
-        else:                    # the prod: its limb bones only (the string bones would bend the hooked tips)
-            renorm(o, idx, set(VG) - MECH - STRINGB); limb += 1
+        elif role == "soft":     # a soft part reaching the prod tips is the string: vanilla's string scheme by x
+            for i in idx.tolist():
+                for g in VG: o.vertex_groups[g].remove([i])
+                for k, x in vanilla_string_weights(P[i, 0]).items(): o.vertex_groups[k].add([i], x, "REPLACE")
+            strings += 1
+        else:                    # the prod: vanilla's limb faces only, limb bones (and the root) only - one transfer below
+            limb_idx += idx.tolist(); limb += 1
+    if limb_idx:
+        for g in VG: o.vertex_groups[g].remove(limb_idx)
+        transfer(o, vlimb, limb_idx); renorm(o, limb_idx, LIMBB | {ROOT})
     stats.setdefault("string_parts", {})[role] = strings
     for g in list(o.vertex_groups):
         if g.name not in VG: o.vertex_groups.remove(g)
