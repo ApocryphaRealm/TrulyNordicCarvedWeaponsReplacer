@@ -57,20 +57,25 @@ ITEMS = {
                        third="nordicgreatsword.nif", first="1stpersonnordicgreatsword.nif", stem="greatsword", weap="DLC2NordicGreatsword", fp_stat="03C351"),
     # -sf (1.1.0 shading fix, round 2, 2026-11-12): the same NIF with its carved faces' outline AND creases (edge chamfers,
     # caps) given their own vertices (set2\shading_fix_split.py --crease=35); geometry and maps identical; set2\shading-fix-1.1.0.png
-    "warhammer": dict(version="v2f-sf", sources=[W(r"work_wh2f_sf\tn_warhammer2.nif")], orient=True,   # v2f: v2e with the straight pommel (2026-11-11)
-                      shapes={"metal": {"name": "tn_warhammer2", "tex": W(r"work_wh2f_sf\tex\tn_warhammer2")}, "wrap": {"name": "TNWarhammer2Wrap", "tex": W(r"work_wh2f_sf\tex\tn_warhammer2_wrap")}},
+    # v2g-knurl (2026-11-12, the owner 20:05: "for the war axe and war hammer, I want the gnarling to be the entire face of the
+    # hammerhead"): v2f-sf's NIF with ONLY the hammer's striking face (x -15.3; the other end is the pick) replaced, spliced at
+    # the byte level (set2\knurl_full_geom.py + knurl_splice.py): 10 x 10 modelled pyramids edge to edge (0.58 x 0.54 pitch,
+    # 0.28 high, tips level with the old face plane), own vertices, UVs on the haft's plain steel; every other vertex record,
+    # triangle and map pixel is v2f-sf's (work_wh2g_sf\splice_proof.json); set2\axes-knurl-v2.jpg
+    "warhammer": dict(version="v2g-knurl", sources=[W(r"work_wh2g_sf\tn_warhammer2.nif")], orient=True,   # v2f: v2e with the straight pommel (2026-11-11)
+                      shapes={"metal": {"name": "tn_warhammer2", "tex": W(r"work_wh2g_sf\tex\tn_warhammer2")}, "wrap": {"name": "TNWarhammer2Wrap", "tex": W(r"work_wh2g_sf\tex\tn_warhammer2_wrap")}},
                       third="nordicwarhammer.nif", first="1stpersonnordicwarhammer.nif", stem="warhammer", weap="DLC2NordicWarhammer", fp_stat="03C355"),
     # added 2026-11-11 (the owner: "Did you add the Nordic War Axe?"); v3 = v2 with the straight pommel (00:28);
     # v4 (approved 2026-11-12 00:12): v3's mesh (the same NIF) repainted to the engraving layout rule
     # -sf (1.1.0 shading fix, round 2, 2026-11-12): the same NIF with its carved faces' outline AND creases (edge chamfers,
     # caps) given their own vertices (set2\shading_fix_split.py --crease=35); geometry and maps identical; set2\shading-fix-1.1.0.png
-    # v5-knurl (2026-11-12, the owner 19:18: "hammerheads ... gnarling like a meat tenderizer"): v4-sf's NIF with ONLY the
-    # poll's striking face replaced, spliced at the byte level (set2\waraxe_knurl_v5_geom.py + waraxe_knurl_v5_splice.py):
-    # a 0.39 flat margin, then 8 x 4 modelled pyramids (0.38 pitch, 0.19 high, tips level with v4's face plane), own
-    # vertices, UVs on the poll's existing plain steel; every other vertex record, triangle and map pixel is v4-sf's
-    # (work_wa5_sf\splice_proof.json); set2\axes-knurl.jpg
-    "waraxe": dict(version="v5-knurl", sources=[W(r"work_wa5_sf\tn_waraxe2.nif")], orient=True,
-                   shapes={"metal": {"name": "tn_waraxe2", "tex": W(r"work_wa5_sf\tex\tn_waraxe2")}, "wrap": {"name": "TNWaraxe2Wrap", "tex": W(r"work_wa5_sf\tex\tn_waraxe2_wrap")}},
+    # v6-knurl (2026-11-12, the owner 20:05: "I want the gnarling to be the entire face of the hammerhead"; supersedes v5's
+    # inset knurl): v4-sf's NIF with ONLY the poll's striking face replaced, spliced at the byte level (set2\knurl_full_geom.py
+    # + knurl_splice.py): 10 x 6 modelled pyramids edge to edge (0.38 x 0.39 pitch, 0.19 high, tips level with v4's face
+    # plane, the four corner ones clipped to the rounded outline), own vertices, UVs on the poll's plain steel; every other
+    # vertex record, triangle and map pixel is v4-sf's (work_wa6_sf\splice_proof.json); set2\axes-knurl-v2.jpg
+    "waraxe": dict(version="v6-knurl", sources=[W(r"work_wa6_sf\tn_waraxe2.nif")], orient=True,
+                   shapes={"metal": {"name": "tn_waraxe2", "tex": W(r"work_wa6_sf\tex\tn_waraxe2")}, "wrap": {"name": "TNWaraxe2Wrap", "tex": W(r"work_wa6_sf\tex\tn_waraxe2_wrap")}},
                    third="nordicwaraxe.nif", first="1stpersonnordiclwaraxe.nif", stem="waraxe", weap="DLC2NordicWarAxe", fp_stat="03C354"),
     # -sf (1.1.0 shading fix, round 2, 2026-11-12): the same NIF with its carved faces' outline AND creases (edge chamfers,
     # caps) given their own vertices (set2\shading_fix_split.py --crease=35); geometry and maps identical; set2\shading-fix-1.1.0.png
