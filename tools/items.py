@@ -97,12 +97,19 @@ ITEMS = {
                 third="nordicbow.nif", first=None, stem="bow", weap="DLC2NordicBow", fp_stat="03CA7C"),
     # 1.1.1 (2026-11-12): normals-only fix - carved faces' outline and creases given their own vertices
     # (set2\shading_fix_split.py --crease=35, real face dumps); geometry and maps identical
-    "shield": dict(version="v4-sf", sources=[W(r"work_sh4_sf\tn_shield4.nif")], orient=True,   # v4: vanilla's placement and profile, faces outward (2026-11-11)
-                   shapes={"metal": {"name": "tn_shield4_steel", "tex": W(r"work_sh4_sf\tex\tn_shield4_steel"), "target": 18000}, "board": {"name": "tn_shield4_board", "tex": W(r"work_sh4_sf\tex\tn_shield4_board"), "target": 2000}},
+    # v4-even (2026-11-12, the owner 19:18: "dark patches and light patches across the whole shield surface"): v4-sf's NIF
+    # (byte for byte) with the maps repainted without the low-frequency tone patches - steel: tn_knot.GRIME = 0 (maps_v3's
+    # 7x7-cell patina blotches, albedo x2 between dark and bright, held at their mean); board: the leather's 10x10-cell
+    # worn patches off, plank tone +-5 % (was 15). Carving height and normal maps byte-identical (set2\shield_v4_even_paint.py,
+    # set2\shields_shading\maps_diff_sh4.json); set2\shields-shading-fix.jpg
+    "shield": dict(version="v4-even", sources=[W(r"work_sh4_sf2\tn_shield4.nif")], orient=True,   # v4: vanilla's placement and profile, faces outward (2026-11-11)
+                   shapes={"metal": {"name": "tn_shield4_steel", "tex": W(r"work_sh4_sf2\tex\tn_shield4_steel"), "target": 18000}, "board": {"name": "tn_shield4_board", "tex": W(r"work_sh4_sf2\tex\tn_shield4_board"), "target": 2000}},
                    third=None, first=None, stem="shield", armo="DLC2ArmorNordicShield"),
     # the clean shield (optional file, 2026-11-11 22:46): v4 with the crest as a plain carved disc - no spikes, points or straps
-    "shield2": dict(version="v5 clean-sf", sources=[W(r"work_sh5_clean_sf\tn_shield5.nif")], orient=True, option=True,
-                    shapes={"metal": {"name": "tn_shield5_steel", "tex": W(r"work_sh5_clean_sf\tex\tn_shield5_steel"), "target": 18000}, "board": {"name": "tn_shield5_board", "tex": W(r"work_sh5_clean_sf\tex\tn_shield5_board"), "target": 2000}},
+    # v5 clean-even (2026-11-12): v5 clean-sf's NIF (byte for byte) with the same even repaint as shield v4-even
+    # (set2\shield_v5_even_paint.py; the board maps are v4-even's)
+    "shield2": dict(version="v5 clean-even", sources=[W(r"work_sh5_clean_sf2\tn_shield5.nif")], orient=True, option=True,
+                    shapes={"metal": {"name": "tn_shield5_steel", "tex": W(r"work_sh5_clean_sf2\tex\tn_shield5_steel"), "target": 18000}, "board": {"name": "tn_shield5_board", "tex": W(r"work_sh5_clean_sf2\tex\tn_shield5_board"), "target": 2000}},
                     third=None, first=None, stem="shieldclean", armo="DLC2ArmorNordicShield"),
     # quiver B4 + its arrows (2026-11-12 after 1.1.1; the owner: "Quiver B and the arrowheads from B, but I want the black
     # feathers for the fletching", then 08:35 the ring): B3's mesh byte for byte with the collar plate's triquetra on the
