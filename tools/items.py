@@ -6,6 +6,7 @@ import os, json
 PLAN = r"D:\Claude output\4. plans\nordic-carved-redesign-20261110"
 S2 = os.path.join(PLAN, "set2")
 VAN = os.path.join(PLAN, r"set\work\vanilla\meshes\dlc02\weapons\nordic")
+VAN_XBOW = os.path.join(S2, r"refs\vanilla_xbow\meshes\dlc01\weapons\crossbow")   # Dawnguard crossbow, bolt quiver, bolt projectile
 VAN_SHIELD = os.path.join(S2, r"work_sh1\vanilla\meshes\dlc02\armor\nordicshield\nordicshield.nif")
 WORK = os.path.join(PLAN, r"package\work")
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -99,13 +100,17 @@ ITEMS = {
     # the edges"): REPAINT ONLY of v3-sf - the NIF byte for byte; the blade flat's serpent replaced by outline + weave + the
     # triquetra (R 1.10) on the standard dark disc + polished ring with a 0.81 weave margin to the inset (set2\dagger_v4_paint.py
     # B); maps outside the blade island + 25 px = v3-sf's. The serpent v3-sf is the installer option "dagger2".
-    "dagger": dict(version="v4B", sources=[W(r"work_dg4B\tn_dagger2.nif")], orient=True,
+    # guard fix (2026-11-13, the owner 06:35: "Fix the guard"): both daggers' NIF is work_dg5_guard's - v3-sf with the
+    # guard face evenly rounded along its length (set2\dagger_guardfix_build.py: half thickness 1.08 - 0.0223 x^2, was a
+    # flat middle with smoothstep ends; ends 0.85 / 0.98, was 0.50) and the shading split re-run; the front outline, the
+    # UVs and every other vertex unchanged, so both daggers' maps stay valid
+    "dagger": dict(version="v4B (guard fix)", sources=[W(r"work_dg5_guard\tn_dagger2.nif")], orient=True,
                    sheath=dict(version="v6 (ringed symbol)", src=W(r"work_sheath_dagger_v6\tn_sheath_dagger_v6.nif"), tex=W(r"work_sheath_dagger_v6\tex\tn_sheath_dagger_v6")),
                    shapes={"metal": {"name": "tn_dagger2", "tex": W(r"work_dg4B\tex\tn_dagger2")}, "wrap": {"name": "TNDagger2Wrap", "tex": W(r"work_dg4B\tex\tn_dagger2_wrap")}},
                    third="nordicdagger.nif", first="1stpersonnordicdagger.nif", stem="dagger", weap="DLC2NordicDagger", fp_stat="03C350"),
     # the serpent dagger (v3-sf, the default until 2026-11-13) - the installer's alternate: its own texture folder (stem
     # daggerv2), installed at the shared dagger\dagger.nif like mace2; the same sheath
-    "dagger2": dict(version="v3-sf (serpent)", sources=[W(r"work_dg3_sf\tn_dagger2.nif")], orient=True, path_stem="dagger",
+    "dagger2": dict(version="v3-sf (serpent, guard fix)", sources=[W(r"work_dg5_guard\tn_dagger2.nif")], orient=True, path_stem="dagger",
                     sheath=dict(version="v6 (ringed symbol)", src=W(r"work_sheath_dagger_v6\tn_sheath_dagger_v6.nif"), tex=W(r"work_sheath_dagger_v6\tex\tn_sheath_dagger_v6")),
                     shapes={"metal": {"name": "tn_dagger2", "tex": W(r"work_dg3_sf\tex\tn_dagger2")}, "wrap": {"name": "TNDagger2Wrap", "tex": W(r"work_dg3_sf\tex\tn_dagger2_wrap")}},
                     third="nordicdagger.nif", first="1stpersonnordicdagger.nif", stem="daggerv2", weap="DLC2NordicDagger", fp_stat="03C350", option=True),
@@ -196,6 +201,18 @@ ITEMS = {
                             "wrap": {"name": "TNHalberdWrap", "tex": W(r"work_gs5_sf\tex\tn_greatsword_wrap"), "target": None}},
                     blood_region=[[-18.8, 73.6, -2.0], [13.3, 135.0, 2.0]],
                     third="nordicbattleaxe.nif", first="1stpersonnordicbattleaxe.nif", stem="halberd"),
+    # the bolt quiver B and its barbed bolts (2026-11-13; the owner 06:36 "make sure we have a crossbow and bolt models in
+    # the upload"; design set2\work_xbow_boltquiverB, gated - work_xbow_NOTES.md). A NEW item for the Additional Weapons file
+    # (AMMO "Carved Nordic Bolt"), built by gb_boltquiver.py like the arrow quiver: on vanilla Dawnguard steelbolt.nif's exact
+    # structure (ArrowRoot > Arrow > ArrowQuiver; ArrowQuiver:1 the case, Arrow1-Arrow4 the bolts in it that vanish as the
+    # count drops, Arrow:0 the loose / nocked bolt) and boltprojectile.nif's (SteelBoltFlight:0, the tracer kept). The
+    # design's five bolt ends go to the four slots (two share the slot nearest the fifth). Nothing decimated.
+    "boltquiver": dict(version="B", sources=[W(r"work_xbow_boltquiverB\tn_boltquiverB.nif"), W(r"work_xbow_boltquiverB\tn_boltBflight.nif")],
+                       builder="gb_boltquiver", atlas_role="bolt",
+                       shapes={"metal": {"name": "TNBoltQuiver", "tex": W(r"work_xbow_boltquiverB\tex\tn_boltquiverB"), "target": None, "design": W(r"work_xbow_boltquiverB")},
+                               "leather": {"name": "TNBoltQuiverSoft", "tex": W(r"work_xbow_boltquiverB\tex\tn_boltquiverB_soft"), "target": None},
+                               "bolt": {"name": "bolt", "tex": os.path.join(WORK, r"boltquiver\tex\tn_boltquiver_bolt"), "target": None, "design": W(r"work_xbow_boltquiverB")}},
+                       third="steelbolt.nif", flight="boltprojectile.nif", first=None, stem="boltquiver", van_dir=VAN_XBOW),
 }
 
 def vanilla_path(item, which):
@@ -207,8 +224,10 @@ def blender_config():
     probe = json.load(open(os.path.join(WORK, "vanilla_probe.json")))
     cfg = {}
     for k, it in ITEMS.items():
-        if it.get("builder") == "gb_quiver":   # gb_quiver.py: sources and out only (no blood, no decimation)
-            cfg[k] = {"out": os.path.join(WORK, k), "sources": it["sources"], "shapes": {r: {"name": sh["name"]} for r, sh in it["shapes"].items()}}; continue
+        if it.get("builder") in ("gb_quiver", "gb_boltquiver"):   # gb_quiver.py / gb_boltquiver.py: sources and out only (no blood, no decimation)
+            cfg[k] = {"out": os.path.join(WORK, k), "sources": it["sources"], "shapes": {r: {"name": sh["name"]} for r, sh in it["shapes"].items()}}
+            if it.get("van_dir"): cfg[k]["vanilla"] = {w: os.path.join(it["van_dir"], it[w]) for w in ("third", "flight")}
+            continue
         c = {"out": os.path.join(WORK, k), "sources": it["sources"], "shapes": {}, "skinned": it.get("skinned", False), "orient": it.get("orient", False)}
         if it.get("sheath"): c["sheath"] = it["sheath"]["src"]   # welded and oriented on its own, never decimated
         for role, sh in it["shapes"].items():
