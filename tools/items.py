@@ -97,9 +97,14 @@ ITEMS = {
                   third="nordicmace.nif", first="1stpersonnordicmace.nif", stem="macev2", weap="DLC2NordicMace", fp_stat="03C352", option=True),
     # v8 (2026-11-12): v2's limbs, grip and string; the riser plate redesigned (v3-v8) and its flat carved faces given
     # their own vertices (bow_v8_build.py: the surface gate passes, lean 0.3 deg p95 against v7's 24); skinned as before
-    "bow": dict(version="v9", sources=[W(r"work_bow9\tn_bow2.nif")], skinned=True,
-                shapes={"metal": {"name": "tn_bow2", "tex": W(r"work_bow9\tex\tn_bow2")}, "wrap": {"name": "TNBowWrap", "tex": W(r"work_bow9\tex\tn_bow2_wrap")},
-                        "string": {"name": "TNBowString", "tex": W(r"work_bow9\tex\tn_bow2_string"), "target": None}},
+    # v10A (2026-11-12/13, the owner 19:21: "the teardrop and other parts didn't have the same braiding going down it. But it
+    # should", 20:05: "Do the braid on the bow", 00:17: "The braid is good on the bow"): v9's mesh with the riser's
+    # string-side wall (the archer's side, collar to sleeve) on its own 55 px/unit island carrying the limb belly's straight
+    # braid, its vertices split from the chamfers; every other point and UV, and every texture pixel outside the new
+    # island, v9's (set2\bow_v10_build.py mode A, bow_v10_paint.py, work_bow10A\v10_proof.json; set2\bow-inner-face-options.jpg)
+    "bow": dict(version="v10A", sources=[W(r"work_bow10A\tn_bow2.nif")], skinned=True,
+                shapes={"metal": {"name": "tn_bow2", "tex": W(r"work_bow10A\tex\tn_bow2")}, "wrap": {"name": "TNBowWrap", "tex": W(r"work_bow10A\tex\tn_bow2_wrap")},
+                        "string": {"name": "TNBowString", "tex": W(r"work_bow10A\tex\tn_bow2_string"), "target": None}},
                 third="nordicbow.nif", first=None, stem="bow", weap="DLC2NordicBow", fp_stat="03CA7C"),
     # 1.1.1 (2026-11-12): normals-only fix - carved faces' outline and creases given their own vertices
     # (set2\shading_fix_split.py --crease=35, real face dumps); geometry and maps identical
