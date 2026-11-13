@@ -100,8 +100,12 @@ ITEMS = {
     # pointed maces (approved 2026-11-12 01:20: "mace looks good"): six-flanged v4 the default, classic v3 the option
     # -sf (1.1.0 shading fix, round 2, 2026-11-12): the same NIF with its carved faces' outline AND creases (edge chamfers,
     # caps) given their own vertices (set2\shading_fix_split.py --crease=35); geometry and maps identical; set2\shading-fix-1.1.0.png
-    "mace": dict(version="six-flanged v4-sf", sources=[W(r"work_mc4_sf\tn_mace.nif")], orient=True,
-                 shapes={"metal": {"name": "tn_mace", "tex": W(r"work_mc4_sf\tex\tn_mace")}, "wrap": {"name": "TNMaceWrap", "tex": W(r"work_mc4_sf\tex\tn_mace_wrap")}},
+    # v5B (2026-11-13, the owner 05:39: "instead of an alternate version i want the main one replaced with the version that has
+    # the no animal art and uses the symbol and braid or weave"; his pick 06:10: "Mace, option b"): REPAINT ONLY of v4-sf - the
+    # NIF byte for byte; the flange face's beast's head replaced by outline + weave + the triquetra on the standard dark filled
+    # disc + polished ring (set2\mace_v5_paint.py B; sheet set2\mace-v5-design-20261113); maps outside the face + 25 px = v4-sf's
+    "mace": dict(version="six-flanged v5B", sources=[W(r"work_mc5B\tn_mace.nif")], orient=True,
+                 shapes={"metal": {"name": "tn_mace", "tex": W(r"work_mc5B\tex\tn_mace")}, "wrap": {"name": "TNMaceWrap", "tex": W(r"work_mc5B\tex\tn_mace_wrap")}},
                  third="nordicmace.nif", first="1stpersonnordicmace.nif", stem="mace", weap="DLC2NordicMace", fp_stat="03C352"),
     # -sf (1.1.0 shading fix, round 2, 2026-11-12): the same NIF with its carved faces' outline AND creases (edge chamfers,
     # caps) given their own vertices (set2\shading_fix_split.py --crease=35); geometry and maps identical; set2\shading-fix-1.1.0.png
