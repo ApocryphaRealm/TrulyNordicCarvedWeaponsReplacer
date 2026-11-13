@@ -20,11 +20,16 @@ Written as changes happen, not reconstructed afterwards (rule 61). Each version 
 - Additional Weapons installer step, Halberd animations: the halberd uses the battleaxe moveset by default. The second choice adds Animated Armoury's WeapTypeHalberd keyword through Keyword Item Distributor, so Animated Armoury's halberd moveset and Simple Dodge's halberd dodge set pick it up.
 
 ### Changed
+- The six-flanged mace is re-carved with the set's weave and a triquetra on a dark disc in a polished ring, in place of the biting maw.
+- The dagger has a new default design carved with the set's braid and a black-ring triquetra; the serpent dagger stays as an installer option (Dagger step). Both daggers' guards are evenly rounded.
 - One naming convention, Carved Nordic, across every file. The Replacer files now rename the Nordic weapons, the Nordic shield and the Nordic arrow to Carved Nordic Sword, Carved Nordic Shield, Carved Nordic Arrow and so on. The ESP file also renames the enchanted copies, keeping each enchantment's name: Virtuous Carved Nordic Sword, Carved Nordic Mace of Fear. The No ESP file renames the base pieces through SkyPatcher and leaves the enchanted copies' names to the game or the enchantment mod in use.
 - Every carved Norse symbol now sits on a dark filled disc inside a polished ring: the lockets of the dagger, curved sword, straight sword and greatsword sheaths, the greatsword pommel and both plates of the bow riser. The models are unchanged; only the carving is repainted.
 
 ### Known
 - The arrow in flight ships as a loose file at the vanilla path; when another mod also replaces it, give this mod the higher priority (lower in the Mod Organizer 2 list) for the carved arrow to show.
+
+### Fixed
+- The curved and straight swords' sheaths no longer clip into armour on the hip.
 
 ## 1.1.1 - 2026-11-12 - untested
 
