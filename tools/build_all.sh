@@ -17,5 +17,6 @@ python -I "$T/assemble.py"
 python -I "$T/silhouette.py"
 python -I "$T/verify.py"
 python -I "$T/arrow_records.py"   # idempotent: adds the arrow records to the three plugins once
+python -I "$T/replacer_names.py"   # idempotent: the Replacer ESP's "Carved Nordic ..." names and its shield override
 python -I "$T/additional_records.py"   # writes the optional file's light plugin (both qualities) from additional_spec.py, from scratch
 python -I "$T/build-packages.py"

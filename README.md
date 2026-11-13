@@ -7,15 +7,15 @@ it is - its edges, its head, its silhouette - and is rebuilt to be realistic in 
 ## The models
 | Item | New look |
 |---|---|
-| Nordic Sword | single-edged curved blade, one-piece half guard sweeping up, hooked pommel, a bold carved braid running to the point; a falchion-shaped sheath |
-| Nordic Battleaxe | a tall upper horn, one long curved cutting edge down to a single beard point, a curved back spike; steel haft forged with the head, carved knot fields, a forged knob pommel |
-| Nordic Greatsword | double-edged blade, carved guards and ricasso, a triquetra medallion on a level boss at the lower guard, two wrapped grips; a straight sheath on the back |
-| Nordic Warhammer | hammer face and curved pick, a triquetra ring centred on the face, a forged knob pommel |
-| Nordic War Axe | bearded blade with a square hammer poll, a triquetra at the widest point, a forged knob pommel |
-| Nordic Dagger | kukri form, the blade carved with weave and a ringed triquetra (or, in the installer, a world serpent); its own sheath |
-| Nordic Mace | six-flanged head with pointed striking edges, every flange carved with weave and a ringed triquetra |
-| Nordic Bow | all-steel bow, a carved riser plate (a triquetra in a woven field inside a braid border) and a braid band along the riser; the string still draws and follows the arrow |
-| Nordic Shield | the carved crest filled out to the rim, the four points in place; sits on the arm and on the back where the vanilla shield does |
+| Carved Nordic Sword | single-edged curved blade, one-piece half guard sweeping up, hooked pommel, a bold carved braid running to the point; a falchion-shaped sheath |
+| Carved Nordic Battleaxe | a tall upper horn, one long curved cutting edge down to a single beard point, a curved back spike; steel haft forged with the head, carved knot fields, a forged knob pommel |
+| Carved Nordic Greatsword | double-edged blade, carved guards and ricasso, a triquetra medallion on a level boss at the lower guard, two wrapped grips; a straight sheath on the back |
+| Carved Nordic Warhammer | hammer face and curved pick, a triquetra ring centred on the face, a forged knob pommel |
+| Carved Nordic War Axe | bearded blade with a square hammer poll, a triquetra at the widest point, a forged knob pommel |
+| Carved Nordic Dagger | kukri form, the blade carved with weave and a ringed triquetra (or, in the installer, a world serpent); its own sheath |
+| Carved Nordic Mace | six-flanged head with pointed striking edges, every flange carved with weave and a ringed triquetra |
+| Carved Nordic Bow | all-steel bow, a carved riser plate (a triquetra in a woven field inside a braid border) and a braid band along the riser; the string still draws and follows the arrow |
+| Carved Nordic Shield | the carved crest filled out to the rim, the four points in place; sits on the arm and on the back where the vanilla shield does |
 
 The sheaths are black leather in one piece with a carved steel mouth and tip, and stay on the hip (the greatsword's on
 the back) when the weapon is drawn.
@@ -42,6 +42,11 @@ Standalone items (the same names at Nordic and Ebony quality): Carved Nordic Swo
 Battleaxe, Carved Nordic Greatsword, Carved Nordic Warhammer, Carved Nordic Dagger, Carved Nordic Mace, Carved Nordic
 Bow, Carved Nordic Shield, Carved Nordic Arrow. The installer's model choices (saber or straight sword, and so on) change
 only the model, not the name.
+
+Replacer names: the Replacer files rename the Nordic pieces to the same names - Carved Nordic Sword, ... Carved
+Nordic Shield, Carved Nordic Arrow. The ESP file also renames the enchanted copies the same way ("Virtuous Carved
+Nordic Sword", "Carved Nordic Mace of Fear"); the No ESP file renames the base pieces only, so a mod that re-enchants
+and renames the enchanted copies (Thaumaturgy, for one) keeps its own names.
 
 Optional file, Additional Weapons: carved weapons the game does not have, in their own light plugin
 (`TrulyNordicCarvedWeapons - Additional Weapons.esp`), installed beside any main file, at Nordic or Ebony quality.

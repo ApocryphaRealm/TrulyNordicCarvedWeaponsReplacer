@@ -43,7 +43,7 @@ def model(subs, path): P.set_sub(subs, "MODL", P.zs(path)); P.set_sub(subs, "MOD
 def replacer():
     pl = P.Plugin(ESP)
     if any(struct.unpack_from("<I", h, 12)[0] == DB_AMMO for h, _ in pl.records("AMMO")): print("replacer: AMMO override already present"); return None
-    h, subs = P.copy_record(DB, "AMMO", DB_AMMO, pl, strings={"FULL": "Nordic Arrow"})
+    h, subs = P.copy_record(DB, "AMMO", DB_AMMO, pl, strings={"FULL": "Carved Nordic Arrow"})
     model(subs, QUIVER); pl.add("AMMO", h, P.pack_subs(subs)); return pl
 
 def standalone(path, quality):
