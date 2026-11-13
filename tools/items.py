@@ -6,6 +6,7 @@ import os, json
 PLAN = r"D:\Claude output\4. plans\nordic-carved-redesign-20261110"
 S2 = os.path.join(PLAN, "set2")
 VAN = os.path.join(PLAN, r"set\work\vanilla\meshes\dlc02\weapons\nordic")
+VAN_XBOW = os.path.join(S2, r"refs\vanilla_xbow\meshes\dlc01\weapons\crossbow")   # Dawnguard crossbow, bolt quiver, bolt projectile
 VAN_SHIELD = os.path.join(S2, r"work_sh1\vanilla\meshes\dlc02\armor\nordicshield\nordicshield.nif")
 WORK = os.path.join(PLAN, r"package\work")
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -200,6 +201,18 @@ ITEMS = {
                             "wrap": {"name": "TNHalberdWrap", "tex": W(r"work_gs5_sf\tex\tn_greatsword_wrap"), "target": None}},
                     blood_region=[[-18.8, 73.6, -2.0], [13.3, 135.0, 2.0]],
                     third="nordicbattleaxe.nif", first="1stpersonnordicbattleaxe.nif", stem="halberd"),
+    # the bolt quiver B and its barbed bolts (2026-11-13; the owner 06:36 "make sure we have a crossbow and bolt models in
+    # the upload"; design set2\work_xbow_boltquiverB, gated - work_xbow_NOTES.md). A NEW item for the Additional Weapons file
+    # (AMMO "Carved Nordic Bolt"), built by gb_boltquiver.py like the arrow quiver: on vanilla Dawnguard steelbolt.nif's exact
+    # structure (ArrowRoot > Arrow > ArrowQuiver; ArrowQuiver:1 the case, Arrow1-Arrow4 the bolts in it that vanish as the
+    # count drops, Arrow:0 the loose / nocked bolt) and boltprojectile.nif's (SteelBoltFlight:0, the tracer kept). The
+    # design's five bolt ends go to the four slots (two share the slot nearest the fifth). Nothing decimated.
+    "boltquiver": dict(version="B", sources=[W(r"work_xbow_boltquiverB\tn_boltquiverB.nif"), W(r"work_xbow_boltquiverB\tn_boltBflight.nif")],
+                       builder="gb_boltquiver", atlas_role="bolt",
+                       shapes={"metal": {"name": "TNBoltQuiver", "tex": W(r"work_xbow_boltquiverB\tex\tn_boltquiverB"), "target": None, "design": W(r"work_xbow_boltquiverB")},
+                               "leather": {"name": "TNBoltQuiverSoft", "tex": W(r"work_xbow_boltquiverB\tex\tn_boltquiverB_soft"), "target": None},
+                               "bolt": {"name": "bolt", "tex": os.path.join(WORK, r"boltquiver\tex\tn_boltquiver_bolt"), "target": None, "design": W(r"work_xbow_boltquiverB")}},
+                       third="steelbolt.nif", flight="boltprojectile.nif", first=None, stem="boltquiver", van_dir=VAN_XBOW),
 }
 
 def vanilla_path(item, which):
@@ -211,8 +224,10 @@ def blender_config():
     probe = json.load(open(os.path.join(WORK, "vanilla_probe.json")))
     cfg = {}
     for k, it in ITEMS.items():
-        if it.get("builder") == "gb_quiver":   # gb_quiver.py: sources and out only (no blood, no decimation)
-            cfg[k] = {"out": os.path.join(WORK, k), "sources": it["sources"], "shapes": {r: {"name": sh["name"]} for r, sh in it["shapes"].items()}}; continue
+        if it.get("builder") in ("gb_quiver", "gb_boltquiver"):   # gb_quiver.py / gb_boltquiver.py: sources and out only (no blood, no decimation)
+            cfg[k] = {"out": os.path.join(WORK, k), "sources": it["sources"], "shapes": {r: {"name": sh["name"]} for r, sh in it["shapes"].items()}}
+            if it.get("van_dir"): cfg[k]["vanilla"] = {w: os.path.join(it["van_dir"], it[w]) for w in ("third", "flight")}
+            continue
         c = {"out": os.path.join(WORK, k), "sources": it["sources"], "shapes": {}, "skinned": it.get("skinned", False), "orient": it.get("orient", False)}
         if it.get("sheath"): c["sheath"] = it["sheath"]["src"]   # welded and oriented on its own, never decimated
         for role, sh in it["shapes"].items():
