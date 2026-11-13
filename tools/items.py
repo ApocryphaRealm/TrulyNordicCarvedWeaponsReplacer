@@ -64,8 +64,13 @@ ITEMS = {
     # v4 (approved 2026-11-12 00:12): v3's mesh (the same NIF) repainted to the engraving layout rule
     # -sf (1.1.0 shading fix, round 2, 2026-11-12): the same NIF with its carved faces' outline AND creases (edge chamfers,
     # caps) given their own vertices (set2\shading_fix_split.py --crease=35); geometry and maps identical; set2\shading-fix-1.1.0.png
-    "waraxe": dict(version="v4-sf", sources=[W(r"work_wa4_sf\tn_waraxe2.nif")], orient=True,
-                   shapes={"metal": {"name": "tn_waraxe2", "tex": W(r"work_wa4_sf\tex\tn_waraxe2")}, "wrap": {"name": "TNWaraxe2Wrap", "tex": W(r"work_wa4_sf\tex\tn_waraxe2_wrap")}},
+    # v5-knurl (2026-11-12, the owner 19:18: "hammerheads ... gnarling like a meat tenderizer"): v4-sf's NIF with ONLY the
+    # poll's striking face replaced, spliced at the byte level (set2\waraxe_knurl_v5_geom.py + waraxe_knurl_v5_splice.py):
+    # a 0.39 flat margin, then 8 x 4 modelled pyramids (0.38 pitch, 0.19 high, tips level with v4's face plane), own
+    # vertices, UVs on the poll's existing plain steel; every other vertex record, triangle and map pixel is v4-sf's
+    # (work_wa5_sf\splice_proof.json); set2\axes-knurl.jpg
+    "waraxe": dict(version="v5-knurl", sources=[W(r"work_wa5_sf\tn_waraxe2.nif")], orient=True,
+                   shapes={"metal": {"name": "tn_waraxe2", "tex": W(r"work_wa5_sf\tex\tn_waraxe2")}, "wrap": {"name": "TNWaraxe2Wrap", "tex": W(r"work_wa5_sf\tex\tn_waraxe2_wrap")}},
                    third="nordicwaraxe.nif", first="1stpersonnordiclwaraxe.nif", stem="waraxe", weap="DLC2NordicWarAxe", fp_stat="03C354"),
     # -sf (1.1.0 shading fix, round 2, 2026-11-12): the same NIF with its carved faces' outline AND creases (edge chamfers,
     # caps) given their own vertices (set2\shading_fix_split.py --crease=35); geometry and maps identical; set2\shading-fix-1.1.0.png
