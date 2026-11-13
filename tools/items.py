@@ -75,8 +75,13 @@ ITEMS = {
     # + knurl_splice.py): 10 x 6 modelled pyramids edge to edge (0.38 x 0.39 pitch, 0.19 high, tips level with v4's face
     # plane, the four corner ones clipped to the rounded outline), own vertices, UVs on the poll's plain steel; every other
     # vertex record, triangle and map pixel is v4-sf's (work_wa6_sf\splice_proof.json); set2\axes-knurl-v2.jpg
-    "waraxe": dict(version="v6-knurl", sources=[W(r"work_wa6_sf\tn_waraxe2.nif")], orient=True,
-                   shapes={"metal": {"name": "tn_waraxe2", "tex": W(r"work_wa6_sf\tex\tn_waraxe2")}, "wrap": {"name": "TNWaraxe2Wrap", "tex": W(r"work_wa6_sf\tex\tn_waraxe2_wrap")}},
+    # v7-knurl (2026-11-13, the owner 2026-11-12 20:48 / 2026-11-13 01:48: "the war axe doesn't have the symbol in the black
+    # filled circle"): v6-knurl's NIF byte for byte; the blade's triquetra (both faces share the pixels) repainted onto the
+    # set's standard medallion - dark filled disc R + 0.12, polished ring 0.12, the weave's rim and groove - R 3.458 -> 3.35
+    # so the ring clears the braid; every map pixel outside the changed medallion zone + 25 px is v6's (set2\waraxe_paint_v7.py,
+    # work_wa7_sf\engraving_check.json "_atlas"); set2\medallion-pass-20261113\
+    "waraxe": dict(version="v7-knurl", sources=[W(r"work_wa7_sf\tn_waraxe2.nif")], orient=True,
+                   shapes={"metal": {"name": "tn_waraxe2", "tex": W(r"work_wa7_sf\tex\tn_waraxe2")}, "wrap": {"name": "TNWaraxe2Wrap", "tex": W(r"work_wa7_sf\tex\tn_waraxe2_wrap")}},
                    third="nordicwaraxe.nif", first="1stpersonnordiclwaraxe.nif", stem="waraxe", weap="DLC2NordicWarAxe", fp_stat="03C354"),
     # -sf (1.1.0 shading fix, round 2, 2026-11-12): the same NIF with its carved faces' outline AND creases (edge chamfers,
     # caps) given their own vertices (set2\shading_fix_split.py --crease=35); geometry and maps identical; set2\shading-fix-1.1.0.png
