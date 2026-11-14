@@ -18,6 +18,12 @@ from scipy.spatial import ConvexHull
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from items import ITEMS, WORK, MESH_REL, TEX_REL, VAN, vanilla_path
 sys.path.insert(0, r"D:\Claude output\4. plans\nordic-double-bit-axe"); import niflib
+# the plain TruePBR shader template. It was read from PGPatcher's output of the vanilla first-person Nordic sword (its "Scb"
+# shape) in the Test profile's PGPatcher Output; a PGPatcher re-run with our Replacer installed (2026-11-14) no longer writes
+# that file, so the block is kept in the repo: data\truepbr_plain_shader.bin = that template exactly as every staged shape
+# of 1.3.0 carries it (name and texture-set refs -1, SLSF1 Skinned clear; identical on the sword, spear and crossbow shapes).
+# PGP stays as the fallback source when the file is missing.
+TEMPLATE_BIN = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", "truepbr_plain_shader.bin")
 PGP = r"D:\Modlists\Njordlinger\mods\PGPatcher Output - Njordlinger Test\meshes\dlc02\weapons\nordic\1stpersonnordicsword.nif"
 HK = 69.99124
 STAGE = os.path.join(WORK, "stage")
@@ -46,11 +52,16 @@ def texset_of(n, sh): return n.i32(sh, n.ref_offsets(sh)[0][-1])
 def parent_of(n, b):
     for p, t in enumerate(n.btypes):
         if t in niflib.NODES and b in n.children(p)[0]: return p
-pg = niflib.Nif(PGP)
-_sc = [b for b in shapes_of(pg) if pg.name(b) == "Scb"][0]; _sh = shader_of(pg, _sc)
-T_PLAIN = bytearray(pg.blocks[_sh]); struct.pack_into("<i", T_PLAIN, 12, -1)
-_f1, _f2 = struct.unpack_from("<II", T_PLAIN, pg.net_end(_sh, 4, [], []))
-assert struct.unpack_from("<I", T_PLAIN, 0)[0] == 0 and _f2 & 0x00800000, "template is not the plain TruePBR block"
+if os.path.isfile(TEMPLATE_BIN):
+    T_PLAIN = bytearray(open(TEMPLATE_BIN, "rb").read())
+    # the flags sit after the NiObjectNET head (name -1, no extra data, controller -1: 12 bytes) and the shader type (4)
+    _f1, _f2 = struct.unpack_from("<II", T_PLAIN, 16)
+else:
+    pg = niflib.Nif(PGP)
+    _sc = [b for b in shapes_of(pg) if pg.name(b) == "Scb"][0]; _sh = shader_of(pg, _sc)
+    T_PLAIN = bytearray(pg.blocks[_sh]); struct.pack_into("<i", T_PLAIN, 12, -1)
+    _f1, _f2 = struct.unpack_from("<II", T_PLAIN, pg.net_end(_sh, 4, [], []))
+assert struct.unpack_from("<I", T_PLAIN, 0)[0] == 0 and _f2 & 0x00800000 and not _f1 & 0x2, "template is not the plain TruePBR block"
 
 def tex_paths(item, role):
     stem = ITEMS[item]["stem"]; name = f"tn_{stem}" + ("" if role == "metal" else f"_{role}")

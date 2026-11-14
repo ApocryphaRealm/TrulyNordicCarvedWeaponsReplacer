@@ -478,7 +478,7 @@ def build_additional(dest, ver):
     for it in AS.ADDITIONAL: place(it["item"], common, "additional")
     for q, (pdir, _, fold, _) in AS.QUALITIES.items():
         put(os.path.join(REPO, "plugin", pdir, AS.PLUGIN), os.path.join(dest, fold, AS.PLUGIN))
-        if q == "ebony":   # 1.3.0: the Ebony quality's items in the Ebony look (the held crossbow / bolts would stay shared)
+        if q == "ebony":   # 1.3.0: the Ebony quality's items in the Ebony look (1.4.0: the crossbow and bolts too)
             for it in AS.ADDITIONAL:
                 if it["item"] in EBL.EBONY_ITEMS: place(it["item"], os.path.join(dest, fold), "additional", ebony=True)
     for it in AS.ADDITIONAL:

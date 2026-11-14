@@ -112,12 +112,14 @@ ADDITIONAL = [
     # STAT names the same file as the WEAP). Stats between the crossbow (value 120, weight 14, damage 19, crit 9) and the
     # dwarven crossbow (350, 20, 22, 11) at Nordic quality, above both at Ebony. Recipes: the Standalone's bow recipe and
     # temper of that quality (its materials, perk and benches), pointed at the crossbow.
+    # 2026-11-14: design B5 with vanilla's bent arms and a cocking lever on CockingMechanismCtrl; the lever's crossbar
+    # reaches game z -3.43, so the bounds' top went from -3 to -4.
     dict(item="crossbow", image="halberd.jpg",
          records=[
              dict(sig="STAT", fid=0x80B, edid="TNCW_Crossbow_1st", template=("Dawnguard.esm", "1stPersonCrossbow"),
                   set={"MODL": r"TrulyNordic\crossbow\crossbow.nif"}),
              dict(sig="WEAP", fid=0x80C, edid="TNCW_Crossbow", template=("Dawnguard.esm", "DLC1CrossBow"),
-                  set={"FULL": "Carved Nordic Crossbow", "MODL": r"TrulyNordic\crossbow\crossbow.nif", "OBND": (-27, -28, -3, 27, 29, 7),
+                  set={"FULL": "Carved Nordic Crossbow", "MODL": r"TrulyNordic\crossbow\crossbow.nif", "OBND": (-27, -28, -4, 27, 29, 7),
                        "stats": {"nordic": (240, 17.0, 20, 10, 1.0, 1.0), "ebony": (900, 19.0, 25, 12, 1.0, 1.0)}}),
              dict(sig="COBJ", fid=0x80D, edid="TNCW_Crossbow_Recipe", template=("standalone", "TNCW_Bow_Recipe"), retarget={"CNAM": "TNCW_Crossbow"}),
              dict(sig="COBJ", fid=0x80E, edid="TNCW_Crossbow_Temper", template=("standalone", "TNCW_Bow_Temper"), retarget={"CNAM": "TNCW_Crossbow"}),
@@ -140,6 +142,8 @@ check()
 # without the crossbow and bolts" - the crossbow is being reworked after his in-game test). Every consumer (plugin
 # records, package, FOMOD steps) reads ADDITIONAL, so a held item ships nothing; remove it from HOLD to ship it again.
 # TN_HOLD="" in the environment ships everything (for building and testing the held items).
+# 2026-11-14 (the owner 05:02 "prep the Crossbow for testing next"): the crossbow (design B5, bent arms, cocking lever) and
+# the bolt quiver come out of HOLD for the 1.4.0 test build. TN_HOLD="crossbow,boltquiver" holds them again.
 import os as _os
-HOLD = {"crossbow", "boltquiver"} if _os.environ.get("TN_HOLD") is None else set(filter(None, _os.environ["TN_HOLD"].split(",")))
+HOLD = set() if _os.environ.get("TN_HOLD") is None else set(filter(None, _os.environ["TN_HOLD"].split(",")))
 ADDITIONAL = [it for it in ADDITIONAL if it["item"] not in HOLD]

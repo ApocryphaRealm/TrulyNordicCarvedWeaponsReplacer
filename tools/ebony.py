@@ -48,10 +48,10 @@ EB_TEX = TEX_REL + "\\" + EB                   # textures\pbr\TrulyNordic\ebony
 EB_WORK = os.path.join(WORK, EB)
 EB_STAGE = os.path.join(STAGE, EB)
 # every item an Ebony quality file ships: the main files' defaults and installer alternates, and the Additional Weapons
-# file's spear and halberd (its crossbow and bolts are on HOLD and stay on the shared look)
+# file's spear and halberd, and (1.4.0, 2026-11-14) its crossbow and bolt quiver / bolts
 MAIN = ["sword", "sword2", "battleaxe", "greatsword", "warhammer", "waraxe", "dagger", "dagger2", "mace", "mace2", "bow",
         "shield", "shield2", "quiver"]
-ADDITIONAL = ["spear", "halberd"]
+ADDITIONAL = ["spear", "halberd", "crossbow", "boltquiver"]
 EBONY_ITEMS = MAIN + ADDITIONAL
 
 GOLD = np.array([0.93, 0.74, 0.40], np.float32)      # satin gold (sRGB albedo) - the study's tone
@@ -274,6 +274,8 @@ def mesh_map(item):
     out.append((os.path.join(st, MESH_REL, it["stem"], it["stem"] + ".nif"), os.path.join(EB_MESH, at, at + ".nif")))
     if item == "quiver":
         out.append((os.path.join(st, MESH_REL, "quiver", "arrowflight.nif"), os.path.join(EB_MESH, "quiver", "arrowflight.nif")))
+    elif item == "boltquiver":     # the bolt in flight (the PROJ's model), beside the quiver / bolts
+        out.append((os.path.join(st, MESH_REL, "boltquiver", "boltflight.nif"), os.path.join(EB_MESH, "boltquiver", "boltflight.nif")))
     elif it.get("new_item"):
         out.append((os.path.join(st, MESH_REL, at, "1stperson" + at + ".nif"), os.path.join(EB_MESH, at, "1stperson" + at + ".nif")))
     elif item in ("battleaxe", "greatsword"):   # the Standalone's own first-person files (build-packages.FIRST_OWN)
@@ -308,7 +310,7 @@ def plugin_paths(path):
     r"""Point an Ebony quality plugin's model paths (MODL / MOD2 / MOD3 / MOD4, every record type) of the Ebony items at
     meshes\TrulyNordic\ebony\<item>\ - TrulyNordic\<at>\ -> TrulyNordic\ebony\<at>\ for each item folder in EBONY_AT,
     nothing else changed (rename_plugin_paths.rewrite: subrecord, record and GRUP sizes rewritten). Idempotent: an
-    ebony path no longer matches. Items outside EBONY_ITEMS (the held crossbow and bolts) keep the shared paths."""
+    ebony path no longer matches. Items outside EBONY_ITEMS keep the shared paths."""
     import rename_plugin_paths as RP
     b = open(path, "rb").read(); total = 0
     for at in EBONY_AT:

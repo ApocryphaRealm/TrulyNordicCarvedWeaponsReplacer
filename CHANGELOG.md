@@ -8,6 +8,15 @@ Written as changes happen, not reconstructed afterwards (rule 61). Each version 
 * **failed** - built but crashed or malfunctioned; the number was reclaimed
 * **scratch** - a hypothesis-test build that never held a real number
 
+## 1.4.0 - 2026-11-14 - untested
+
+### Added
+- Additional Weapons: Carved Nordic Bolts in a carved leather bolt quiver with a steel collar plate. The bolts drop out of the quiver as the count falls, and the bolt in flight is the same carved bolt. Forged 10 at a time, at Nordic or Ebony quality.
+- Additional Weapons: the Carved Nordic Crossbow, a new crossbow in the Nordic carved style. Its stock carries a flat steel deck with the bolt groove inset to the front face, one roller nut holding the string, an engraved steel-plated hand-hold block with the triquetra on its lock plates, and the prod mounted on the front face in a steel bridle with a stirrup. The arms stand on edge with a carved braid on their faces and are bent back like the vanilla crossbow's. A steel cocking lever swings up during the reload, as on the vanilla crossbow. It draws and reloads with the vanilla crossbow animations, and is forged and tempered at Nordic or Ebony quality.
+
+### Changed
+- Additional Weapons, Ebony quality: the crossbow and the bolts take the black-and-gold Ebony look like the spear and halberd.
+
 ## 1.3.0 - 2026-11-13 - untested
 
 ### Changed
