@@ -151,6 +151,8 @@ def build(q):
         h = bytearray(h); struct.pack_into("<I", h, 12, own_idx | rec["fid"]); pl.add(rec["sig"], h, P.pack_subs(out))
         top = max(top, rec["fid"])
     pl.bump_next_id(top + 1); pl.save(tmp); os.replace(tmp, out_path(q))
+    if q == "ebony":   # 1.3.0: the Ebony quality's spear and halberd are the black-and-gold models (tools\ebony.py)
+        import ebony; ebony.plugin_paths(out_path(q))
     return out_path(q)
 
 def readback(path):

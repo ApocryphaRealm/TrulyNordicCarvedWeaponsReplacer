@@ -19,3 +19,6 @@ for sub, src in SRC.items():
         if t == b"HEDR": hedr = struct.unpack_from("<fiI", dd, 0)
         q += 6 + L
     print(sub, "flags", hex(struct.unpack_from("<I", b, 8)[0]), "masters", mast, "records", hedr[1], "next id", hex(hedr[2]), len(b), "bytes")
+# 1.3.0 (2026-11-13): the Ebony quality's models are the black-and-gold copies at meshes\TrulyNordic\ebony\ (tools\ebony.py)
+import sys; sys.path.insert(0, os.path.dirname(os.path.abspath(__file__))); import ebony
+ebony.plugin_paths(os.path.join(REPO, "plugin", "standalone-ebony", NAME))
