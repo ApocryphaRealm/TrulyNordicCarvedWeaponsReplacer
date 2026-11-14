@@ -7,7 +7,7 @@
 # stored slope n.xy/n.z by k = density / 31 and renormalising - done here per UV island (each island's median texel
 # density, measured from the model's own triangles), in float, from the painter's 8-bit normal PNG.
 #
-# Run: python -I textures.py [item ...]      (writes <WORK>\<item>\tex\*.png and <STAGE>\textures\...\*.dds)
+# Run: python -I textures.py [--quality nordic|ebony] [item ...]      (writes <WORK>\<item>\tex\*.png and <STAGE>\textures\...\*.dds)
 import os, sys, json, subprocess, shutil
 import numpy as np
 from PIL import Image, ImageDraw
@@ -142,4 +142,13 @@ def build(item):
     print(item, json.dumps(rep)[:600])
 
 if __name__ == "__main__":
-    for k in (sys.argv[1:] or list(ITEMS)): build(k)
+    # the quality axis (1.3.0): "--quality ebony" builds the Ebony look's textures and model copies (tools/ebony.py:
+    # textures/pbr/TrulyNordic/ebony/<stem>/, the black-and-gold recolour of these same maps); run it after assemble.py
+    a = sys.argv[1:]
+    if a[:1] == ["--quality"]:
+        q = a[1] if len(a) > 1 else ""
+        if q == "nordic": a = a[2:]
+        elif q == "ebony":
+            import ebony; ebony.build(a[2:] or ebony.EBONY_ITEMS); sys.exit(0)
+        else: raise SystemExit(f"--quality nordic|ebony, not {q!r}")
+    for k in (a or list(ITEMS)): build(k)

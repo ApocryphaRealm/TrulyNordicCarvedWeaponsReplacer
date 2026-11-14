@@ -11,7 +11,10 @@ MAIN FILES (each a FOMOD: Common + the steps Sword, Mace, Shield - the default o
     Replacer - ESP              the same files and TrulyNordicCarvedWeapons.esp in place of the SkyPatcher ini
     Standalone - Nordic quality new items (TrulyNordicCarvedWeapons - Standalone.esp), crafted and tempered like the
                                 Nordic pieces; the vanilla items are untouched (every file at our own paths)
-    Standalone - Ebony quality  the same items with the Ebony pieces' numbers, keyword and recipes (same plugin name)
+    Standalone - Ebony quality  the same items with the Ebony pieces' numbers, keyword and recipes (same plugin name),
+                                and the Ebony LOOK (1.3.0): black ebony steel, gold knotwork and gold haft rings - every
+                                model and texture at meshes\TrulyNordic\ebony\ / textures\pbr\TrulyNordic\ebony\
+                                (tools\ebony.py), its installer pictures from fomod\images\ebony\
     Each option folder holds its model at the shared path (sword\sword.nif, mace\mace.nif, the shield), so only the
     chosen model is installed and the records find it whichever was chosen.
 
@@ -22,7 +25,9 @@ step), and a KID step per item that has one. Built from the table in additional_
 WHAT IT REFUSES
     * a staged file missing for any item;
     * a texture path in a shipped NIF that an install (Common + one option per step, every combination) does not contain;
-    * a model path in a Standalone plugin that an install does not contain, or a vanilla path in a Standalone package.
+    * a model path in a Standalone plugin that an install does not contain, or a vanilla path in a Standalone package;
+    * (1.3.0) an Ebony quality install that ships a shared-look model or texture, or a NIF that names one; any other
+      install that ships an ebony one.
 NEVER DELETES A PACKAGE: a release folder this build replaces is moved to <project>\_work\superseded-packages\<date>\.
 
 Usage:  python tools/build-packages.py [output folder]
@@ -46,6 +51,7 @@ ARMO_INI_DIR = r"SKSE\Plugins\SkyPatcher\armor\TrulyNordicCarvedWeaponsReplacer"
 # the names (2026-11-13, the owner 06:48 "Yes they should rename them"): the No-ESP edition renames the same records the
 # ESP overrides, by FormID (replacer_names.names_ini_lines reads them back from the ESP), one names ini per type folder
 import replacer_names as RN
+import ebony as EBL                # the Ebony look (1.3.0): its staged models and textures, and its folder names
 NAMES_INI = "TrulyNordicCarvedWeapons - Names.ini"
 VAN_FLIGHT = r"meshes\dlc02\weapons\nordic\nordicarrowflight.nif"
 SA_PLUGIN = "TrulyNordicCarvedWeapons - Standalone.esp"
@@ -87,7 +93,9 @@ def first_vanilla(item):    # staged first-person file at the vanilla path (Repl
     if item.startswith("shield"): return os.path.join(STAGE, item, VAN_SHIELD), VAN_SHIELD
     rel = r"meshes\dlc02\weapons\nordic" + "\\" + (it["first"] or it["third"])
     return os.path.join(STAGE, item, rel), rel
-def textures(item, dest): put_tree(os.path.join(STAGE, TEX_REL, ITEMS[item]["stem"]), os.path.join(dest, TEX_REL, ITEMS[item]["stem"]))
+def textures(item, dest, ebony=False):
+    rel = EBL.EB_TEX if ebony else TEX_REL
+    put_tree(os.path.join(STAGE, rel, ITEMS[item]["stem"]), os.path.join(dest, rel, ITEMS[item]["stem"]))
 
 def ini_line(item):
     it = ITEMS[item]
@@ -104,13 +112,15 @@ def nif_textures(path):
     return out
 def plugin_models(path):
     """Every MODL path in a plugin (uncompressed records, as houseCARL writes them)."""
-    b = open(path, "rb").read(); out = set(); i = 0
-    while True:
-        i = b.find(b"MODL", i)
-        if i < 0: break
-        L = struct.unpack_from("<H", b, i + 4)[0]; s = b[i + 6:i + 6 + L].rstrip(b"\0")
-        if s.lower().endswith(b".nif"): out.add("meshes\\" + s.decode("latin-1"))
-        i += 6
+    b = open(path, "rb").read(); out = set()
+    for tag in (b"MODL", b"MOD2", b"MOD3", b"MOD4"):   # MOD2-4: the shield's ARMO / ARMA models (1.3.0)
+        i = 0
+        while True:
+            i = b.find(tag, i)
+            if i < 0: break
+            L = struct.unpack_from("<H", b, i + 4)[0]; s = b[i + 6:i + 6 + L].rstrip(b"\0")
+            if s.lower().endswith(b".nif"): out.add("meshes\\" + s.decode("latin-1"))
+            i += 6
     return out
 def check_textures(folders):
     for folder in folders:
@@ -162,9 +172,14 @@ PACKAGES = {  # folder: (kind, plugin or ini, description for info.xml)
     "Standalone - Ebony quality": ("standalone", "ebony", "Adds the carved set as new items with the ebony pieces' stats and recipes. The vanilla Nordic items are untouched."),
 }
 
-def place(item, dest, kind):
-    """One item's files: its third-person model at the shared path (the shield: ours for a Standalone, the vanilla path
-    for a Replacer), its textures, and for a Replacer the vanilla-path first-person copy."""
+def place(item, dest, kind, ebony=False):
+    r"""One item's files: its third-person model at the shared path (the shield: ours for a Standalone, the vanilla path
+    for a Replacer), its textures, and for a Replacer the vanilla-path first-person copy. ebony (1.3.0): the Ebony look's
+    copies instead - every model ebony.mesh_map names, at meshes\TrulyNordic\ebony\, and the ebony textures."""
+    if ebony:
+        if kind == "replacer": fail(f"{item}: the Ebony look is for the Ebony quality files only")
+        for _, rel in EBL.mesh_map(item): put(os.path.join(EBL.EB_STAGE, item, rel), os.path.join(dest, rel))
+        textures(item, dest, ebony=True); return
     if item.startswith("shield"):
         s, _ = third(item); put(s, os.path.join(dest, VAN_SHIELD if kind == "replacer" else OUR_SHIELD))
     elif ITEMS[item].get("new_item"):     # the spear: the optional file only, its own first-person file at our path
@@ -215,6 +230,10 @@ INFO = """<?xml version="1.0" encoding="UTF-8"?>
 </fomod>
 """
 
+def ebony_steps(steps):
+    r"""the same installer with the Ebony look's pictures (fomod\images\ebony\<same name>)"""
+    return [(st, g, [(o[0], o[1], o[2], "ebony\\" + o[3]) + tuple(o[4:]) for o in opts]) for st, g, opts in steps]
+
 def fomod(dest, title, steps, ver, desc):
     r"""fomod\ModuleConfig.xml + info.xml + every option's picture, and the docs"""
     fm = os.path.join(dest, "fomod"); os.makedirs(os.path.join(fm, "images"))
@@ -225,9 +244,27 @@ def fomod(dest, title, steps, ver, desc):
             if not os.path.isfile(os.path.join(fm, "images", o[3])): put(os.path.join(REPO, "fomod", "images", o[3]), os.path.join(fm, "images", o[3]))
     docs(dest)
 
+def look_check(roots, ebony, label):
+    """1.3.0: an Ebony quality install ships only the Ebony look (models and textures at the ebony folders, every NIF
+    naming only ebony textures); any other install ships none of it. Counts what it checked and fails on zero."""
+    n = 0; mesh_eb, tex_eb = (EBL.EB_MESH + "\\").lower(), (EBL.EB_TEX + "\\").lower()
+    for r in roots:
+        for dp, _, fs in os.walk(r):
+            for f in fs:
+                rel = os.path.relpath(os.path.join(dp, f), r).lower()
+                if not rel.endswith((".nif", ".dds")) or not rel.startswith((MESH_REL.lower() + "\\", TEX_REL.lower() + "\\")): continue
+                n += 1; is_eb = rel.startswith((mesh_eb, tex_eb))
+                if ebony and not is_eb: fail(f"{label}: the Ebony quality install ships the shared-look {rel}")
+                if not ebony and is_eb: fail(f"{label}: a Nordic-look install ships the Ebony-look {rel}")
+                if rel.endswith(".nif"):
+                    for t in nif_textures(os.path.join(dp, f)):
+                        if ebony != t.lower().startswith(tex_eb): fail(f"{label}: {rel} names {t} - the wrong look's texture")
+    if not n: fail(f"{label}: the look check found no model or texture of ours to check")
+    return n
+
 def build_package(dest, folder, ver):
-    kind, what, desc = PACKAGES[folder]; common = os.path.join(dest, "Common")
-    for item in CORE: place(item, common, kind)
+    kind, what, desc = PACKAGES[folder]; common = os.path.join(dest, "Common"); eb = kind == "standalone" and what == "ebony"
+    for item in CORE: place(item, common, kind, ebony=eb)
     if kind == "replacer":
         if what == "esp": put(os.path.join(REPO, "plugin", "TrulyNordicCarvedWeapons.esp"), os.path.join(common, "TrulyNordicCarvedWeapons.esp"))
         else:
@@ -251,13 +288,14 @@ def build_package(dest, folder, ver):
     else:
         put(os.path.join(REPO, "plugin", "standalone-" + what, SA_PLUGIN), os.path.join(common, SA_PLUGIN))
     for _, _, opts in STEPS:
-        for _, item, f, _, _, _ in opts: place(item, os.path.join(dest, f), kind)
-    fomod(dest, f"{NAME} - {folder}", STEPS, ver, desc)
+        for _, item, f, _, _, _ in opts: place(item, os.path.join(dest, f), kind, ebony=eb)
+    fomod(dest, f"{NAME} - {folder}", ebony_steps(STEPS) if eb else STEPS, ver, desc)
     # every install the installer can make: Common + one option per step -> every texture resolves, no vanilla path in
     # a Standalone, every model path its plugin names is shipped
     import itertools
     for combo in itertools.product(*[opts for _, _, opts in STEPS]):
         roots = [common] + [os.path.join(dest, o[2]) for o in combo]; check_textures(roots)
+        look_check(roots, eb, f"{folder} {[o[0] for o in combo]}")
         if kind == "standalone":
             for m in plugin_models(os.path.join(common, SA_PLUGIN)):
                 if not any(os.path.isfile(os.path.join(r, m)) for r in roots): fail(f"{folder}: {SA_PLUGIN} points at {m}, which the install {[o[0] for o in combo]} does not ship")
@@ -284,7 +322,7 @@ def kid_ini(it):
     return "\n".join(L) + "\n"
 def additional_steps():
     img = AS.ADDITIONAL[0]["image"]
-    steps = [("Quality", f"{AS.NAME} quality", [(opt, None, fold, img, d, q == next(iter(AS.QUALITIES)))
+    steps = [("Quality", f"{AS.NAME} quality", [(opt, None, fold, ("ebony\\" + img) if q == "ebony" else img, d, q == next(iter(AS.QUALITIES)))
                                                for q, (_, opt, fold, d) in AS.QUALITIES.items()])]
     for it in AS.ADDITIONAL:
         k = it.get("kid")
@@ -298,6 +336,9 @@ def build_additional(dest, ver):
     for it in AS.ADDITIONAL: place(it["item"], common, "additional")
     for q, (pdir, _, fold, _) in AS.QUALITIES.items():
         put(os.path.join(REPO, "plugin", pdir, AS.PLUGIN), os.path.join(dest, fold, AS.PLUGIN))
+        if q == "ebony":   # 1.3.0: the Ebony quality's items in the Ebony look (the held crossbow / bolts would stay shared)
+            for it in AS.ADDITIONAL:
+                if it["item"] in EBL.EBONY_ITEMS: place(it["item"], os.path.join(dest, fold), "additional", ebony=True)
     for it in AS.ADDITIONAL:
         if it.get("kid"):
             ko = os.path.join(dest, it["kid"]["folder"]); os.makedirs(ko)
@@ -309,6 +350,8 @@ def build_additional(dest, ver):
     import itertools
     for combo in itertools.product(*[opts for _, _, opts in steps]):
         roots = [common] + [os.path.join(dest, o[2]) for o in combo if o[2]]; check_textures(roots)
+        eb_fold = os.path.join(dest, AS.QUALITIES["ebony"][2])
+        look_check([common], False, f"{AS.NAME} Common"); look_check([eb_fold], True, f"{AS.NAME} {AS.QUALITIES['ebony'][1]}")
         plug = [os.path.join(r, AS.PLUGIN) for r in roots if os.path.isfile(os.path.join(r, AS.PLUGIN))]
         if len(plug) != 1: fail(f"{AS.NAME}: the install {[o[0] for o in combo]} ships {len(plug)} copies of {AS.PLUGIN}")
         b = open(plug[0], "rb").read(); flags = struct.unpack_from("<I", b, 8)[0]

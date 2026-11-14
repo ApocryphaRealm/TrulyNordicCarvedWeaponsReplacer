@@ -20,6 +20,7 @@ python -I "$T/quiver_atlas.py" boltquiver
 "$B" --background --factory-startup --python-exit-code 1 --python "$T/gb_crossbow.py" -- "$CFG" crossbow > "$(dirname "$CFG")/blender_crossbow.log" 2>&1
 python -I "$T/textures.py"
 python -I "$T/assemble.py"
+python -I "$T/textures.py" --quality ebony   # 1.3.0: the Ebony look (tools/ebony.py) - after assemble.py, it copies its NIFs
 python -I "$T/silhouette.py"
 python -I "$T/verify.py"
 python -I "$T/arrow_records.py"   # idempotent: adds the arrow records to the three plugins once

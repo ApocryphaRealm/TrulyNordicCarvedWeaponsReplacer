@@ -8,6 +8,12 @@ Written as changes happen, not reconstructed afterwards (rule 61). Each version 
 * **failed** - built but crashed or malfunctioned; the number was reclaimed
 * **scratch** - a hypothesis-test build that never held a real number
 
+## 1.3.0 - 2026-11-13 - untested
+
+### Changed
+- The Standalone - Ebony quality installer shows each model choice in black and gold, and so does the Ebony quality choice of Additional Weapons.
+- The Ebony quality files have their own look: black ebony steel with every carved braid, weave and symbol rim in polished gold, the dark carving floors kept for contrast, and the rings and bands on every haft and grip in gold. Every piece of the Standalone - Ebony quality file and the Ebony quality spear and halberd of Additional Weapons take it, sheaths, quiver and arrows included. The Nordic quality and Replacer files are unchanged.
+
 ## 1.2.0 - 2026-11-12 - untested
 
 ### Added
