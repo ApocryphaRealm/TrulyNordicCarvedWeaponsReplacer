@@ -15,6 +15,13 @@ MAIN FILES (each a FOMOD: Common + the steps Sword, Mace, Shield - the default o
                                 and the Ebony LOOK (1.3.0): black ebony steel, gold knotwork and gold haft rings - every
                                 model and texture at meshes\TrulyNordic\ebony\ / textures\pbr\TrulyNordic\ebony\
                                 (tools\ebony.py), its installer pictures from fomod\images\ebony\
+    Replacer - Ebony - No ESP / Replacer - Ebony - ESP (1.3.0, tools\ebony_replacer.py): the Carved Ebony look on the
+                                VANILLA Ebony weapons, arrow and shield (SkyPatcher by record, or the light plugin
+                                TrulyNordicCarvedWeapons - Ebony Replacer.esp); the first-person models, the shield and the
+                                arrow in flight are loose files at the vanilla Ebony paths. Its last step, "Legacy of
+                                Ysgramor", puts the same models on LoY's Wolf Ebony weapons and shield (loose files at
+                                LoY's mesh paths + a SkyPatcher INI per LoY plugin, named after it); the sword, dagger and
+                                shield it installs follow the installer's choice through FOMOD flags (conditional installs).
     Each option folder holds its model at the shared path (sword\sword.nif, mace\mace.nif, the shield), so only the
     chosen model is installed and the records find it whichever was chosen.
 
@@ -52,6 +59,7 @@ ARMO_INI_DIR = r"SKSE\Plugins\SkyPatcher\armor\TrulyNordicCarvedWeaponsReplacer"
 # ESP overrides, by FormID (replacer_names.names_ini_lines reads them back from the ESP), one names ini per type folder
 import replacer_names as RN
 import ebony as EBL                # the Ebony look (1.3.0): its staged models and textures, and its folder names
+import ebony_replacer as ER        # the Ebony Replacer (1.3.0): vanilla Ebony + Legacy of Ysgramor targets, lines, plugin
 NAMES_INI = "TrulyNordicCarvedWeapons - Names.ini"
 VAN_FLIGHT = r"meshes\dlc02\weapons\nordic\nordicarrowflight.nif"
 SA_PLUGIN = "TrulyNordicCarvedWeapons - Standalone.esp"
@@ -168,6 +176,8 @@ CORE = [i for i in DEFAULT if i not in ALTERNATED]
 PACKAGES = {  # folder: (kind, plugin or ini, description for info.xml)
     "Replacer - No ESP": ("replacer", "ini", "Replaces the Dragonborn Nordic carved weapons' and shield's models. No plugin: SkyPatcher swaps the models by record."),
     "Replacer - ESP": ("replacer", "esp", "Replaces the Dragonborn Nordic carved weapons' and shield's models through one light plugin. No SkyPatcher needed."),
+    "Replacer - Ebony - No ESP": ("replacer-ebony", "ini", "Replaces the vanilla Ebony weapons', arrow's and shield's models with the Carved Ebony set, black steel and gold knotwork. No plugin: SkyPatcher swaps the models by record. Optional: the same on Legacy of Ysgramor's Wolf Ebony weapons."),
+    "Replacer - Ebony - ESP": ("replacer-ebony", "esp", "Replaces the vanilla Ebony weapons', arrow's and shield's models with the Carved Ebony set, black steel and gold knotwork, through one light plugin. Optional: the same on Legacy of Ysgramor's Wolf Ebony weapons (renamed through SkyPatcher)."),
     "Standalone - Nordic quality": ("standalone", "nordic", "Adds the carved set as new items, forged and tempered like the Nordic pieces. The vanilla Nordic items are untouched."),
     "Standalone - Ebony quality": ("standalone", "ebony", "Adds the carved set as new items with the ebony pieces' stats and recipes. The vanilla Nordic items are untouched."),
 }
@@ -176,6 +186,16 @@ def place(item, dest, kind, ebony=False):
     r"""One item's files: its third-person model at the shared path (the shield: ours for a Standalone, the vanilla path
     for a Replacer), its textures, and for a Replacer the vanilla-path first-person copy. ebony (1.3.0): the Ebony look's
     copies instead - every model ebony.mesh_map names, at meshes\TrulyNordic\ebony\, and the ebony textures."""
+    if kind == "replacer-ebony":      # the vanilla Ebony items: our ebony third-person model by record, the rest loose
+        if item.startswith("shield"):
+            put(os.path.join(EBL.EB_STAGE, item, "replacer", "shield.nif"), os.path.join(dest, ER.SHIELD_FILE))
+        elif item == "quiver":
+            put(os.path.join(EBL.EB_STAGE, item, EBL.EB_MESH, "quiver", "quiver.nif"), os.path.join(dest, EBL.EB_MESH, "quiver", "quiver.nif"))
+            put(os.path.join(EBL.EB_STAGE, item, "replacer", "flight.nif"), os.path.join(dest, ER.FLIGHT_FILE))
+        else:
+            _, rel = EBL.mesh_map(item)[0]; put(os.path.join(EBL.EB_STAGE, item, rel), os.path.join(dest, rel))
+            put(os.path.join(EBL.EB_STAGE, item, "replacer", "first.nif"), os.path.join(dest, ER_FIRST[at(item)]))
+        textures(item, dest, ebony=True); return
     if ebony:
         if kind == "replacer": fail(f"{item}: the Ebony look is for the Ebony quality files only")
         for _, rel in EBL.mesh_map(item): put(os.path.join(EBL.EB_STAGE, item, rel), os.path.join(dest, rel))
@@ -204,22 +224,43 @@ def place(item, dest, kind, ebony=False):
         elif item in FIRST_OWN: put(s, os.path.join(dest, MESH_REL, item, "1stperson" + item + ".nif"))
     textures(item, dest)
 
+ER_FIRST = {v[0]: v[2] for v in ER.WEAPONS.values()}      # our item's path stem -> the vanilla Ebony first-person file
+def place_loy(item, dest):
+    r"""Legacy of Ysgramor: the item's ebony first-person file (the shield: our ebony shield) at LoY's mesh path, which
+    both views of every LoY variant use; the textures come with the main option of the same item."""
+    if item.startswith("shield"): src = os.path.join(EBL.EB_STAGE, item, "replacer", "shield.nif"); f = ER.LOY_FILES["shield"]
+    else: src = os.path.join(EBL.EB_STAGE, item, "replacer", "first.nif"); f = ER.LOY_FILES[at(item)]
+    put(src, os.path.join(dest, ER.LOY_DIR + f))
+
 def xml_escape(t): return t.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace('"', "&quot;")
-def module_config(title, steps=STEPS):
+def module_config(title, steps=STEPS, conditional=None):
     L = ['<?xml version="1.0" encoding="UTF-8"?>',
          '<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://qconsulting.ca/fo3/ModConfig5.0.xsd">',
          f'\t<moduleName>{xml_escape(title)}</moduleName>', '\t<requiredInstallFiles>', '\t\t<folder source="Common" destination="" priority="0" />',
          '\t</requiredInstallFiles>', '\t<installSteps order="Explicit">']
     for step, group, opts in steps:
         L += [f'\t\t<installStep name="{step}">', '\t\t\t<optionalFileGroups order="Explicit">', f'\t\t\t\t<group name="{group}" type="SelectExactlyOne">', '\t\t\t\t\t<plugins order="Explicit">']
-        for name, _, folder, img, desc, default in opts:
+        for o in opts:
+            name, _, folder, img, desc, default = o[:6]; flags = o[6] if len(o) > 6 else None
             L += [f'\t\t\t\t\t\t<plugin name="{xml_escape(name)}">', f'\t\t\t\t\t\t\t<description>{xml_escape(desc)}</description>',
                   f'\t\t\t\t\t\t\t<image path="fomod\\images\\{img}" />']
             if folder:   # an option that installs nothing (the spear's default moveset, optional file) carries no <files>
                 L += ['\t\t\t\t\t\t\t<files>', f'\t\t\t\t\t\t\t\t<folder source="{folder}" destination="" priority="0" />', '\t\t\t\t\t\t\t</files>']
+            if flags:    # (1.3.0) flags the conditional installs read (the Replacer - Ebony files' Legacy of Ysgramor step)
+                L += ['\t\t\t\t\t\t\t<conditionFlags>'] + [f'\t\t\t\t\t\t\t\t<flag name="{k}">{v}</flag>' for k, v in flags.items()] + ['\t\t\t\t\t\t\t</conditionFlags>']
             L += [f'\t\t\t\t\t\t\t<typeDescriptor><type name="{"Recommended" if default else "Optional"}" /></typeDescriptor>', '\t\t\t\t\t\t</plugin>']
         L += ['\t\t\t\t\t</plugins>', '\t\t\t\t</group>', '\t\t\t</optionalFileGroups>', '\t\t</installStep>']
-    L += ['\t</installSteps>', '</config>']
+    L += ['\t</installSteps>']
+    if conditional:   # [(required flags {name: value}, [folder, ...])] - every flag must match (operator And)
+        L += ['\t<conditionalFileInstalls>', '\t\t<patterns>']
+        for need, folders in conditional:
+            L += ['\t\t\t<pattern>', '\t\t\t\t<dependencies operator="And">']
+            L += [f'\t\t\t\t\t<flagDependency flag="{k}" value="{v}" />' for k, v in need.items()]
+            L += ['\t\t\t\t</dependencies>', '\t\t\t\t<files>']
+            L += [f'\t\t\t\t\t<folder source="{f}" destination="" priority="0" />' for f in folders]
+            L += ['\t\t\t\t</files>', '\t\t\t</pattern>']
+        L += ['\t\t</patterns>', '\t</conditionalFileInstalls>']
+    L += ['</config>']
     return "\n".join(L) + "\n"
 INFO = """<?xml version="1.0" encoding="UTF-8"?>
 <fomod>
@@ -234,10 +275,10 @@ def ebony_steps(steps):
     r"""the same installer with the Ebony look's pictures (fomod\images\ebony\<same name>)"""
     return [(st, g, [(o[0], o[1], o[2], "ebony\\" + o[3]) + tuple(o[4:]) for o in opts]) for st, g, opts in steps]
 
-def fomod(dest, title, steps, ver, desc):
+def fomod(dest, title, steps, ver, desc, conditional=None):
     r"""fomod\ModuleConfig.xml + info.xml + every option's picture, and the docs"""
     fm = os.path.join(dest, "fomod"); os.makedirs(os.path.join(fm, "images"))
-    open(os.path.join(fm, "ModuleConfig.xml"), "w", encoding="utf-8").write(module_config(title, steps))
+    open(os.path.join(fm, "ModuleConfig.xml"), "w", encoding="utf-8").write(module_config(title, steps, conditional))
     open(os.path.join(fm, "info.xml"), "w", encoding="utf-8").write(INFO.format(name=xml_escape(title), ver=ver, desc=xml_escape(desc)))
     for _, _, opts in steps:
         for o in opts:
@@ -252,6 +293,10 @@ def look_check(roots, ebony, label):
         for dp, _, fs in os.walk(r):
             for f in fs:
                 rel = os.path.relpath(os.path.join(dp, f), r).lower()
+                if rel.endswith(".nif") and not rel.startswith(MESH_REL.lower() + "\\"):   # a vanilla- or LoY-path model
+                    for t in nif_textures(os.path.join(dp, f)):
+                        if ebony != t.lower().startswith(tex_eb): fail(f"{label}: {rel} names {t} - the wrong look's texture")
+                    continue
                 if not rel.endswith((".nif", ".dds")) or not rel.startswith((MESH_REL.lower() + "\\", TEX_REL.lower() + "\\")): continue
                 n += 1; is_eb = rel.startswith((mesh_eb, tex_eb))
                 if ebony and not is_eb: fail(f"{label}: the Ebony quality install ships the shared-look {rel}")
@@ -262,8 +307,105 @@ def look_check(roots, ebony, label):
     if not n: fail(f"{label}: the look check found no model or texture of ours to check")
     return n
 
+# ------------------------------------------------------------------ Replacer - Ebony (1.3.0, tools\ebony_replacer.py)
+def write_ini(path, head, lines):
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    body = [f"; {NAME}: {head[0]}"] + [f"; {h}" for h in head[1:]] + lines
+    open(path, "w", newline="\r\n").write("\n".join(body) + "\n")
+
+LOY_FOLDER = "50 Legacy of Ysgramor - Wolf Ebony weapons"
+LOY_CORE = ["battleaxe", "greatsword", "waraxe"]          # LoY's Wolf Ebony items that have no installer alternate
+LOY_ALT = {"sword": "sword", "sword2": "sword", "dagger": "dagger", "dagger2": "dagger", "shield": "shield", "shield2": "shield"}
+def loy_alt_folder(item): return f"5{list(LOY_ALT).index(item) + 1} Legacy of Ysgramor - {item}"
+def ebony_replacer_steps():
+    r"""the Replacer installer in the Ebony look - every Sword / Dagger / Shield option flags its choice - and the Legacy
+    of Ysgramor step; plus the conditional installs that give LoY's items the chosen sword, dagger and shield"""
+    steps = []
+    for st, g, opts in ebony_steps(STEPS):
+        out = [tuple(o[:6]) + (({LOY_ALT[o[1]]: o[1]},) if o[1] in LOY_ALT else ()) for o in opts]
+        steps.append((st, g.replace("Carved Nordic", "Carved Ebony"), out))
+    steps.append(("Legacy of Ysgramor", "Legacy of Ysgramor - Wolf Ebony weapons", [
+        ("Leave them as they are (default)", None, None, "ebony\\carved-ebony-set.jpg",
+         "Legacy of Ysgramor's Wolf Ebony weapons keep their own look. Choose this if you do not use Legacy of Ysgramor.", True, {"loy": "Off"}),
+        ("Carved Wolf Ebony weapons", None, LOY_FOLDER, "ebony\\carved-ebony-set.jpg",
+         "For Legacy of Ysgramor (NordwarUA's original or Xtudo's fixes, any version): the Wolf Ebony sword, greatsword, dagger, "
+         "battleaxe, war axe and shield take the Carved Ebony models chosen above and are renamed Carved Wolf Ebony (the names and "
+         "the third-person models through SkyPatcher). The Wolf Ebony armour keeps its look. Put this mod below Legacy of "
+         "Ysgramor and its patches in Mod Organizer's left pane.", False, {"loy": "On"})]))
+    cond = [({"loy": "On", LOY_ALT[o[1]]: o[1]}, [loy_alt_folder(o[1])]) for _, _, opts in STEPS for o in opts if o[1] in LOY_ALT]
+    return steps, cond
+
+def build_ebony_replacer(dest, folder, ver):
+    kind, what, desc = PACKAGES[folder]; common = os.path.join(dest, "Common")
+    for item in CORE: place(item, common, kind)
+    gen = "Generated by tools\\build-packages.py from tools\\ebony_replacer.py."
+    if what == "esp":
+        put(ER.ESP, os.path.join(common, ER.PLUGIN))
+    else:
+        write_ini(os.path.join(common, INI_DIR, "TrulyNordicCarvedWeapons - Ebony.ini"), [
+            "the vanilla Ebony weapons' new models (Carved Ebony), by weapon record.",
+            "Matched by the weapon's vanilla first-person model (the Skyrim.esm STAT), so every enchanted or added copy", "that shows that model takes the new one. " + gen], ER.model_lines())
+        write_ini(os.path.join(common, AMMO_INI_DIR, "TrulyNordicCarvedWeapons - Ebony.ini"), [
+            "the Ebony arrow's model (the quiver on the back, the loose and nocked arrow).",
+            "The arrow in flight (its projectile) ships as a loose file at the vanilla path. " + gen], ER.ammo_lines())
+        for d, lab in ((INI_DIR, "WEAP"), (AMMO_INI_DIR, "AMMO"), (ARMO_INI_DIR, "ARMO")):
+            lines = ER.names_lines(lab)
+            if not lines: fail(f"no {lab} names in the Ebony Replacer ESP")
+            write_ini(os.path.join(common, d, "TrulyNordicCarvedWeapons - Ebony Names.ini"), [
+                f"the item names, Carved Ebony ... - {len(lines)} {lab} record(s), each by FormID (nothing else is matched).",
+                "The enchanted copies keep their names here: enchantment mods rename them (see tools\\replacer_names.py).", gen], lines)
+    steps, cond = ebony_replacer_steps()
+    for _, _, opts in steps:
+        for o in opts:
+            if o[1]: place(o[1], os.path.join(dest, o[2]), kind)
+    # Legacy of Ysgramor: the items without an alternate, and one INI per LoY plugin named after it (loads only beside it)
+    loy = os.path.join(dest, LOY_FOLDER)
+    for item in LOY_CORE: place_loy(item, loy)
+    models = {i: i for i in ER.LOY_NAMES}
+    for plug in ER.LOY:
+        write_ini(os.path.join(loy, INI_DIR, plug + ".ini"), [
+            f"Legacy of Ysgramor's Wolf Ebony weapons ({plug}): the Carved Ebony third-person model and the name.",
+            "Matched by each weapon's first-person STAT, never by its own FormID: NordwarUA's original and Xtudo's light",
+            "version share this filename with different FormIDs, and each STAT FormID below exists in one layout only.",
+            "This file loads only when that plugin is active. " + gen], ER.loy_lines(plug, "weapon", models))
+        write_ini(os.path.join(loy, ARMO_INI_DIR, plug + ".ini"), [
+            f"Legacy of Ysgramor's Wolf Ebony shield ({plug}): the name (the model is the loose file at LoY's own path).",
+            "This file loads only when that plugin is active. " + gen], ER.loy_lines(plug, "armor", models))
+    for item in LOY_ALT: place_loy(item, os.path.join(dest, loy_alt_folder(item)))
+    fomod(dest, f"{NAME} - {folder}", steps, ver, desc, cond)
+    # every install the installer can make: Common + one option per step + the conditional folders whose flags match
+    import itertools
+    n = 0
+    for combo in itertools.product(*[opts for _, _, opts in steps]):
+        flags = {}
+        for o in combo:
+            if len(o) > 6: flags.update(o[6])
+        roots = [common] + [os.path.join(dest, o[2]) for o in combo if o[2]]
+        roots += [os.path.join(dest, f) for need, fs in cond if all(flags.get(k) == v for k, v in need.items()) for f in fs]
+        label = f"{folder} {[o[0] for o in combo]}"; check_textures(roots); look_check(roots, True, label)
+        def shipped(m): return any(os.path.isfile(os.path.join(r, m)) for r in roots)
+        if what == "esp":
+            for m in plugin_models(os.path.join(common, ER.PLUGIN)):
+                if not shipped(m): fail(f"{label}: {ER.PLUGIN} points at {m}, which the install does not ship")
+        for r in roots:
+            for dp, _, fs in os.walk(r):
+                for f in fs:
+                    if f.lower().endswith(".ini"):
+                        for m in re.findall(r"model=([^:\r\n]+\.nif)", open(os.path.join(dp, f)).read()):
+                            if not shipped("meshes\\" + m): fail(f"{label}: {f} sets model {m}, which the install does not ship")
+        for m in list(ER_FIRST.values()) + [ER.SHIELD_FILE, ER.FLIGHT_FILE]:
+            if not shipped(m): fail(f"{label}: the vanilla Ebony file {m} is not installed")
+        loy_on = flags.get("loy") == "On"
+        for f in ER.LOY_FILES.values():
+            if shipped(ER.LOY_DIR + f) != loy_on: fail(f"{label}: Legacy of Ysgramor file {f} {'missing' if loy_on else 'installed without the option'}")
+        n += 1
+    for dp, _, fs in os.walk(dest):
+        if "\\meshes\\dlc02" in dp.lower(): fail(f"a Replacer - Ebony package must not ship a Nordic vanilla path: {dp}")
+    print(f"  {folder}: {n} installer combinations checked")
+
 def build_package(dest, folder, ver):
     kind, what, desc = PACKAGES[folder]; common = os.path.join(dest, "Common"); eb = kind == "standalone" and what == "ebony"
+    if kind == "replacer-ebony": return build_ebony_replacer(dest, folder, ver)
     for item in CORE: place(item, common, kind, ebony=eb)
     if kind == "replacer":
         if what == "esp": put(os.path.join(REPO, "plugin", "TrulyNordicCarvedWeapons.esp"), os.path.join(common, "TrulyNordicCarvedWeapons.esp"))

@@ -32,7 +32,9 @@ QUALITIES = {  # quality: (plugin folder in the repo, FOMOD option, option folde
     "nordic": ("additional-nordic", "Nordic quality (default)", "10 Quality - Nordic",
                "Forged and tempered like the Nordic pieces (Nordic smithing), with Nordic-tier stats."),
     "ebony": ("additional-ebony", "Ebony quality", "11 Quality - Ebony",
-              "The ebony pieces' numbers, keyword and recipes (Ebony smithing, ebony ingots)."),
+              "The ebony pieces' numbers, keyword and recipes (Ebony smithing, ebony ingots), in the black-and-gold Ebony look. "
+              "Pick this beside Replacer - Ebony (the vanilla Ebony weapons replaced) or Standalone - Ebony quality: the spear and "
+              "halberd have no vanilla record, so they always come in through this file's own light plugin."),
 }
 MASTER_ORDER = ["Skyrim.esm", "Update.esm", "Dawnguard.esm", "HearthFires.esm", "Dragonborn.esm"]
 

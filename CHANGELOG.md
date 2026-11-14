@@ -11,8 +11,13 @@ Written as changes happen, not reconstructed afterwards (rule 61). Each version 
 ## 1.3.0 - 2026-11-13 - untested
 
 ### Changed
+- Additional Weapons: the Ebony quality choice says it goes beside Replacer - Ebony or Standalone - Ebony quality (the spear and halberd have no vanilla record, so they always come in through their own light plugin).
 - The Standalone - Ebony quality installer shows each model choice in black and gold, and so does the Ebony quality choice of Additional Weapons.
 - The Ebony quality files have their own look: black ebony steel with every carved braid, weave and symbol rim in polished gold, the dark carving floors kept for contrast, and the rings and bands on every haft and grip in gold. Every piece of the Standalone - Ebony quality file and the Ebony quality spear and halberd of Additional Weapons take it, sheaths, quiver and arrows included. The Nordic quality and Replacer files are unchanged.
+
+### Added
+- Replacer - Ebony files, last installer step: Carved Wolf Ebony weapons for Legacy of Ysgramor - the Wolf Ebony sword, greatsword, dagger, battleaxe, war axe and shield take the Carved Ebony models you picked and are renamed Carved Wolf Ebony. Works with NordwarUA's original and every version of Xtudo's fixes (his light, RMB, non-ESL and standalone plugins); a SkyPatcher file per Legacy of Ysgramor plugin that loads only beside it, and loose models at Legacy of Ysgramor's mesh paths (put this mod below it). The Wolf Ebony armour keeps its look.
+- Two new main files, Replacer - Ebony - No ESP and Replacer - Ebony - ESP: the Carved Ebony look (black ebony steel, gold knotwork and haft rings) on the vanilla Ebony weapons, the Ebony arrow and quiver, and the Ebony shield, renamed Carved Ebony Sword, Carved Ebony Arrow and so on. The No ESP file swaps the models through SkyPatcher by the vanilla Ebony first-person models (so enchanted and added copies change too) and renames the base pieces; the ESP file is a light plugin over the 311 Ebony weapon records, the arrow and the 16 Ebony shields (enchanted names included). First-person models, the shield and the arrow in flight are loose files at the vanilla Ebony paths. The same four model choices as the other files, with black-and-gold pictures.
 
 ## 1.2.0 - 2026-11-12 - untested
 

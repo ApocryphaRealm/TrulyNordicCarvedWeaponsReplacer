@@ -11,6 +11,17 @@ PGPatcher writes for texture sets without a fuzz layer.
 
 Tools used: Blender with PyNifly (mesh work), Microsoft texconv (BC7 compression), SkyPatcher (runtime model swap).
 
+## Legacy of Ysgramor (the Replacer - Ebony files' optional step)
+
+The "Carved Wolf Ebony weapons" choice puts this mod's own models on the Wolf Ebony weapons and shield of
+**Legacy of Ysgramor** by **NordwarUA** ([Nexus 109963](https://www.nexusmods.com/skyrimspecialedition/mods/109963))
+and of **Legacy of Ysgramor - My patches and fixes** by **Xtudo**
+([Nexus 111121](https://www.nexusmods.com/skyrimspecialedition/mods/111121)). Nothing of either mod ships here: no
+mesh, texture or plugin. This mod only places its own meshes at Legacy of Ysgramor's mesh paths and names those
+records' FormIDs in SkyPatcher files that load only when their plugin is active. Legacy of Ysgramor's permissions
+(recorded in this project's Ebony Wolf Armor and Weapons notice) allow modification and use of its assets with
+credit, on Nexus only and never for sale; this mod stays within that and credits both authors.
+
 ## Licence
 Truly Nordic Carved Weapons Replacer - Copyright (C) 2026 ApocryphaRealm.
 This mod (its models, textures, SkyPatcher INIs and build scripts) is free software: you can redistribute it and/or
