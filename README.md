@@ -62,10 +62,11 @@ The ESP file copies each record from the base game's masters, so it undoes other
 loads after them (the Unofficial Patch's, an enchantment overhaul's); with such mods, use the No ESP file or load the
 ESP file first.
 
-Standalone items (the same names at Nordic and Ebony quality): Carved Nordic Sword, Carved Nordic War Axe, Carved Nordic
-Battleaxe, Carved Nordic Greatsword, Carved Nordic Warhammer, Carved Nordic Dagger, Carved Nordic Mace, Carved Nordic
-Bow, Carved Nordic Shield, Carved Nordic Arrow. The installer's model choices (saber or straight sword, and so on) change
-only the model, not the name.
+Standalone items: Carved Nordic Sword, Carved Nordic War Axe, Carved Nordic Battleaxe, Carved Nordic Greatsword, Carved
+Nordic Warhammer, Carved Nordic Dagger, Carved Nordic Mace, Carved Nordic Bow, Carved Nordic Shield, Carved Nordic Arrow.
+At Ebony quality each name carries "Ebony": Carved Nordic Ebony Sword, Carved Nordic Ebony War Axe, ... Carved Nordic Ebony
+Shield, Carved Nordic Ebony Arrow (and in Additional Weapons: Carved Nordic Ebony Spear, Halberd, Crossbow and Bolt). The
+installer's model choices (saber or straight sword, and so on) change only the model, not the name.
 
 Replacer names: the Replacer files rename the Nordic pieces to the same names - Carved Nordic Sword, ... Carved
 Nordic Shield, Carved Nordic Arrow. The ESP file also renames the enchanted copies the same way ("Virtuous Carved

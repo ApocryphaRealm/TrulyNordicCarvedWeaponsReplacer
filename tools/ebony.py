@@ -64,7 +64,15 @@ RING_ALONG, RING_ALONG_X, RING_ROUND, RING_HOLE, RING_MIN_TRIS = 2.0, 0.8, 1.4, 
 # within the given radius of the axis. The spear's socket ends in a polished foot above the binding (the spear sheet's
 # "binding" view) - its last 1.2 units are its ring.
 RING_BANDS = {"spear": [(57.0, 58.5, 1.25)]}
-RING_ITEMS = {"sword", "sword2", "battleaxe", "greatsword", "warhammer", "waraxe", "dagger", "dagger2", "mace", "mace2", "bow", "spear", "halberd"}
+RING_ITEMS = {"sword", "sword2", "battleaxe", "greatsword", "warhammer", "waraxe", "dagger", "dagger2", "mace", "mace2", "bow", "spear", "halberd",
+              "crossbow"}
+# The crossbow (the owner, 2026-11-15 06:12, "Make the rings gold": the two steel collars at the ends of its grip wrap).
+# Its builder (gb_crossbow.py) leaves no orig_metal.npz, so its ring source is the painter's own triangle dump of the B5
+# metal mesh - the triangles and pixel UVs the atlas was painted from (per-triangle xyz, uv in atlas pixels, rows down).
+# Only the parts inside RING_SPAN along the long axis count: the crossbow has five round open parts, and the three at
+# the front (y 18.9 .. 20.2: the catch and lock-plate parts) are not grip rings. The collars sit at y -15.0 and -9.15.
+RING_SOURCE = {"crossbow": os.path.join(S2, r"work_xbow_crossbowB5\dump.npz")}
+RING_SPAN = {"crossbow": (-16.0, -8.0)}
 
 
 def smooth01(x): x = np.clip(x, 0, 1); return x * x * (3 - 2 * x)
@@ -96,9 +104,15 @@ def ring_parts(item, verbose=True):
     outer radius - the haft passes through it) OR a closed plain band: no carving under it (under 2 % of its atlas
     pixels at carving-floor height) - the halberd's rings are capped bands; a pommel or cap end is carved."""
     if item not in RING_ITEMS: return None, []
-    p = os.path.join(WORK, item, "orig_metal.npz")
-    if not os.path.isfile(p): return None, []
-    d = np.load(p); V, F, UV = d["V"].astype(np.float64), d["F"], d["UV"]
+    if item in RING_SOURCE:   # a painter's triangle dump: per-triangle xyz and pixel UVs (rows down) -> V, F, UV (0..1, v up)
+        d = np.load(RING_SOURCE[item]); xyz, uvp = d["xyz"].astype(np.float64), d["uv"].astype(np.float64)
+        Wa, Ha = Image.open(ITEMS[item]["shapes"]["metal"]["tex"] + ".png").size
+        V = xyz.reshape(-1, 3); F = np.arange(len(V)).reshape(-1, 3)
+        UV = np.stack([uvp[..., 0] / Wa, 1 - uvp[..., 1] / Ha], -1)
+    else:
+        p = os.path.join(WORK, item, "orig_metal.npz")
+        if not os.path.isfile(p): return None, []
+        d = np.load(p); V, F, UV = d["V"].astype(np.float64), d["F"], d["UV"]
     key = np.round(V * 1000).astype(np.int64); _, inv = np.unique(key, axis=0, return_inverse=True); inv = inv.ravel()
     Fw = inv[F]; n = int(inv.max()) + 1
     r = np.concatenate([Fw[:, 0], Fw[:, 1]]); c = np.concatenate([Fw[:, 1], Fw[:, 2]])
@@ -117,6 +131,7 @@ def ring_parts(item, verbose=True):
         P = V[np.unique(F[m])]; lo, hi = P.min(0), P.max(0); e = hi - lo
         along, w1, w2 = e[ax], e[cr[0]], e[cr[1]]
         if along > RING_ALONG or along > RING_ALONG_X * min(w1, w2) or max(w1, w2) / max(min(w1, w2), 1e-6) > RING_ROUND: continue
+        if item in RING_SPAN and not (RING_SPAN[item][0] <= lo[ax] and hi[ax] <= RING_SPAN[item][1]): continue
         cen = (lo + hi) / 2; rad = np.hypot(P[:, cr[0]] - cen[cr[0]], P[:, cr[1]] - cen[cr[1]])
         kind = "open ring"
         if rad.min() < RING_HOLE * rad.max():

@@ -153,6 +153,7 @@ def build(q):
     pl.bump_next_id(top + 1); pl.save(tmp); os.replace(tmp, out_path(q))
     if q == "ebony":   # 1.3.0: the Ebony quality's spear and halberd are the black-and-gold models (tools\ebony.py)
         import ebony; ebony.plugin_paths(out_path(q))
+        import ebony_names; ebony_names.rename(out_path(q))   # 1.4.0: "Carved Nordic Ebony ..." (ebony_names.py)
     return out_path(q)
 
 def readback(path):

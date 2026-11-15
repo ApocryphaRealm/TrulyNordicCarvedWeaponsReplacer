@@ -22,3 +22,6 @@ for sub, src in SRC.items():
 # 1.3.0 (2026-11-13): the Ebony quality's models are the black-and-gold copies at meshes\TrulyNordic\ebony\ (tools\ebony.py)
 import sys; sys.path.insert(0, os.path.dirname(os.path.abspath(__file__))); import ebony
 ebony.plugin_paths(os.path.join(REPO, "plugin", "standalone-ebony", NAME))
+# 1.4.0 (2026-11-15): the Ebony quality's items are named "Carved Nordic Ebony ..." (tools\ebony_names.py; build_all.sh
+# runs it again after arrow_records.py, which adds the arrow under its Nordic name)
+import ebony_names; ebony_names.rename(os.path.join(REPO, "plugin", "standalone-ebony", NAME))
