@@ -138,6 +138,34 @@ ADDITIONAL = [
              dict(sig="COBJ", fid=0x811, edid="TNCW_Quarterstaff_Recipe", template=("standalone", "TNCW_Warhammer_Recipe")),
              dict(sig="COBJ", fid=0x812, edid="TNCW_Quarterstaff_Temper", template=("standalone", "TNCW_Warhammer_Temper")),
          ]),
+    # the rapier AG (2026-11-15, the owner: "I also like option A for the rapier" - the swept hilt): a one-handed sword -
+    # the Standalone's sword records of that quality as templates (OneHandSword animation, sword keyword and sounds, Nordic or
+    # Ebony recipe and temper), our own NIFs (the third-person one carries the scabbard 'Scb'). Stats (helper's pick, against
+    # the Standalone sword 290 / 12 / 11 / 6 / 1.0 / 1.0 Nordic, 720 / 15 / 13 / 6 / 1.0 / 1.0 Ebony): a lighter, quicker
+    # thrusting blade - weight 3 less, speed 1.15, one point less damage, one more critical, reach 1.1 for its 74-unit
+    # blade, value a little over the sword's for the work in the hilt.
+    dict(item="rapier", image="halberd.jpg",
+         records=[
+             dict(sig="STAT", fid=0x813, edid="TNCW_Rapier_1st", template=("standalone", "TNCW_Sword_1st"),
+                  set={"MODL": r"TrulyNordic\rapier\1stpersonrapier.nif"}),
+             dict(sig="WEAP", fid=0x814, edid="TNCW_Rapier", template=("standalone", "TNCW_Sword"),
+                  set={"FULL": "Carved Nordic Rapier", "MODL": r"TrulyNordic\rapier\rapier.nif", "OBND": (-7, -14, -4, 7, 75, 2),
+                       "stats": {"nordic": (320, 9.0, 10, 7, 1.15, 1.1), "ebony": (780, 11.0, 12, 7, 1.15, 1.1)}}),
+             dict(sig="COBJ", fid=0x815, edid="TNCW_Rapier_Recipe", template=("standalone", "TNCW_Sword_Recipe")),
+             dict(sig="COBJ", fid=0x816, edid="TNCW_Rapier_Temper", template=("standalone", "TNCW_Sword_Temper")),
+         ],
+         # Keyword Compatibility Framework's rapier keyword (kcf.esm 0x805 WeapTypeRapier; Animated Armoury's rapier
+         # animations and the packs built on KCF key on it). Named by EditorID, so no master: without kcf.esm KID makes an
+         # empty keyword of that name and nothing changes. (KCF's own kcf_KID.ini also tags any weapon named "*Rapier".)
+         kid=dict(weap="TNCW_Rapier", ini=PLUGIN[:-4] + " - Rapier_KID.ini",
+                  step="Rapier animations", group="Carved Nordic Rapier moveset", folder="42 Rapier - Animation pack keywords",
+                  default=("Sword moveset (default)",
+                           "The rapier uses the one-handed sword animations, the game's own moveset. Choose this if you have no rapier animation mod."),
+                  option=("Rapier animation packs (keyword via KID)",
+                          "Gives the rapier the rapier keyword of Keyword Compatibility Framework (WeapTypeRapier), the one Animated Armoury's "
+                          "rapier moveset and the packs built on it look for. Requires Keyword Item Distributor (KID); without the animation "
+                          "mods the keyword changes nothing."),
+                  keywords=[("WeapTypeRapier", "Keyword Compatibility Framework (kcf.esm 0x805) / Animated Armoury rapier")])),
 ]
 
 def check():

@@ -51,7 +51,7 @@ EB_STAGE = os.path.join(STAGE, EB)
 # file's spear and halberd, and (1.4.0, 2026-11-14) its crossbow and bolt quiver / bolts
 MAIN = ["sword", "sword2", "battleaxe", "greatsword", "warhammer", "waraxe", "dagger", "dagger2", "mace", "mace2", "bow",
         "shield", "shield2", "quiver"]
-ADDITIONAL = ["spear", "halberd", "crossbow", "boltquiver", "quarterstaff"]
+ADDITIONAL = ["spear", "halberd", "crossbow", "boltquiver", "quarterstaff", "rapier"]
 EBONY_ITEMS = MAIN + ADDITIONAL
 
 GOLD = np.array([0.93, 0.74, 0.40], np.float32)      # satin gold (sRGB albedo) - the study's tone
@@ -65,14 +65,17 @@ RING_ALONG, RING_ALONG_X, RING_ROUND, RING_HOLE, RING_MIN_TRIS = 2.0, 0.8, 1.4, 
 # "binding" view) - its last 1.2 units are its ring.
 RING_BANDS = {"spear": [(57.0, 58.5, 1.25)]}
 RING_ITEMS = {"sword", "sword2", "battleaxe", "greatsword", "warhammer", "waraxe", "dagger", "dagger2", "mace", "mace2", "bow", "spear", "halberd",
-              "crossbow", "quarterstaff"}
+              "crossbow", "quarterstaff", "rapier"}
 # The crossbow (the owner, 2026-11-15 06:12, "Make the rings gold": the two steel collars at the ends of its grip wrap).
 # Its builder (gb_crossbow.py) leaves no orig_metal.npz, so its ring source is the painter's own triangle dump of the B5
 # metal mesh - the triangles and pixel UVs the atlas was painted from (per-triangle xyz, uv in atlas pixels, rows down).
 # Only the parts inside RING_SPAN along the long axis count: the crossbow has five round open parts, and the three at
 # the front (y 18.9 .. 20.2: the catch and lock-plate parts) are not grip rings. The collars sit at y -15.0 and -9.15.
 RING_SOURCE = {"crossbow": os.path.join(S2, r"work_xbow_crossbowB5\dump.npz")}
-RING_SPAN = {"crossbow": (-16.0, -8.0)}
+RING_SPAN = {"crossbow": (-16.0, -8.0),
+             # the rapier (2026-11-15): only the grip's collars (the ferrules at y -9.8 / +0.05 and the pommel's neck) - its
+             # side ring (y 0.7 .. 1.8) is a round open guard part, not a grip ring, and stays ebony black
+             "rapier": (-12.5, 0.6)}
 
 
 def smooth01(x): x = np.clip(x, 0, 1); return x * x * (3 - 2 * x)

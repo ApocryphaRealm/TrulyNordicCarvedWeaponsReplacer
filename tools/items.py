@@ -215,6 +215,23 @@ ITEMS = {
                             "wrap": {"name": "TNQuarterstaffWrap", "tex": W(r"work_gs5_sf\tex\tn_greatsword_wrap"), "target": None}},
                     blood_region=[[-2.2, 60.0, -2.2], [2.2, 80.5, 2.2]],
                     third="nordicbattleaxe.nif", first="1stpersonnordicbattleaxe.nif", stem="quarterstaff"),
+    # the rapier AG (2026-11-15, the owner: "I also like option A for the rapier" - the swept hilt): set2\rapier_build.py AG
+    # (run set2\run_aa.sh rapier AG) = option A exactly, with the side ring and the two swept bars on -z: on the hip the
+    # WeaponSword node's +z points into the thigh, so on +z the ring would sit in the armour. A long narrow diamond-section
+    # blade from a carved ricasso (one two-strand braid), quillons with turned tips and knobs, two arms to the ricasso, the
+    # knuckle bow into a wheel pommel (outline + weave). A NEW one-handed item on vanilla's Nordic SWORD NIFs (OneHandSword
+    # moveset; Prn WeaponSword), undecimated, its own first-person file; the grip wrap on the greatsword's wrap maps as in the
+    # approved renders. Its scabbard r1 (set2\run_sheath_rapier.sh): the straight sword sheath v3's construction fitted to
+    # this blade - black leather over wood, a forged locket over the ricasso's top and a chape, both framed weave panels (a
+    # 2.2-wide locket face has no room for a bold symbol) - as 'Scb'. hip: the saber's tilt; the shift only 0.58 out (this
+    # model's grip is on z 0, the set's swords' on +0.67), so the grip centre lands on -0.58 like theirs.
+    "rapier": dict(version="AG", new_item=True, hip=dict(rot_x_deg=-4.0, pivot=[0.0, -4.68, 0.0], shift=[0.0, 0.0, -0.58]),
+                   sources=[W(r"work_rapierAG\tn_rapierAG.nif")], orient=True,
+                   sheath=dict(version="r1 (straight sheath v3 construction, weave locket and chape)", src=W(r"work_sheath_rapier_sf\tn_sheath_rapier.nif"), tex=W(r"work_sheath_rapier_sf\tex\tn_sheath_rapier")),
+                   shapes={"metal": {"name": "TNRapier", "tex": W(r"work_rapierAG\tex\tn_rapierAG"), "target": None, "design": W(r"work_rapierAG")},
+                           "wrap": {"name": "TNRapierWrap", "tex": W(r"work_gs5_sf\tex\tn_greatsword_wrap"), "target": None}},
+                   blood_region=[[-1.0, 8.5, -0.45], [1.0, 74.1, 0.45]],
+                   third="nordicsword.nif", first="1stpersonnordicsword.nif", stem="rapier"),
     # the bolt quiver B and its barbed bolts (2026-11-13; the owner 06:36 "make sure we have a crossbow and bolt models in
     # the upload"; design set2\work_xbow_boltquiverB, gated - work_xbow_NOTES.md). A NEW item for the Additional Weapons file
     # (AMMO "Carved Nordic Bolt"), built by gb_boltquiver.py like the arrow quiver: on vanilla Dawnguard steelbolt.nif's exact

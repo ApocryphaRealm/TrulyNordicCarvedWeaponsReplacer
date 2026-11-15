@@ -65,7 +65,7 @@ ESP file first.
 Standalone items: Carved Nordic Sword, Carved Nordic War Axe, Carved Nordic Battleaxe, Carved Nordic Greatsword, Carved
 Nordic Warhammer, Carved Nordic Dagger, Carved Nordic Mace, Carved Nordic Bow, Carved Nordic Shield, Carved Nordic Arrow.
 At Ebony quality each name carries "Ebony": Carved Nordic Ebony Sword, Carved Nordic Ebony War Axe, ... Carved Nordic Ebony
-Shield, Carved Nordic Ebony Arrow (and in Additional Weapons: Carved Nordic Ebony Spear, Halberd, Quarterstaff, Crossbow and Bolt). The
+Shield, Carved Nordic Ebony Arrow (and in Additional Weapons: Carved Nordic Ebony Spear, Halberd, Quarterstaff, Rapier, Crossbow and Bolt). The
 installer's model choices (saber or straight sword, and so on) change only the model, not the name.
 
 Replacer names: the Replacer files rename the Nordic pieces to the same names - Carved Nordic Sword, ... Carved
@@ -78,6 +78,7 @@ Optional file, Additional Weapons: carved weapons the game does not have, in the
 - **Carved Nordic Spear:** a winged spear with the triquetra on its head.
 - **Carved Nordic Halberd:** a bearded blade with a crescent hollow under it and a triquetra, a carved back spike and a top blade, 163 units long.
 - **Carved Nordic Quarterstaff:** a 160-unit dark-ash staff with a forged square steel shoe at each end, a carved braid on each of its four plates; a blunt two-handed weapon on the warhammer's numbers and moveset.
+- **Carved Nordic Rapier:** a swept-hilt rapier, 87.5 units long, with a carved ricasso and a wheel pommel, in a slim black leather scabbard with forged weave-carved fittings; a one-handed sword, lighter and quicker than the sword. An installer step can add Keyword Compatibility Framework's rapier keyword (WeapTypeRapier) through Keyword Item Distributor for rapier animation mods.
 
 The spear and halberd are forged and tempered like the battleaxe and use the battleaxe moveset unless an installer step adds the keywords
 that animation packs look for, through Keyword Item Distributor: spear packs, or Animated Armoury's halberd (which also

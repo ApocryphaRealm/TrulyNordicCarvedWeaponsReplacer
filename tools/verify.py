@@ -153,15 +153,18 @@ for nk in [k for k, it_ in ITEMS.items() if it_.get("new_item")]:
         if not os.path.isfile(pth): print(f"== {nk}: MISSING", ours_f); bad += 1; continue
         a, v = niflib.Nif(pth), niflib.Nif(os.path.join(VAN, van_f)); ta, tv = tree(a), tree(v)
         root = tv[0]; extra = {f"{root}/BSTriShape:TN_{st}_shaft", f"{root}/BSTriShape:TN_{st}_wrap"}
+        if it.get("sheath"): extra.add(f"{root}/BSTriShape:Scb")   # the rapier (2026-11-15): a one-hander with its sheath
         miss = [x for x in tv if x not in ta]; more = [x for x in ta if x not in tv and x not in extra]
         kv = [(t, bytes(v.blocks[i])) for i, t in enumerate(v.btypes) if t in KEEP and t != "bhkCollisionObject"]
         ka = [(t, bytes(a.blocks[i])) for i, t in enumerate(a.btypes) if t in KEEP and t != "bhkCollisionObject"]
         same = sorted(kv) == sorted(ka)
         prn = [(a.strings[struct.unpack_from("<i", a.blocks[i], 0)[0]], a.strings[struct.unpack_from("<i", a.blocks[i], 4)[0]]) for i, t in enumerate(a.btypes) if t == "NiStringExtraData"]
         tris = {a.name(b): len(winding._tris_from_shape(a, b)[1]) for b, t in enumerate(a.btypes) if t == "BSTriShape"}
-        line = (f"== structure {ours_f} vs vanilla {van_f}: {len(tv)} vanilla nodes/shapes, missing {miss or 0}, added {more or 0} (allowed: shaft, wrap); "
+        line = (f"== structure {ours_f} vs vanilla {van_f}: {len(tv)} vanilla nodes/shapes, missing {miss or 0}, added {more or 0} (allowed: shaft, wrap, Scb with a sheath); "
                 f"kept blocks {len(kv)} {'byte for byte' if same else 'DIFFER'}; extra data {prn}; triangles {tris}")
-        if miss or more or not same or ("Prn", "WeaponBack") not in prn: line += "  STRUCTURE FAULT"; bad += 1
+        prn_v = [(v.strings[struct.unpack_from("<i", v.blocks[i], 0)[0]], v.strings[struct.unpack_from("<i", v.blocks[i], 4)[0]]) for i, t in enumerate(v.btypes) if t == "NiStringExtraData"]
+        # the attach point is vanilla's own (two-handers 'WeaponBack', the rapier on the sword NIF 'WeaponSword')
+        if miss or more or not same or sorted(prn) != sorted(prn_v) or not prn: line += "  STRUCTURE FAULT"; bad += 1
         print(line)
 import json; json.dump(WIND, open(os.path.join(STAGE, "..", "winding_report.json") if os.path.basename(STAGE) == "stage" else os.path.join(os.environ.get("TEMP", "."), "tncw_winding_report.json"), "w"), indent=1)
 print(f"RESULT {n_nif} NIFs:", "PASS" if bad == 0 else f"FAIL {bad}")
