@@ -76,7 +76,7 @@ and renames the enchanted copies (Thaumaturgy, for one) keeps its own names.
 Optional file, Additional Weapons: carved weapons the game does not have, in their own light plugin
 (`TrulyNordicCarvedWeapons - Additional Weapons.esp`), installed beside any main file, at Nordic or Ebony quality.
 - **Carved Nordic Spear:** a winged spear with the triquetra on its head.
-- **Carved Nordic Halberd:** a bearded blade with a triquetra, a carved back spike and a top blade, 163 units long.
+- **Carved Nordic Halberd:** a bearded blade with a crescent hollow under it and a triquetra, a carved back spike and a top blade, 163 units long.
 
 Both are forged and tempered like the battleaxe and use the battleaxe moveset unless an installer step adds the keywords
 that animation packs look for, through Keyword Item Distributor: spear packs, or Animated Armoury's halberd (which also

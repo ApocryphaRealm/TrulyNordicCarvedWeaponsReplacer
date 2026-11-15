@@ -195,9 +195,12 @@ ITEMS = {
     # length (set2\halberd_build.py A2; work_halberd_NOTES.md). A NEW item on vanilla's two-handed axe NIFs, built as the
     # spear: undecimated, its own first-person file, the grip wrap and the binding on the greatsword's wrap maps as in the
     # approved renders. Blood: the blade, the back spike and the top blade (blood_region).
-    "halberd": dict(version="A2", new_item=True, sources=[W(r"work_halberdA2\tn_halberdA2.nif")], orient=True,
-                    shapes={"metal": {"name": "TNHalberd", "tex": W(r"work_halberdA2\tex\tn_halberdA2"), "target": None, "design": W(r"work_halberdA2")},
-                            "shaft": {"name": "TNHalberdShaft_0", "tex": W(r"work_halberdA2\tex\tn_halberdA2_soft"), "target": None},
+    # A3 (2026-11-15, the owner's mark on the A2 head-front render): the blade's lower edge is one smooth concave crescent
+    # from the beard's point to the socket instead of A2's straight diagonal; the engraving re-laid on the new face and the
+    # medallion re-centred in it; everything else as A2 (set2\halberd-A3-crescent, halberd_build.py A3).
+    "halberd": dict(version="A3", new_item=True, sources=[W(r"work_halberdA3\tn_halberdA3.nif")], orient=True,
+                    shapes={"metal": {"name": "TNHalberd", "tex": W(r"work_halberdA3\tex\tn_halberdA3"), "target": None, "design": W(r"work_halberdA3")},
+                            "shaft": {"name": "TNHalberdShaft_0", "tex": W(r"work_halberdA3\tex\tn_halberdA3_soft"), "target": None},
                             "wrap": {"name": "TNHalberdWrap", "tex": W(r"work_gs5_sf\tex\tn_greatsword_wrap"), "target": None}},
                     blood_region=[[-18.8, 73.6, -2.0], [13.3, 135.0, 2.0]],
                     third="nordicbattleaxe.nif", first="1stpersonnordicbattleaxe.nif", stem="halberd"),
