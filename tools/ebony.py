@@ -51,7 +51,7 @@ EB_STAGE = os.path.join(STAGE, EB)
 # file's spear and halberd, and (1.4.0, 2026-11-14) its crossbow and bolt quiver / bolts
 MAIN = ["sword", "sword2", "battleaxe", "greatsword", "warhammer", "waraxe", "dagger", "dagger2", "mace", "mace2", "bow",
         "shield", "shield2", "quiver"]
-ADDITIONAL = ["spear", "halberd", "crossbow", "boltquiver"]
+ADDITIONAL = ["spear", "halberd", "crossbow", "boltquiver", "quarterstaff"]
 EBONY_ITEMS = MAIN + ADDITIONAL
 
 GOLD = np.array([0.93, 0.74, 0.40], np.float32)      # satin gold (sRGB albedo) - the study's tone
@@ -65,7 +65,7 @@ RING_ALONG, RING_ALONG_X, RING_ROUND, RING_HOLE, RING_MIN_TRIS = 2.0, 0.8, 1.4, 
 # "binding" view) - its last 1.2 units are its ring.
 RING_BANDS = {"spear": [(57.0, 58.5, 1.25)]}
 RING_ITEMS = {"sword", "sword2", "battleaxe", "greatsword", "warhammer", "waraxe", "dagger", "dagger2", "mace", "mace2", "bow", "spear", "halberd",
-              "crossbow"}
+              "crossbow", "quarterstaff"}
 # The crossbow (the owner, 2026-11-15 06:12, "Make the rings gold": the two steel collars at the ends of its grip wrap).
 # Its builder (gb_crossbow.py) leaves no orig_metal.npz, so its ring source is the painter's own triangle dump of the B5
 # metal mesh - the triangles and pixel UVs the atlas was painted from (per-triangle xyz, uv in atlas pixels, rows down).

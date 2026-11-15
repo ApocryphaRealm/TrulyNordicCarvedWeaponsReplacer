@@ -16,6 +16,10 @@ def mask(item, kind, axes, lo, size):
     return np.asarray(im) > 0
 rep = {}; tiles = []
 for item in ITEMS:
+    # an item built by its own builder (the crossbow's gb_crossbow.py, the quivers') is never decimated and leaves no
+    # orig_/dec_ npz - there is nothing to compare (2026-11-15: build_all.sh stopped here on the crossbow)
+    if not all(os.path.isfile(os.path.join(WORK, item, f"{k}_{r}.npz")) for r in ITEMS[item]["shapes"] for k in ("orig", "dec")):
+        print(item, "skipped: no orig/dec meshes (own builder, not decimated)"); continue
     allV = np.concatenate([np.load(os.path.join(WORK, item, f"orig_{r}.npz"))["V"] for r in ITEMS[item]["shapes"]])
     row = []
     for name, axes in (("front", [0, 1]), ("side", [2, 1])):

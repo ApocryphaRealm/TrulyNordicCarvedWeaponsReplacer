@@ -124,6 +124,20 @@ ADDITIONAL = [
              dict(sig="COBJ", fid=0x80D, edid="TNCW_Crossbow_Recipe", template=("standalone", "TNCW_Bow_Recipe"), retarget={"CNAM": "TNCW_Crossbow"}),
              dict(sig="COBJ", fid=0x80E, edid="TNCW_Crossbow_Temper", template=("standalone", "TNCW_Bow_Temper"), retarget={"CNAM": "TNCW_Crossbow"}),
          ]),
+    # the quarterstaff Q1 (2026-11-15; the owner 06:45 "start building the other weapon types that we haven't built yet"):
+    # a blunt two-handed staff - the Standalone's warhammer records of that quality as templates (TwoHandAxe animation,
+    # blunt keyword, warhammer sounds, Nordic or Ebony recipe and temper), our own NIFs. Stats (helper's pick): lighter,
+    # cheaper and quicker than the warhammer, a little less damage, the halberd's length so a long reach.
+    dict(item="quarterstaff", image="halberd.jpg",
+         records=[
+             dict(sig="STAT", fid=0x80F, edid="TNCW_Quarterstaff_1st", template=("standalone", "TNCW_Warhammer_1st"),
+                  set={"MODL": r"TrulyNordic\quarterstaff\1stpersonquarterstaff.nif"}),
+             dict(sig="WEAP", fid=0x810, edid="TNCW_Quarterstaff", template=("standalone", "TNCW_Warhammer"),
+                  set={"FULL": "Carved Nordic Quarterstaff", "MODL": r"TrulyNordic\quarterstaff\quarterstaff.nif", "OBND": (-2, -81, -2, 2, 81, 2),
+                       "stats": {"nordic": (520, 16.0, 18, 9, 0.85, 1.4), "ebony": (1300, 19.0, 21, 10, 0.85, 1.4)}}),
+             dict(sig="COBJ", fid=0x811, edid="TNCW_Quarterstaff_Recipe", template=("standalone", "TNCW_Warhammer_Recipe")),
+             dict(sig="COBJ", fid=0x812, edid="TNCW_Quarterstaff_Temper", template=("standalone", "TNCW_Warhammer_Temper")),
+         ]),
 ]
 
 def check():

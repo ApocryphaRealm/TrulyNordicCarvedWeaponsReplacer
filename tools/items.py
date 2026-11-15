@@ -204,6 +204,17 @@ ITEMS = {
                             "wrap": {"name": "TNHalberdWrap", "tex": W(r"work_gs5_sf\tex\tn_greatsword_wrap"), "target": None}},
                     blood_region=[[-18.8, 73.6, -2.0], [13.3, 135.0, 2.0]],
                     third="nordicbattleaxe.nif", first="1stpersonnordicbattleaxe.nif", stem="halberd"),
+    # the quarterstaff Q1 (2026-11-15, the owner 06:45 "start building the other weapon types that we haven't built yet. Just
+    # do them one at a time" - the Animated Armoury list's quarterstaff): set2\quarterstaff_build.py Q1 - a 160-long dark-ash
+    # staff, the set's grip wrap, a forged square steel shoe at each end (four raised plates, one straight braid each, square
+    # bands, a square neck over a ring and a leather binding, a blunt four-sided cap). A NEW item built as the halberd: on
+    # vanilla's two-handed axe NIFs (TwoHandAxe moveset), undecimated, its own first-person file; blood on the top shoe.
+    "quarterstaff": dict(version="Q1", new_item=True, sources=[W(r"work_quarterstaffQ1\tn_quarterstaffQ1.nif")], orient=True,
+                    shapes={"metal": {"name": "TNQuarterstaff", "tex": W(r"work_quarterstaffQ1\tex\tn_quarterstaffQ1"), "target": None, "design": W(r"work_quarterstaffQ1")},
+                            "shaft": {"name": "TNQuarterstaffShaft_0", "tex": W(r"work_quarterstaffQ1\tex\tn_quarterstaffQ1_soft"), "target": None},
+                            "wrap": {"name": "TNQuarterstaffWrap", "tex": W(r"work_gs5_sf\tex\tn_greatsword_wrap"), "target": None}},
+                    blood_region=[[-2.2, 60.0, -2.2], [2.2, 80.5, 2.2]],
+                    third="nordicbattleaxe.nif", first="1stpersonnordicbattleaxe.nif", stem="quarterstaff"),
     # the bolt quiver B and its barbed bolts (2026-11-13; the owner 06:36 "make sure we have a crossbow and bolt models in
     # the upload"; design set2\work_xbow_boltquiverB, gated - work_xbow_NOTES.md). A NEW item for the Additional Weapons file
     # (AMMO "Carved Nordic Bolt"), built by gb_boltquiver.py like the arrow quiver: on vanilla Dawnguard steelbolt.nif's exact
