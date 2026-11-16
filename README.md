@@ -7,7 +7,7 @@ it is - its edges, its head, its silhouette - and is rebuilt to be realistic in 
 ## The models
 | Item | New look |
 |---|---|
-| Carved Nordic Sword | single-edged curved blade, one-piece half guard sweeping up, hooked pommel, a bold carved braid running to the point; a falchion-shaped sheath |
+| Carved Nordic Sword | straight double-edged blade with one carved braid up its middle, the greatsword's carved guard and disc pommel at one-hand size; a straight sheath |
 | Carved Nordic Battleaxe | a tall upper horn, one long curved cutting edge down to a single beard point, a curved back spike; steel haft forged with the head, carved knot fields, a forged knob pommel |
 | Carved Nordic Greatsword | double-edged blade, carved guards and ricasso, a triquetra medallion on a level boss at the lower guard, two wrapped grips; a straight sheath on the back |
 | Carved Nordic Warhammer | hammer face and curved pick, a triquetra ring centred on the face, a forged knob pommel |
@@ -24,10 +24,10 @@ the back) when the weapon is drawn.
 Pick ONE Nordic file (Replacer - No ESP, Replacer - ESP or Standalone - Nordic quality) and, if you want the black and
 gold Ebony look, ONE Ebony file (Replacer - Ebony - No ESP, Replacer - Ebony - ESP or Standalone - Ebony quality): the
 Replacer - Ebony files put the look on the vanilla Ebony weapons, the Standalone - Ebony quality file adds it as a set
-of new items beside them. Each main file has its own installer with four choices, each shown with a picture: the
-sword (curved saber, the default, or a straight sword), the mace (six-flanged, the default, or the classic four-flanged
-one, both with pointed striking edges), the shield (carved, the default, or clean) and the dagger (carved, the default,
-or the serpent). Only the chosen model is installed, at the one path every record
+of new items beside them. Each main file has its own installer with three choices, each shown with a picture: the
+mace (six-flanged, the default, or the classic four-flanged one, both with pointed striking edges), the shield (carved,
+the default, or clean) and the dagger (carved, the default, or the serpent). The sword is the straight sword in every
+file; the curved saber is in Additional Weapons, with a greatsword of its own. Only the chosen model is installed, at the one path every record
 uses, so nothing is left over. To change a choice later, reinstall and pick again.
 
 | Main file | What it does |
@@ -65,8 +65,9 @@ ESP file first.
 Standalone items: Carved Nordic Sword, Carved Nordic War Axe, Carved Nordic Battleaxe, Carved Nordic Greatsword, Carved
 Nordic Warhammer, Carved Nordic Dagger, Carved Nordic Mace, Carved Nordic Bow, Carved Nordic Shield, Carved Nordic Arrow.
 At Ebony quality each name carries "Ebony": Carved Nordic Ebony Sword, Carved Nordic Ebony War Axe, ... Carved Nordic Ebony
-Shield, Carved Nordic Ebony Arrow (and in Additional Weapons: Carved Nordic Ebony Spear, Halberd, Quarterstaff, Rapier, Crossbow and Bolt). The
-installer's model choices (saber or straight sword, and so on) change only the model, not the name.
+Shield, Carved Nordic Ebony Arrow (and in Additional Weapons: Carved Nordic Ebony Spear, Halberd, Quarterstaff, Rapier,
+Saber, Saber Greatsword, Crossbow and Bolt). The installer's model choices (the mace, shield and dagger)
+change only the model, not the name.
 
 Replacer names: the Replacer files rename the Nordic pieces to the same names - Carved Nordic Sword, ... Carved
 Nordic Shield, Carved Nordic Arrow. The ESP file also renames the enchanted copies the same way ("Virtuous Carved
@@ -79,6 +80,7 @@ Optional file, Additional Weapons: carved weapons the game does not have, in the
 - **Carved Nordic Halberd:** a bearded blade with a crescent hollow under it and a triquetra, a carved back spike and a top blade, 163 units long.
 - **Carved Nordic Quarterstaff:** a 160-unit dark-ash staff with a forged square steel shoe at each end, a carved braid on each of its four plates; a blunt two-handed weapon on the warhammer's numbers and moveset.
 - **Carved Nordic Rapier:** a swept-hilt rapier, 87.5 units long, with a carved ricasso and a wheel pommel, in a slim black leather scabbard with forged weave-carved fittings; a one-handed sword, lighter and quicker than the sword. An installer step can add Keyword Compatibility Framework's rapier keyword (WeapTypeRapier) through Keyword Item Distributor for rapier animation mods.
+- **Carved Nordic Saber and Saber Greatsword:** the curved saber (until 1.4.0 the main files' default sword) and the same blade scaled up to a 115-unit greatsword, each in its own falchion-shaped carved sheath. The saber is a one-handed sword, the saber greatsword a two-handed greatsword. An installer step can give both Keyword Compatibility Framework's katana keyword (WeapTypeKatana) through Keyword Item Distributor, for katana animation mods.
 
 The spear and halberd are forged and tempered like the battleaxe and use the battleaxe moveset unless an installer step adds the keywords
 that animation packs look for, through Keyword Item Distributor: spear packs, or Animated Armoury's halberd (which also

@@ -21,15 +21,18 @@ Normal maps are the shared build's DDS, copied (the relief is the same).
 DAMASCUS (1.4.0, 2026-11-15, the owner 19:19 "Pbr Damascus"): after recolour(), damascus() lays procedural damascus
 bands on the plain black steel of every weapon's and shield's metal atlas, and of a blade atlas of its own (role "blade":
 the saber B build, WORK\<item>\orig_blade.npz) (DAMASCUS_ITEMS; not the sheaths, quivers,
-arrows or bolts) - albedo +/- 0.025, roughness -/+ 0.22, from each item's own mesh (WORK\<item>\orig_metal.npz; the
-crossbow's painter dump). Never on gold, carved floors or non-metal (the build refuses). --no-damascus builds without it.
+arrows or bolts), from each item's own mesh (WORK\<item>\orig_metal.npz; the crossbow's painter dump). Never on gold,
+carved floors or non-metal (the build refuses). --no-damascus builds without it. Pattern (2026-11-16, the owner 14:46):
+option c RAINDROP by default (a hard-edged layer stack of rings round jittered drops, albedo +/- 0.04, roughness -/+ 0.26,
+period 0.30 units, scaled up per atlas below ~7 px per period); --damascus-a builds the first look, setting A (soft
+cosine bands, albedo +/- 0.025, roughness -/+ 0.22).
 
 OUTPUT (the build's stage, beside the shared files; build-packages.py ships it in the Ebony quality files only):
     <STAGE>\textures\pbr\TrulyNordic\ebony\<stem>\tn_<stem>[_role].dds
     <STAGE>\ebony\<item>\meshes\TrulyNordic\ebony\<at>\<file>.nif   (copies of the shared NIFs, texture paths -> ebony)
     <WORK>\ebony\<item>\tex\*.png                                  (the recoloured maps, with the height map beside them)
     <WORK>\ebony\masks\*.jpg, <WORK>\ebony\ebony_report.json, <WORK>\ebony\medallion_check.json (ebony-mode measure)
-Run after textures.py and assemble.py:  python -I ebony.py [--no-damascus] [item ...]
+Run after textures.py and assemble.py:  python -I ebony.py [--no-damascus | --damascus-a] [item ...]
                                         python -I ebony.py --plugins   (the Ebony plugins' model paths; also run by
                                         standalone_finish.py and additional_records.py)
                                         python -I ebony.py --rings     (print the haft rings found per item)
@@ -54,9 +57,11 @@ EB_WORK = os.path.join(WORK, EB)
 EB_STAGE = os.path.join(STAGE, EB)
 # every item an Ebony quality file ships: the main files' defaults and installer alternates, and the Additional Weapons
 # file's spear and halberd, and (1.4.0, 2026-11-14) its crossbow and bolt quiver / bolts
-MAIN = ["sword", "sword2", "battleaxe", "greatsword", "warhammer", "waraxe", "dagger", "dagger2", "mace", "mace2", "bow",
+# 1.4.0 (2026-11-15, the blade families): the main files' one sword is the straight sword ("sword"; the "sword2" option is
+# gone) and the saber line - the saber, the saber longsword and greatsword - and the European longsword are Additional Weapons
+MAIN = ["sword", "battleaxe", "greatsword", "warhammer", "waraxe", "dagger", "dagger2", "mace", "mace2", "bow",
         "shield", "shield2", "quiver"]
-ADDITIONAL = ["spear", "halberd", "crossbow", "boltquiver", "quarterstaff", "rapier"]
+ADDITIONAL = ["spear", "halberd", "crossbow", "boltquiver", "quarterstaff", "rapier", "longsword", "saber", "saberlongsword", "sabergreatsword"]
 EBONY_ITEMS = MAIN + ADDITIONAL
 
 GOLD = np.array([0.93, 0.74, 0.40], np.float32)      # satin gold (sRGB albedo) - the study's tone
@@ -69,8 +74,8 @@ RING_ALONG, RING_ALONG_X, RING_ROUND, RING_HOLE, RING_MIN_TRIS = 2.0, 0.8, 1.4, 
 # within the given radius of the axis. The spear's socket ends in a polished foot above the binding (the spear sheet's
 # "binding" view) - its last 1.2 units are its ring.
 RING_BANDS = {"spear": [(57.0, 58.5, 1.25)]}
-RING_ITEMS = {"sword", "sword2", "battleaxe", "greatsword", "warhammer", "waraxe", "dagger", "dagger2", "mace", "mace2", "bow", "spear", "halberd",
-              "crossbow", "quarterstaff", "rapier"}
+RING_ITEMS = {"sword", "battleaxe", "greatsword", "warhammer", "waraxe", "dagger", "dagger2", "mace", "mace2", "bow", "spear", "halberd",
+              "crossbow", "quarterstaff", "rapier", "longsword", "saber", "saberlongsword", "sabergreatsword"}
 # The crossbow (the owner, 2026-11-15 06:12, "Make the rings gold": the two steel collars at the ends of its grip wrap).
 # Its builder (gb_crossbow.py) leaves no orig_metal.npz, so its ring source is the painter's own triangle dump of the B5
 # metal mesh - the triangles and pixel UVs the atlas was painted from (per-triangle xyz, uv in atlas pixels, rows down).
@@ -257,6 +262,16 @@ DAMASCUS_ITEMS = [k for k in EBONY_ITEMS if k not in ("quiver", "boltquiver")]
 DAMASCUS_ROLES = ("metal", "blade")
 DAM = dict(period=0.42, warp=1.0, fine=0.30, a_alb=0.025, a_r=0.22)   # the demo's setting A (medium bands)
 DAM_ZCUT, DAM_WELD, DAM_SEED = 1.5, 0.02, 1347
+# 1.4.0, 2026-11-16 (the owner 14:46: "Do c as new default and apply it to the full ebony set"): the DEFAULT pattern is the
+# design study's option c, RAINDROP (4. plans\nordic-carved-missing-weapons-20261115\work\damascus_options\make_options.py
+# field "c" + layers()): concentric rings round jittered drops about 1.5 units apart on a gentle wavy ground, cut into a
+# HARD-EDGED layer stack (one-texel anti-aliased edges from the field's own gradient, bright layer 45 % of each period, a
+# per-layer brightness jitter); albedo +/- 0.04, roughness -/+ 0.26. Setting A (the soft cosine bands above) stays
+# selectable: python -I ebony.py --damascus-a. Each atlas at its OWN texel density: the study found periods under ~0.3
+# units alias at 24 px/unit (5-6 px per period), so the whole pattern (period, drop spacing, ring size) is scaled up on an
+# atlas whose damascus texels hold fewer than DAM_C["min_px"] px per 0.30-unit period (dam_scale()).
+DAM_STYLE = "c"                                                      # "c" raindrop (default) | "A" (--damascus-a)
+DAM_C = dict(period=0.30, sx=1.45, sy=1.6, r=0.62, a_alb=0.040, a_r=0.26, duty=0.45, jit=0.25, seed=ord("c"), min_px=7.2)
 
 
 def _dam_noise():
@@ -284,6 +299,48 @@ def dam_pattern(u, v, period, warp, fine_w):
     f2 = f + 0.25 * period * _noise(4, u * 12.0, v * 4.0)
     b2 = 0.5 + 0.5 * np.cos(2 * np.pi * f2 / (period * 0.37))
     return np.clip((1 - fine_w) * b1 + fine_w * b2, 0, 1)
+
+
+def _h01(n, k):  # hash of an integer index -> 0..1 (the study's h01)
+    x = np.sin(n * 12.9898 + k * 78.233) * 43758.5453; return x - np.floor(x)
+
+
+def dam_raindrop_field(u, v):
+    """The study's option c field ("layer depth", world units): a gentle wavy base + a raised dome at each jittered drop."""
+    c = DAM_C; iu, iv = np.floor(u / c["sx"]), np.floor(v / c["sy"]); best = np.zeros_like(u)
+    for du in (-1, 0, 1):
+        for dv in (-1, 0, 1):
+            cu, cv = iu + du, iv + dv
+            pu = (cu + 0.2 + 0.6 * _h01(cu * 131 + cv, 3)) * c["sx"]; pv = (cv + 0.2 + 0.6 * _h01(cu * 17 + cv * 7, 5)) * c["sy"]
+            best = np.maximum(best, np.exp(-((u - pu) ** 2 + (v - pv) ** 2) / c["r"] ** 2))
+    return 0.45 * (u + _noise(0, u * 2.0, v * 0.6) * 0.5) + 1.25 * best
+
+
+def dam_layers(f, sel, period):
+    """The study's layers(): the hard-edged layer stack of the field image f (H,W; world units) - 1 = a bright layer.
+    The anti-aliasing width comes from f's gradient per texel (capped at its 95th percentile over the selected texels, so
+    a part seam or the mask edge does not smear)."""
+    c = DAM_C; gy, gx = np.gradient(f); g = np.hypot(gx, gy)
+    g = np.minimum(g, np.percentile(g[sel], 95))
+    aa = np.clip(g / period, 0.03, 0.5)
+    t = f / period; n = np.floor(t); fr = t - n; d = c["duty"]
+    dd = np.where(fr < d, np.minimum(fr, d - fr), -np.minimum(fr - d, 1 - fr))
+    s = np.clip(dd / aa + 0.5, 0, 1)
+    bright = 1 - c["jit"] * _h01(n, c["seed"]); dark = 0.12 * _h01(n, c["seed"] + 7)
+    return dark + s * (bright - dark)
+
+
+def dam_density(P, on):
+    """px per world unit on the damascus texels (median, and the 10th percentile), from the world map's gradient."""
+    gy = np.hypot(*np.gradient(P[..., 1])); gx = np.hypot(*np.gradient(P[..., 0])); gz = np.hypot(*np.gradient(P[..., 2]))
+    upx = np.maximum(np.maximum(gy, gx), gz)[on]
+    d = 1 / np.maximum(upx, 1e-4)
+    return float(np.median(d)), float(np.percentile(d, 10))
+
+
+def dam_scale(dens):
+    """1.0, or the factor that scales the whole raindrop pattern up so one period holds DAM_C["min_px"] texels."""
+    return max(1.0, DAM_C["min_px"] / (DAM_C["period"] * dens))
 
 
 def dam_geometry(item, W, H, role="metal"):
@@ -374,12 +431,22 @@ def damascus(item, base, alb, rmo, g, role="metal"):
     wd = ndi.gaussian_filter(metal * fl * cov, 0.6) * (1 - np.clip(g * 1.5 + gold_near, 0, 1))
     sel = wd > 1e-3
     u, v = dam_uv(T, plab, P, L, sel)
-    b = np.full((Hh, Ww), 0.5, np.float32); b[sel] = dam_pattern(u, v, DAM["period"], DAM["warp"], DAM["fine"])
-    s2 = (b - 0.5) * 2
-    A = np.clip(alb + (DAM["a_alb"] * s2 * wd)[..., None], 0, 1)
-    R = rmo.copy(); R[..., 0] = np.clip(rmo[..., 0] - DAM["a_r"] * s2 * wd, 0.06, 1)
     on = wd > 0.5
-    st = dict(damascus="setting A", geometry=os.path.relpath(src, os.path.dirname(WORK)) if src.startswith(os.path.dirname(WORK)) else src,
+    if DAM_STYLE == "A":
+        b = np.full((Hh, Ww), 0.5, np.float32); b[sel] = dam_pattern(u, v, DAM["period"], DAM["warp"], DAM["fine"])
+        a_alb, a_r, extra = DAM["a_alb"], DAM["a_r"], {}
+    else:
+        dens, dens10 = dam_density(P, on if on.any() else sel); k = dam_scale(dens)
+        f = np.zeros((Hh, Ww)); f[sel] = dam_raindrop_field(u / k, v / k) * k     # the whole pattern scaled by k
+        b = np.full((Hh, Ww), 0.5, np.float32); b[sel] = dam_layers(f, sel, DAM_C["period"] * k)[sel]
+        a_alb, a_r = DAM_C["a_alb"], DAM_C["a_r"]
+        extra = dict(px_per_unit=round(dens, 1), px_per_unit_p10=round(dens10, 1), scale=round(k, 3),
+                     period_units=round(DAM_C["period"] * k, 3), period_px=round(DAM_C["period"] * k * dens, 1),
+                     bright_fraction=round(float((b[on] > 0.5).mean()), 3) if on.any() else None)
+    s2 = (b - 0.5) * 2
+    A = np.clip(alb + (a_alb * s2 * wd)[..., None], 0, 1)
+    R = rmo.copy(); R[..., 0] = np.clip(rmo[..., 0] - a_r * s2 * wd, 0.06, 1)
+    st = dict(damascus="setting A" if DAM_STYLE == "A" else "c raindrop", **extra, geometry=os.path.relpath(src, os.path.dirname(WORK)) if src.startswith(os.path.dirname(WORK)) else src,
               parts=int(len(np.unique(plab))), damascus_px=int(on.sum()), damascus_share_of_metal=round(float(on.sum() / max((metal > 0.5).sum(), 1)), 4),
               gold_touched_px=int(((g > 0.5) & (wd > 0.02)).sum()), floor_touched_px=int(((h < 80) & (wd > 0.02)).sum()),
               nonmetal_touched_px=int(((a0[..., 1] < 0.4) & (wd > 0.02)).sum()),
@@ -471,7 +538,7 @@ def measure_medallions(done):
     from medallion_audit import MEDALLIONS
     faces = {}
     for key, piece, face, work, stem, cx, cy, rg, lay in MEDALLIONS:
-        eb = done.get((work, stem))
+        eb = done.get((key, work, stem))      # by item (1.4.0: the longsword recolours the greatsword's atlas too)
         if not eb or key not in EBONY_ITEMS: continue
         m = MM.measure(eb, cx, cy, rg, name=f"{piece} / {face} (ebony)")
         m.update(item=key, piece=piece, face=face, work=work, look="ebony")
@@ -541,10 +608,12 @@ def build(items):
             shutil.copy2(os.path.join(shared, name + "_n.dds"), os.path.join(tex_out, name + "_n.dds"))
             mask_preview(os.path.join(EB_WORK, "masks", name + "_gold.jpg"), base + ".png", g, rings)
             stt["haft_rings"] = found; rep["atlases"][name] = stt
-            done[(os.path.basename(os.path.dirname(os.path.dirname(base))), os.path.basename(base))] = ob
+            done[(item, os.path.basename(os.path.dirname(os.path.dirname(base))), os.path.basename(base))] = ob
             print(f"  {name}: gold {stt['gold_share']:.3f} of the metal, {len(found)} ring part(s), medallions {stt['medallions']}"
                   + (f", damascus {stt['damascus_px']} px ({stt['damascus_share_of_metal']:.3f} of the metal, {stt['parts']} parts, gold/floor/non-metal touched"
-                     f" {stt['gold_touched_px']}/{stt['floor_touched_px']}/{stt['nonmetal_touched_px']})" if "damascus_px" in stt else f", damascus: {stt.get('damascus', 'off (--no-damascus)' if not DAMASCUS else 'none (not a weapon or shield steel atlas)')}"))
+                     f" {stt['gold_touched_px']}/{stt['floor_touched_px']}/{stt['nonmetal_touched_px']}; {stt['damascus']}"
+                     + (f", {stt['px_per_unit']} px/unit (p10 {stt['px_per_unit_p10']}), period {stt['period_units']} = {stt['period_px']} px, scale {stt['scale']}" if "scale" in stt else "") + ")"
+                     if "damascus_px" in stt else f", damascus: {stt.get('damascus', 'off (--no-damascus)' if not DAMASCUS else 'none (not a weapon or shield steel atlas)')}"))
         if item == "quiver":
             q = ITEMS["quiver"]["shapes"]; name = tex_name("quiver", "arrow")
             ob = os.path.join(png_out, os.path.basename(q["arrow"]["tex"]))
@@ -583,6 +652,7 @@ def build(items):
 if __name__ == "__main__":
     a = sys.argv[1:]
     if "--no-damascus" in a: DAMASCUS = False; a = [x for x in a if x != "--no-damascus"]
+    if "--damascus-a" in a: DAM_STYLE = "A"; a = [x for x in a if x != "--damascus-a"]   # 2026-11-16: setting A, not the raindrop
     if a and a[0] == "--plugins":
         for pth in EBONY_PLUGINS: plugin_paths(pth)
         sys.exit(0)

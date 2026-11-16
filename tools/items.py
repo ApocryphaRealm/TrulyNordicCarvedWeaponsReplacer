@@ -22,7 +22,6 @@ def W(*p): return os.path.join(S2, *p)
 ITEMS = {
     # sword A5i (approved 2026-11-12 00:01: "looks good"): A5h's flat-sided pommel with the crack inside the hook closed;
     # A5f's blade and tip engraving; the wrap is A5d's, unchanged. Layout record in work_sword_a5i\engraving_check.json.
-    # option: the curved saber and the straight sword (sword2) are the installer's "Sword" step; both install at sword\sword.nif
     # sheath: the shape named 'Scb' that the game leaves on the hip when the weapon is drawn (in the weapon's own frame)
     # 1.1.1 (2026-11-12): normals-only fix - carved faces' outline and creases given their own vertices
     # (set2\shading_fix_split.py --crease=35, real face dumps); geometry and maps identical
@@ -41,19 +40,71 @@ ITEMS = {
     # its old blade leaves. The v4b blade is a shape of its own (TN_sword_blade) on its own 2048 atlas, undecimated; the
     # edge blood is cut from it. Sheath C2 unchanged: no v4b blade vertex above the guard leaves it (A5i's blade the
     # control; 4. plans\nordic-carved-missing-weapons-20261115\work\saber_b_build\sheath_fit_*.json).
-    "sword": dict(hip=dict(rot_x_deg=-4.0, pivot=[-0.28, -2.98, 0.67], shift=[0.0, 0.0, -1.25]), version="A5i-sf hilt + A5j v4b blade (saber B)",
-                  sources=[W(r"work_sword_a5i_sf\A5I_metal.nif"), os.path.join(PLAN, r"A5\work\A5_wrap.nif"), W(r"work_sword_a5jM\tn_sword_a5jM.nif")], orient=True, option=True,
+    # THE SABER LINE (1.4.0, 2026-11-15, the owner 19:39: "use the European style single-handed sword as the base sword design
+    # and have the saber be a weapon tagged as a katana ... scale the saber up to a long sword and great sword size"): saber B
+    # is no longer the Replacer's sword - it is a NEW item of the Additional Weapons ("Carved Nordic Saber", WeapTypeKatana
+    # through the KID step), built exactly as before (the same sources, maps, sheath C2, hip and blood) on vanilla's Nordic
+    # sword NIFs, with its own first-person file and its own paths (stem "saber": meshes\TrulyNordic\saber\).
+    "saber": dict(hip=dict(rot_x_deg=-4.0, pivot=[-0.28, -2.98, 0.67], shift=[0.0, 0.0, -1.25]), version="A5i-sf hilt + A5j v4b blade (saber B)",
+                  sources=[W(r"work_sword_a5i_sf\A5I_metal.nif"), os.path.join(PLAN, r"A5\work\A5_wrap.nif"), W(r"work_sword_a5jM\tn_sword_a5jM.nif")], orient=True, new_item=True,
                   sheath=dict(version="saber C2 (falchion fit, ringed symbol)", src=W(r"work_sheath_saber_fitC2\tn_sheath_saber_fitC2.nif"), tex=W(r"work_sheath_saber_fitC2\tex\tn_sheath_saber_fitC2")),
                   shapes={"metal": {"name": "NordicSwordA5", "tex": W(r"work_sword_a5i_sf\tex\nordicsworda5i"), "drop_islands_y_over": 20.0},
                           "wrap": {"name": "NordicWrapA5", "tex": None, "dds_from": r"D:\Modlists\Njordlinger\mods\Nordic Carved Redesign A (test)\textures\pbr\ApocryphaTest\NordicCarvedRedesignA5\nordicwrapa5"},
                           "blade": {"name": "TNSaberA5j", "tex": W(r"work_sword_a5jM\tex\tn_sword_a5jM"), "target": None}},
                   blood_from="blade",
-                  third="nordicsword.nif", first="1stpersonnordicsword.nif", stem="sword", weap="DLC2NordicSword", fp_stat="03C353"),
-    # the straight sword (installer option, 2026-11-11): greatsword v3's blade and upper hilt as a one-hander
+                  third="nordicsword.nif", first="1stpersonnordicsword.nif", stem="saber"),
+    # the saber LONGSWORD (sword_a5k L) and saber GREATSWORD (sword_a5k G) (the owner 20:13: "The larger sabers look fine"):
+    # set2\sword_a5k_build.py L / G (the blade, its own 2048 atlas, undecimated) + set2\sword_a5k_hilt.py L / G (the shipped
+    # saber's guard, ferrule and hooked pommel scaled x1.08 / x1.18 on A5i's atlas - the "metal" role, so the normal fix and the
+    # Ebony gold / damascus work on it as on the saber's - and the wrap rebuilt at the longer grip on its own maps). NEW items:
+    # the longsword one-handed on vanilla's Nordic SWORD NIFs (OneHandSword, Prn WeaponSword; reach 1.1), the greatsword
+    # two-handed on vanilla's Nordic GREATSWORD NIFs (TwoHandSword, Prn WeaponBack). Their scabbards: set2\run_sheath_blades.sh
+    # saberL / saberG - sheath C2's construction (fit C, ringed triquetra on a weave locket, weave chape) fitted by the probe /
+    # design steps to each blade and hilt, fittings scaled with the blade (x1.10 / x1.25). Blood from the blade. hip (longsword
+    # only, the greatsword hangs on the back as the greatsword does): the saber's tilt about its own grip centre (the grip is
+    # 4.288 longer at the bottom, so the pivot is 2.144 lower).
+    "saberlongsword": dict(hip=dict(rot_x_deg=-4.0, pivot=[-0.28, -5.124, 0.67], shift=[0.0, 0.0, -1.25]), version="A5k L (saber B scaled to a longsword)",
+                           sources=[W(r"work_sword_a5kL\tn_sword_a5kL.nif"), W(r"work_sword_a5kL_hilt\tn_sword_a5kL_hilt.nif")], orient=True, new_item=True,
+                           sheath=dict(version="saberL r2 (sheath C2 construction, fitted with the blade mesh, x1.10)", src=W(r"work_sheath_saberL_sf\tn_sheath_saberL.nif"), tex=W(r"work_sheath_saberL_sf\tex\tn_sheath_saberL")),
+                           shapes={"metal": {"name": "hilt", "tex": W(r"work_sword_a5i_sf\tex\nordicsworda5i"), "target": None},
+                                   "wrap": {"name": "wrap", "tex": W(r"work_sword_a5kL_hilt\tex\tn_sword_a5kL_wrap"), "target": None, "design": W(r"work_sword_a5kL")},
+                                   "blade": {"name": "TNSaberA5k", "tex": W(r"work_sword_a5kL\tex\tn_sword_a5kL"), "target": None}},
+                           blood_from="blade", blood_region=[[-9.0, 3.0, -3.0], [9.0, 78.5, 4.0]],
+                           third="nordicsword.nif", first="1stpersonnordicsword.nif", stem="saberlongsword"),
+    "sabergreatsword": dict(version="A5k G (saber B scaled to a greatsword)",
+                            sources=[W(r"work_sword_a5kG\tn_sword_a5kG.nif"), W(r"work_sword_a5kG_hilt\tn_sword_a5kG_hilt.nif")], orient=True, new_item=True,
+                            sheath=dict(version="saberG r2 (sheath C2 construction, fitted with the blade mesh, x1.25)", src=W(r"work_sheath_saberG_sf\tn_sheath_saberG.nif"), tex=W(r"work_sheath_saberG_sf\tex\tn_sheath_saberG")),
+                            shapes={"metal": {"name": "hilt", "tex": W(r"work_sword_a5i_sf\tex\nordicsworda5i"), "target": None},
+                                    "wrap": {"name": "wrap", "tex": W(r"work_sword_a5kG_hilt\tex\tn_sword_a5kG_wrap"), "target": None, "design": W(r"work_sword_a5kG")},
+                                    "blade": {"name": "TNSaberA5k", "tex": W(r"work_sword_a5kG\tex\tn_sword_a5kG"), "target": None}},
+                            blood_from="blade", blood_region=[[-10.0, 3.0, -3.0], [10.0, 91.5, 4.0]],
+                            third="nordicgreatsword.nif", first="1stpersonnordicgreatsword.nif", stem="sabergreatsword"),
+    # the European LONGSWORD A (the owner 21:35: "Longsword, we'll go with the first option that has the curved guard with the
+    # symbol on the guard and the pommel"): set2\longsword_build.py A (the blade: the family's straight double-edged blade,
+    # one bevel per edge, one straight 3-strand braid; its own 2048 atlas, undecimated) + set2\longsword_hilt.py A (the
+    # greatsword's lower guard with its medallion x0.72 and its ferrule, collar and disc pommel x0.90 on the GREATSWORD's atlas -
+    # the "metal" role; the wrap rebuilt at the hand-and-a-half grip, 14.9 long, its maps copied into work_longswordA_hilt\tex).
+    # A NEW one-handed item on vanilla's Nordic SWORD NIFs (OneHandSword, Prn WeaponSword; reach 1.1 for its 97.3 length):
+    # Keyword Compatibility Framework has no longsword keyword, and the owner asked for sword animations on the European line.
+    # Its scabbard: set2\run_sheath_blades.sh longswordA - the greatsword sheath v3's construction (the same guard family's
+    # throat) fitted to this blade and hilt. hip: the straight sword's tilt about its own grip centre (14.45 visible grip).
+    "longsword": dict(hip=dict(rot_x_deg=-4.0, pivot=[0.0, -5.9, 0.67], shift=[0.0, 0.0, -1.25]), version="A (greatsword scheme scaled down)",
+                      sources=[W(r"work_longswordA\tn_longswordA.nif"), W(r"work_longswordA_hilt\tn_longswordA_hilt.nif")], orient=True, new_item=True,
+                      sheath=dict(version="longswordA r2 (greatsword sheath v3 construction, fitted with the blade mesh)", src=W(r"work_sheath_longswordA_sf\tn_sheath_longswordA.nif"), tex=W(r"work_sheath_longswordA_sf\tex\tn_sheath_longswordA")),
+                      shapes={"metal": {"name": "LSHiltGS", "tex": W(r"work_gs5_sf\tex\tn_greatsword"), "target": None},
+                              "wrap": {"name": "LSWrap", "tex": W(r"work_longswordA_hilt\tex\tn_longsword_wrap"), "target": None, "design": W(r"work_longswordA")},
+                              "blade": {"name": "TNLongsword", "tex": W(r"work_longswordA\tex\tn_longswordA"), "target": None}},
+                      blood_from="blade", blood_region=[[-4.0, 3.0, -2.0], [4.0, 78.5, 3.5]],
+                      third="nordicsword.nif", first="1stpersonnordicsword.nif", stem="longsword"),
+    # THE SWORD (1.4.0, 2026-11-15, the restructure): the straight sword - until now the installer's "Straight sword" option
+    # (item "sword2") - is the main files' ONE sword (the Sword step is gone; the saber line is in the Additional Weapons).
+    # The same NIF, maps, sheath and hip as the option had, so its files (sword\sword.nif, textures\...\swordstraight\) are
+    # byte for byte the 1.4.0 option's.
+    # the straight sword (2026-11-11): greatsword v3's blade and upper hilt as a one-hander
     # 1.1.0 shading fix (2026-11-12): v1-sf = v1's NIF with the flat guard and pommel faces' outline vertices split from
     # their chamfers (set2\shading_fix_split.py, as bow v8) - geometry and maps identical; set2\shading-fix-1.1.0.png
     # hip: as the saber's (same clip: Nordic carved 9 hidden slices / depth sum 19.0 -> 5 / 3.9), pivot its own grip centre
-    "sword2": dict(hip=dict(rot_x_deg=-4.0, pivot=[0.0, -4.02, 0.67], shift=[0.0, 0.0, -1.25]), version="straight v1-sf", sources=[W(r"work_straightsword_sf\tn_straightsword.nif")], orient=True, option=True, path_stem="sword",
+    "sword": dict(hip=dict(rot_x_deg=-4.0, pivot=[0.0, -4.02, 0.67], shift=[0.0, 0.0, -1.25]), version="straight v1-sf", sources=[W(r"work_straightsword_sf\tn_straightsword.nif")], orient=True, path_stem="sword",
                    sheath=dict(version="v3 (ringed symbol)", src=W(r"work_sheath_straightsword_v3\tn_sheath_straightsword_v3.nif"), tex=W(r"work_sheath_straightsword_v3\tex\tn_sheath_straightsword_v3")),
                    shapes={"metal": {"name": "tn_straightsword", "tex": W(r"work_straightsword_sf\tex\tn_straightsword")}, "wrap": {"name": "TNStraightswordWrap", "tex": W(r"work_straightsword_sf\tex\tn_straightsword_wrap")}},
                    third="nordicsword.nif", first="1stpersonnordicsword.nif", stem="swordstraight", weap="DLC2NordicSword", fp_stat="03C353"),

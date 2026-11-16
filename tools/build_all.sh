@@ -6,7 +6,9 @@ T="$(cd "$(dirname "$0")" && pwd)"
 B="C:/Program Files/Blender Foundation/Blender 5.2/blender.exe"
 python -I "$T/items.py"
 CFG="D:/Claude output/4. plans/nordic-carved-redesign-20261110/package/work/blender_config.json"
-for k in sword sword2 battleaxe greatsword warhammer waraxe dagger dagger2 mace mace2 bow shield shield2 spear halberd quarterstaff rapier; do
+# 1.4.0 (2026-11-15): sword = the straight sword (the main files' one sword); the saber line (saber, saber longsword, saber
+# greatsword) and the European longsword are new items of the optional file
+for k in sword battleaxe greatsword warhammer waraxe dagger dagger2 mace mace2 bow shield shield2 spear halberd quarterstaff rapier longsword saber saberlongsword sabergreatsword; do
   "$B" --background --factory-startup --python-exit-code 1 --python "$T/gb_blender.py" -- "$CFG" $k > "$(dirname "$CFG")/blender_$k.log" 2>&1
 done
 # the quiver / arrows: their own Blender step (no decimation; the arrows cut out of the quiver onto one arrow atlas)
@@ -21,6 +23,8 @@ python -I "$T/quiver_atlas.py" boltquiver
 python -I "$T/textures.py"
 python -I "$T/assemble.py"
 python -I "$T/textures.py" --quality ebony   # 1.3.0: the Ebony look (tools/ebony.py) - after assemble.py, it copies its NIFs
+python -I "$T/ebony_replacer.py" --stage     # 1.4.0: the Replacer - Ebony's first-person / shield / flight copies from the ebony stage
+                                             # (was a separate step: the saber B build found the Ebony Replacer's first.nif stale)
 python -I "$T/silhouette.py"
 python -I "$T/verify.py"
 python -I "$T/arrow_records.py"   # idempotent: adds the arrow records to the three plugins once
