@@ -19,7 +19,8 @@ as painted). Rivets, pommels, sockets and caps fail one of the three tests. ring
 Only metal pixels (RMAOS G >= 0.5) change; leather, wood, string and wraps are untouched (an atlas with no metal is copied).
 Normal maps are the shared build's DDS, copied (the relief is the same).
 DAMASCUS (1.4.0, 2026-11-15, the owner 19:19 "Pbr Damascus"): after recolour(), damascus() lays procedural damascus
-bands on the plain black steel of every weapon's and shield's metal atlas (DAMASCUS_ITEMS; not the sheaths, quivers,
+bands on the plain black steel of every weapon's and shield's metal atlas, and of a blade atlas of its own (role "blade":
+the saber B build, WORK\<item>\orig_blade.npz) (DAMASCUS_ITEMS; not the sheaths, quivers,
 arrows or bolts) - albedo +/- 0.025, roughness -/+ 0.22, from each item's own mesh (WORK\<item>\orig_metal.npz; the
 crossbow's painter dump). Never on gold, carved floors or non-metal (the build refuses). --no-damascus builds without it.
 
@@ -251,6 +252,9 @@ def recolour(base, rings=None):
 # the arrows' and the bolts' atlases stay plain (their fittings are not pattern-welded steel).
 DAMASCUS = True                                                    # python -I ebony.py --no-damascus: the plain look
 DAMASCUS_ITEMS = [k for k in EBONY_ITEMS if k not in ("quiver", "boltquiver")]
+# the steel atlases that take it: "metal", and "blade" - a blade on an atlas of its own (the saber B build, 1.4.0: A5j
+# v4b's blade beside A5i's hilt), its geometry WORK\<item>\orig_blade.npz
+DAMASCUS_ROLES = ("metal", "blade")
 DAM = dict(period=0.42, warp=1.0, fine=0.30, a_alb=0.025, a_r=0.22)   # the demo's setting A (medium bands)
 DAM_ZCUT, DAM_WELD, DAM_SEED = 1.5, 0.02, 1347
 
@@ -282,14 +286,14 @@ def dam_pattern(u, v, period, warp, fine_w):
     return np.clip((1 - fine_w) * b1 + fine_w * b2, 0, 1)
 
 
-def dam_geometry(item, W, H):
+def dam_geometry(item, W, H, role="metal"):
     """(per-triangle xyz (T,3,3), per-triangle pixel uv (T,3,2) rows down, per-triangle part label, source) or None."""
-    p = os.path.join(WORK, item, "orig_metal.npz")
+    p = os.path.join(WORK, item, f"orig_{role}.npz")
     if os.path.isfile(p):
         d = np.load(p); V, F, UV = d["V"].astype(np.float64), d["F"], d["UV"].astype(np.float64)
         px = (UV if UV.ndim == 3 else UV[F]) * np.array([W, H]); px[..., 1] = H - px[..., 1]
         src = p
-    elif item in RING_SOURCE:
+    elif role == "metal" and item in RING_SOURCE:
         d = np.load(RING_SOURCE[item]); xyz = d["xyz"].astype(np.float64); px = d["uv"].astype(np.float64)
         V = xyz.reshape(-1, 3); F = np.arange(len(V)).reshape(-1, 3); src = RING_SOURCE[item]
     else: return None
@@ -352,11 +356,11 @@ def dam_uv(T, plab, P, L, sel):
     return u, v
 
 
-def damascus(item, base, alb, rmo, g):
-    """The damascus pass on one recoloured metal atlas (after recolour()). Returns (albedo, rmaos, band preview or None,
+def damascus(item, base, alb, rmo, g, role="metal"):
+    """The damascus pass on one recoloured steel atlas (after recolour()). Returns (albedo, rmaos, band preview or None,
     stats). Only the plain black steel changes."""
     Hh, Ww = alb.shape[:2]
-    geo = dam_geometry(item, Ww, Hh)
+    geo = dam_geometry(item, Ww, Hh, role)
     if geo is None: return alb, rmo, None, {"damascus": "no geometry - plain"}
     T, px, plab, src = geo
     a0 = np.asarray(Image.open(base + "_rmaos.png").convert("RGBA"), np.float32) / 255
@@ -520,8 +524,8 @@ def build(items):
             W_, H_ = Image.open(base + ".png").size
             rings, found = ring_mask(item, W_, H_) if role == "metal" else (None, [])
             c, rmo, g, stt = recolour(base, rings)
-            if role == "metal" and DAMASCUS and item in DAMASCUS_ITEMS:
-                c, rmo, bands, dst = damascus(item, base, c, rmo, g); stt.update(dst)
+            if role in DAMASCUS_ROLES and DAMASCUS and item in DAMASCUS_ITEMS:
+                c, rmo, bands, dst = damascus(item, base, c, rmo, g, role); stt.update(dst)
                 if bands is not None:
                     im = Image.fromarray(np.clip(bands * 255, 0, 255).astype(np.uint8)); im.thumbnail((1024, 1024))
                     im.save(os.path.join(EB_WORK, "masks", name + "_damascus.jpg"), quality=90)

@@ -33,10 +33,21 @@ ITEMS = {
 # off-centre). Scored against XPMSSE + steel / Nord plate / Nordic carved cuirasses (the owner's), slices of the
 # weapon fully behind the armour from the side: Nordic carved 9 -> 6 (vanilla steel sheath 6), buried depth sum
 # 21.5 -> 6.0 (vanilla 6.8). The first-person NIF is not moved (its sheath never shows; the blade stays straight in view).
-    "sword": dict(hip=dict(rot_x_deg=-4.0, pivot=[-0.28, -2.98, 0.67], shift=[0.0, 0.0, -1.25]), version="A5i-sf", sources=[W(r"work_sword_a5i_sf\A5I_metal.nif"), os.path.join(PLAN, r"A5\work\A5_wrap.nif")], orient=True, option=True,
+    # saber B (1.4.0, 2026-11-15; the owner 18:58 "Build the ebony version with saber b for now"): the BLADE is A5j v4b
+    # (set2\sword_a5j_build.py key M, `bash set2\run_aa.sh sword_a5j M`: blank first, one constant edge bevel, the narrow
+    # braid with pointed ends, the weave cut at the 18:14 line, the triquetra medallion in the weave), built on A5i's exact
+    # outline in A5i's own frame; the hilt (guard, ferrule, pommel, wrap) stays A5i-sf's. The A5i metal NIF keeps only its
+    # welded pieces reaching no higher than y 20 ("drop_islands_y_over", as the approved renders' render_game_pbr.py did):
+    # its old blade leaves. The v4b blade is a shape of its own (TN_sword_blade) on its own 2048 atlas, undecimated; the
+    # edge blood is cut from it. Sheath C2 unchanged: no v4b blade vertex above the guard leaves it (A5i's blade the
+    # control; 4. plans\nordic-carved-missing-weapons-20261115\work\saber_b_build\sheath_fit_*.json).
+    "sword": dict(hip=dict(rot_x_deg=-4.0, pivot=[-0.28, -2.98, 0.67], shift=[0.0, 0.0, -1.25]), version="A5i-sf hilt + A5j v4b blade (saber B)",
+                  sources=[W(r"work_sword_a5i_sf\A5I_metal.nif"), os.path.join(PLAN, r"A5\work\A5_wrap.nif"), W(r"work_sword_a5jM\tn_sword_a5jM.nif")], orient=True, option=True,
                   sheath=dict(version="saber C2 (falchion fit, ringed symbol)", src=W(r"work_sheath_saber_fitC2\tn_sheath_saber_fitC2.nif"), tex=W(r"work_sheath_saber_fitC2\tex\tn_sheath_saber_fitC2")),
-                  shapes={"metal": {"name": "NordicSwordA5", "tex": W(r"work_sword_a5i_sf\tex\nordicsworda5i")},
-                          "wrap": {"name": "NordicWrapA5", "tex": None, "dds_from": r"D:\Modlists\Njordlinger\mods\Nordic Carved Redesign A (test)\textures\pbr\ApocryphaTest\NordicCarvedRedesignA5\nordicwrapa5"}},
+                  shapes={"metal": {"name": "NordicSwordA5", "tex": W(r"work_sword_a5i_sf\tex\nordicsworda5i"), "drop_islands_y_over": 20.0},
+                          "wrap": {"name": "NordicWrapA5", "tex": None, "dds_from": r"D:\Modlists\Njordlinger\mods\Nordic Carved Redesign A (test)\textures\pbr\ApocryphaTest\NordicCarvedRedesignA5\nordicwrapa5"},
+                          "blade": {"name": "TNSaberA5j", "tex": W(r"work_sword_a5jM\tex\tn_sword_a5jM"), "target": None}},
+                  blood_from="blade",
                   third="nordicsword.nif", first="1stpersonnordicsword.nif", stem="sword", weap="DLC2NordicSword", fp_stat="03C353"),
     # the straight sword (installer option, 2026-11-11): greatsword v3's blade and upper hilt as a one-hander
     # 1.1.0 shading fix (2026-11-12): v1-sf = v1's NIF with the flat guard and pommel faces' outline vertices split from
@@ -277,7 +288,9 @@ def blender_config():
         if it.get("sheath"): c["sheath"] = it["sheath"]["src"]   # welded and oriented on its own, never decimated
         for role, sh in it["shapes"].items():
             t = sh.get("target", METAL_T if role == "metal" else WRAP_T)
-            c["shapes"][role] = {"name": sh["name"], "target": t, "atlas_px": 2048 if role in ("metal", "board") else 512}
+            c["shapes"][role] = {"name": sh["name"], "target": t, "atlas_px": 2048 if role in ("metal", "board", "blade") else 512}
+            if sh.get("drop_islands_y_over") is not None: c["shapes"][role]["drop_islands_y_over"] = sh["drop_islands_y_over"]
+        if it.get("blood_from"): c["blood_from"] = it["blood_from"]   # the shape the edge blood is cut from (default metal)
         vp = vanilla_path(k, "third")
         if vp and k != "bow":
             pr = probe[vp.replace("\\", "/")] if vp.replace("\\", "/") in probe else probe[vp]

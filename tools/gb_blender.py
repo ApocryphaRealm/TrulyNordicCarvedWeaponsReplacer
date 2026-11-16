@@ -225,9 +225,32 @@ for src in C["sources"]:
     before = set(bpy.data.objects); bpy.ops.import_scene.pynifly(filepath=src)
     for o in set(bpy.data.objects) - before:
         if o.type != "MESH": bpy.data.objects.remove(o)
+def drop_islands_y_over(o, thr):
+    """Delete the shape's pieces (vertices welded by position at 1e-3, joined by edges) that reach above world y thr - the
+    saber B build (1.4.0): A5i's old blade leaves its metal shape, its guard (to y 9.7), ferrule and pommel stay."""
+    me = o.data; M = o.matrix_world
+    V = np.array([list(M @ v.co) for v in me.vertices]); key = np.round(V * 1000).astype(np.int64)
+    _, inv = np.unique(key, axis=0, return_inverse=True); inv = inv.ravel(); par = list(range(int(inv.max()) + 1))
+    def find(i):
+        while par[i] != i: par[i] = par[par[i]]; i = par[i]
+        return i
+    for e in me.edges:
+        a_, b_ = find(int(inv[e.vertices[0]])), find(int(inv[e.vertices[1]]))
+        if a_ != b_: par[a_] = b_
+    lab = np.array([find(int(inv[i])) for i in range(len(V))]); top = {}
+    for i, l in enumerate(lab): top[l] = max(top.get(l, -1e9), V[i, 1])
+    kill = {i for i in range(len(V)) if top[lab[i]] > thr}
+    bm = bmesh.new(); bm.from_mesh(me); bm.verts.ensure_lookup_table()
+    bmesh.ops.delete(bm, geom=[bm.verts[i] for i in sorted(kill)], context="VERTS"); bm.to_mesh(me); bm.free(); me.update()
+    rep = {"threshold_y": thr, "pieces": len(top), "pieces_dropped": sum(1 for t in top.values() if t > thr),
+           "verts_dropped": len(kill), "verts_kept": len(V) - len(kill), "kept_y_max": round(max((t for t in top.values() if t <= thr), default=0.0), 3)}
+    print("DROP", o.name, json.dumps(rep)); return rep
+
 shapes = {}
 for role, sh in C["shapes"].items():
     o = bpy.data.objects[sh["name"]]; o.name = "dec_" + role
+    if sh.get("drop_islands_y_over") is not None:
+        stats.setdefault("dropped_islands", {})[role] = drop_islands_y_over(o, float(sh["drop_islands_y_over"]))
     orig = o.copy(); orig.data = o.data.copy(); orig.name = "orig_" + role; bpy.context.collection.objects.link(orig)
     n0 = decimate(o, sh.get("target"))
     V, F, UV = arrays(orig); np.savez(os.path.join(OUT, f"orig_{role}.npz"), V=V, F=F, UV=UV)
