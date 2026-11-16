@@ -65,7 +65,7 @@ ITEMS = {
     # 4.288 longer at the bottom, so the pivot is 2.144 lower).
     "saberlongsword": dict(hip=dict(rot_x_deg=-4.0, pivot=[-0.28, -5.124, 0.67], shift=[0.0, 0.0, -1.25]), version="A5k L (saber B scaled to a longsword)",
                            sources=[W(r"work_sword_a5kL\tn_sword_a5kL.nif"), W(r"work_sword_a5kL_hilt\tn_sword_a5kL_hilt.nif")], orient=True, new_item=True,
-                           sheath=dict(version="saberL r1 (sheath C2 construction, fitted, x1.10)", src=W(r"work_sheath_saberL_sf\tn_sheath_saberL.nif"), tex=W(r"work_sheath_saberL_sf\tex\tn_sheath_saberL")),
+                           sheath=dict(version="saberL r2 (sheath C2 construction, fitted with the blade mesh, x1.10)", src=W(r"work_sheath_saberL_sf\tn_sheath_saberL.nif"), tex=W(r"work_sheath_saberL_sf\tex\tn_sheath_saberL")),
                            shapes={"metal": {"name": "hilt", "tex": W(r"work_sword_a5i_sf\tex\nordicsworda5i"), "target": None},
                                    "wrap": {"name": "wrap", "tex": W(r"work_sword_a5kL_hilt\tex\tn_sword_a5kL_wrap"), "target": None, "design": W(r"work_sword_a5kL")},
                                    "blade": {"name": "TNSaberA5k", "tex": W(r"work_sword_a5kL\tex\tn_sword_a5kL"), "target": None}},
@@ -73,7 +73,7 @@ ITEMS = {
                            third="nordicsword.nif", first="1stpersonnordicsword.nif", stem="saberlongsword"),
     "sabergreatsword": dict(version="A5k G (saber B scaled to a greatsword)",
                             sources=[W(r"work_sword_a5kG\tn_sword_a5kG.nif"), W(r"work_sword_a5kG_hilt\tn_sword_a5kG_hilt.nif")], orient=True, new_item=True,
-                            sheath=dict(version="saberG r1 (sheath C2 construction, fitted, x1.25)", src=W(r"work_sheath_saberG_sf\tn_sheath_saberG.nif"), tex=W(r"work_sheath_saberG_sf\tex\tn_sheath_saberG")),
+                            sheath=dict(version="saberG r2 (sheath C2 construction, fitted with the blade mesh, x1.25)", src=W(r"work_sheath_saberG_sf\tn_sheath_saberG.nif"), tex=W(r"work_sheath_saberG_sf\tex\tn_sheath_saberG")),
                             shapes={"metal": {"name": "hilt", "tex": W(r"work_sword_a5i_sf\tex\nordicsworda5i"), "target": None},
                                     "wrap": {"name": "wrap", "tex": W(r"work_sword_a5kG_hilt\tex\tn_sword_a5kG_wrap"), "target": None, "design": W(r"work_sword_a5kG")},
                                     "blade": {"name": "TNSaberA5k", "tex": W(r"work_sword_a5kG\tex\tn_sword_a5kG"), "target": None}},
@@ -90,7 +90,7 @@ ITEMS = {
     # throat) fitted to this blade and hilt. hip: the straight sword's tilt about its own grip centre (14.45 visible grip).
     "longsword": dict(hip=dict(rot_x_deg=-4.0, pivot=[0.0, -5.9, 0.67], shift=[0.0, 0.0, -1.25]), version="A (greatsword scheme scaled down)",
                       sources=[W(r"work_longswordA\tn_longswordA.nif"), W(r"work_longswordA_hilt\tn_longswordA_hilt.nif")], orient=True, new_item=True,
-                      sheath=dict(version="longswordA r1 (greatsword sheath v3 construction, fitted)", src=W(r"work_sheath_longswordA_sf\tn_sheath_longswordA.nif"), tex=W(r"work_sheath_longswordA_sf\tex\tn_sheath_longswordA")),
+                      sheath=dict(version="longswordA r2 (greatsword sheath v3 construction, fitted with the blade mesh)", src=W(r"work_sheath_longswordA_sf\tn_sheath_longswordA.nif"), tex=W(r"work_sheath_longswordA_sf\tex\tn_sheath_longswordA")),
                       shapes={"metal": {"name": "LSHiltGS", "tex": W(r"work_gs5_sf\tex\tn_greatsword"), "target": None},
                               "wrap": {"name": "LSWrap", "tex": W(r"work_longswordA_hilt\tex\tn_longsword_wrap"), "target": None, "design": W(r"work_longswordA")},
                               "blade": {"name": "TNLongsword", "tex": W(r"work_longswordA\tex\tn_longswordA"), "target": None}},

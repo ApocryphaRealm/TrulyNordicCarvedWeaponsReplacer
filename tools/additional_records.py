@@ -77,6 +77,31 @@ def relay(src, sig, subs, remap, rec=None):
         out.append([s, bytes(sd)])
     return out
 
+_BOUNDS = {}
+def staged_bounds(rec):
+    r"""OBND "nif" (2026-11-16): the bounds of the model the record names, measured from the STAGED NIF (assemble.py's
+    stage\<item>\meshes\<MODL>) by nif_bounds.py - and the Ebony quality's copy (stage\ebony\<item>\meshes\TrulyNordic\
+    ebony\...) must measure the same, since one table value serves both plugins. Refuses a missing NIF: build_all.sh stages
+    before it writes records."""
+    m = rec["set"]["MODL"]
+    if m not in _BOUNDS:
+        import nif_bounds
+        from items import WORK, ITEMS
+        stem = m.split("\\")[1]
+        item = [k for k, it in ITEMS.items() if it.get("stem") == stem]
+        assert len(item) == 1, f"{rec['edid']}: {m} - no single staged item with stem {stem}: {item}"
+        stage = os.path.join(WORK, "stage")
+        nf = os.path.join(stage, item[0], "meshes", m)
+        assert os.path.isfile(nf), f"{rec['edid']}: OBND from the staged model, but {nf} is missing"
+        ob = nif_bounds.bounds(nf)
+        eb = os.path.join(stage, "ebony", item[0], "meshes", m.replace("TrulyNordic\\", "TrulyNordic\\ebony\\", 1))
+        assert os.path.isfile(eb), f"{rec['edid']}: the Ebony copy {eb} is missing"
+        ob2 = nif_bounds.bounds(eb)
+        if ob2 != ob: raise SystemExit(f"{rec['edid']}: Nordic {ob} and Ebony {ob2} models measure different bounds")
+        print(f"   OBND {rec['edid']}: {ob} measured from {os.path.relpath(nf, stage)} (the Ebony copy equal)")
+        _BOUNDS[m] = ob
+    return _BOUNDS[m]
+
 def apply_set(q, rec, subs, new_fid=None, src=None):
     if src is not None and src.localized and any(x[0] == "FULL" for x in subs) and "FULL" not in rec.get("set", {}):
         raise SystemExit(f"{rec['edid']}: its template's FULL is a string id of {src.name} - the table must give a FULL")
@@ -84,7 +109,7 @@ def apply_set(q, rec, subs, new_fid=None, src=None):
         P.set_sub(subs, k, struct.pack("<I", new_fid(e)))
     for k, v in rec.get("set", {}).items():
         if k in ("FULL", "MODL"): P.set_sub(subs, k, P.zs(v))
-        elif k == "OBND": P.set_sub(subs, k, struct.pack("<6h", *v))
+        elif k == "OBND": P.set_sub(subs, k, struct.pack("<6h", *(staged_bounds(rec) if v == "nif" else v)))
         elif k == "stats":
             val, wt, dmg, crit, spd, reach = v[q]
             P.set_sub(subs, "DATA", struct.pack("<IfH", val, wt, dmg))

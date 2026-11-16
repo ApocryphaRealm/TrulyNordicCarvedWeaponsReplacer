@@ -100,6 +100,39 @@ def check_and_save(pl, path):
             txt = sd[:-1].decode("latin-1") if s in ("EDID", "FULL", "MODL") else sd.hex()
             print(f"       {s:4} {len(sd):3}  {txt[:120]}")
 
+def arrow_bounds(path):
+    r"""2026-11-16 (gate row item-object-bounds-not-all-zero): Dragonborn's DLC2NordicArrow has OBND 0,0,0 / 0,0,0, and the
+    Standalone - Nordic arrow was copied from it. An AMMO this plugin DEFINES with all-zero bounds gets the bounds of its model
+    (the staged quiver.nif, nif_bounds.py - the Creation Kit's way), written in place (OBND is 12 bytes, so no size changes).
+    Idempotent: bounds that are not all zero are left as they are. Every other byte of the file is checked unchanged."""
+    import zlib, nif_bounds
+    from items import WORK
+    b = bytearray(open(path, "rb").read()); before = bytes(b); hs = struct.unpack_from("<I", b, 4)[0]; done = []
+    def walk(off, end):
+        while off + 24 <= end:
+            t = bytes(b[off:off + 4]); n = struct.unpack_from("<I", b, off + 4)[0]
+            if t == b"GRUP": walk(off + 24, off + n); off += n; continue
+            if t == b"AMMO":
+                assert not struct.unpack_from("<I", b, off + 8)[0] & 0x00040000, "compressed AMMO - not handled"
+                i, e = off + 24, off + 24 + n; subs = {}
+                while i + 6 <= e:
+                    s = bytes(b[i:i + 4]); k = struct.unpack_from("<H", b, i + 4)[0]; subs.setdefault(s, (i + 6, k)); i += 6 + k
+                o, k = subs.get(b"OBND", (None, 0)); mo, mk = subs.get(b"MODL", (None, 0))
+                if o is not None and k == 12 and mo is not None and not any(struct.unpack_from("<6h", b, o)):
+                    m = bytes(b[mo:mo + mk]).rstrip(b"\0").decode("latin-1")
+                    stem = m.split("\\")[1]
+                    nf = os.path.join(WORK, "stage", stem, "meshes", m); assert os.path.isfile(nf), nf
+                    ob = nif_bounds.bounds(nf); struct.pack_into("<6h", b, o, *ob)
+                    done.append(f"AMMO {struct.unpack_from('<I', b, off + 12)[0]:08X} OBND 0 -> {ob} (from {m})")
+            off += 24 + n
+    walk(24 + hs, len(b))
+    if done:
+        diff = [i for i in range(len(b)) if b[i] != before[i]]
+        assert len(b) == len(before) and len(diff) <= 12 * len(done), "more than the OBND bytes changed"
+        open(path, "wb").write(bytes(b))
+    print(f"arrow_bounds {os.path.relpath(path, REPO)}: " + ("; ".join(done) if done else "no AMMO with all-zero bounds"))
+
 for path, fn in ((ESP, replacer), (SAN, lambda: standalone(SAN, "nordic")), (SAE, lambda: standalone(SAE, "ebony"))):
     pl = fn()
     if pl is not None: check_and_save(pl, path)
+for path in (SAN, SAE): arrow_bounds(path)
