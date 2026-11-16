@@ -149,6 +149,8 @@ if __name__ == "__main__":
         q = a[1] if len(a) > 1 else ""
         if q == "nordic": a = a[2:]
         elif q == "ebony":
-            import ebony; ebony.build(a[2:] or ebony.EBONY_ITEMS); sys.exit(0)
+            import ebony; rest = a[2:]
+            if "--no-damascus" in rest: ebony.DAMASCUS = False; rest = [x for x in rest if x != "--no-damascus"]   # 1.4.0
+            ebony.build(rest or ebony.EBONY_ITEMS); sys.exit(0)
         else: raise SystemExit(f"--quality nordic|ebony, not {q!r}")
     for k in (a or list(ITEMS)): build(k)

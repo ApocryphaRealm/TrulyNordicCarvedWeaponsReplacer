@@ -18,13 +18,17 @@ through it) - is rasterised from its UV triangles into a mask and painted gold (
 as painted). Rivets, pommels, sockets and caps fail one of the three tests. ring_parts() prints what it found.
 Only metal pixels (RMAOS G >= 0.5) change; leather, wood, string and wraps are untouched (an atlas with no metal is copied).
 Normal maps are the shared build's DDS, copied (the relief is the same).
+DAMASCUS (1.4.0, 2026-11-15, the owner 19:19 "Pbr Damascus"): after recolour(), damascus() lays procedural damascus
+bands on the plain black steel of every weapon's and shield's metal atlas (DAMASCUS_ITEMS; not the sheaths, quivers,
+arrows or bolts) - albedo +/- 0.025, roughness -/+ 0.22, from each item's own mesh (WORK\<item>\orig_metal.npz; the
+crossbow's painter dump). Never on gold, carved floors or non-metal (the build refuses). --no-damascus builds without it.
 
 OUTPUT (the build's stage, beside the shared files; build-packages.py ships it in the Ebony quality files only):
     <STAGE>\textures\pbr\TrulyNordic\ebony\<stem>\tn_<stem>[_role].dds
     <STAGE>\ebony\<item>\meshes\TrulyNordic\ebony\<at>\<file>.nif   (copies of the shared NIFs, texture paths -> ebony)
     <WORK>\ebony\<item>\tex\*.png                                  (the recoloured maps, with the height map beside them)
     <WORK>\ebony\masks\*.jpg, <WORK>\ebony\ebony_report.json, <WORK>\ebony\medallion_check.json (ebony-mode measure)
-Run after textures.py and assemble.py:  python -I ebony.py [item ...]
+Run after textures.py and assemble.py:  python -I ebony.py [--no-damascus] [item ...]
                                         python -I ebony.py --plugins   (the Ebony plugins' model paths; also run by
                                         standalone_finish.py and additional_records.py)
                                         python -I ebony.py --rings     (print the haft rings found per item)
@@ -229,6 +233,159 @@ def recolour(base, rings=None):
     return c, rmo, g * metal, stats
 
 
+# ------------------------------------------------------------------ Damascus steel on the black steel (1.4.0, 2026-11-15)
+# The owner, 2026-11-15 17:09 ("investigate how the ebony wolf weapons add the damascus steel effect to add to our own
+# ebony weapons") and 19:19 "Pbr Damascus" (the saber demo, 4. plans\nordic-carved-missing-weapons-20261115\
+# saber-ebony-damascus-sheet.jpg; work\saber_damascus\make_damascus.py is the demo this pass is folded from). Setting A.
+# OUR OWN procedural pattern (nothing of Legacy of Ysgramor's texture): per atlas texel its WORLD position and mesh part
+# (barycentric fill of the item's metal triangles, gutters from the nearest texel); per part (connected mesh piece) its own
+# frame - the long axis, the across axis and the thin axis (area-weighted principal axes) - and its centre line along the
+# long axis; u = across from the centre line, plus on a thinner-than-full section (a bevel, an axe cheek) the depth ground
+# through (Z_CUT x (half thickness at that station - |depth|): the bands run as contour lines along a ground edge); v = along.
+# Bands follow u (they run along the part's length) after a two-level domain warp and a finer layer set at lower weight.
+# MASK: plain black steel only = metal x flush (height >= ~250) x not gold (grown 1 px) x covered by the mesh - never gold,
+# never carved floors, never non-metal. PBR: albedo +/- DAM["a_alb"] (sRGB, absolute), roughness -/+ DAM["a_r"] around
+# the steel's own value, metallic unchanged. The build refuses a damascus that touches gold or a carved floor.
+# Geometry: WORK\<item>\orig_metal.npz (the metal mesh the atlas was painted for: V, F, UV 0..1 v up); the crossbow,
+# which has none, uses its painter's triangle dump (RING_SOURCE). Weapons and shields only: the sheaths, the quivers,
+# the arrows' and the bolts' atlases stay plain (their fittings are not pattern-welded steel).
+DAMASCUS = True                                                    # python -I ebony.py --no-damascus: the plain look
+DAMASCUS_ITEMS = [k for k in EBONY_ITEMS if k not in ("quiver", "boltquiver")]
+DAM = dict(period=0.42, warp=1.0, fine=0.30, a_alb=0.025, a_r=0.22)   # the demo's setting A (medium bands)
+DAM_ZCUT, DAM_WELD, DAM_SEED = 1.5, 0.02, 1347
+
+
+def _dam_noise():
+    rng = np.random.default_rng(DAM_SEED)
+    G = [ndi.gaussian_filter(rng.standard_normal((512, 512)), 3.0, mode="wrap") for _ in range(5)]
+    return [g / g.std() for g in G]
+
+
+_DG = None
+
+
+def _noise(k, x, y):       # smooth noise, features ~ every 6 grid cells; x, y in grid cells
+    global _DG
+    if _DG is None: _DG = _dam_noise()
+    return ndi.map_coordinates(_DG[k], [y.ravel() + 37 * k, x.ravel() + 91 * k], order=3, mode="grid-wrap").reshape(x.shape)
+
+
+def dam_pattern(u, v, period, warp, fine_w):
+    """The demo's bands: u across (world units), v along. Returns 0..1."""
+    w1 = _noise(0, u * 2.4, v * 0.75) * 0.55 * warp
+    w2 = _noise(1, (u + w1) * 7.0, v * 2.2) * 0.12 * warp
+    vv = v + _noise(2, u * 3.0, v * 1.0) * 0.6 * warp
+    f = u + w1 + w2 + 0.35 * warp * _noise(3, u * 1.5, vv * 0.45)
+    b1 = smooth01((0.5 + 0.5 * np.cos(2 * np.pi * f / period) - 0.15) / 0.7)
+    f2 = f + 0.25 * period * _noise(4, u * 12.0, v * 4.0)
+    b2 = 0.5 + 0.5 * np.cos(2 * np.pi * f2 / (period * 0.37))
+    return np.clip((1 - fine_w) * b1 + fine_w * b2, 0, 1)
+
+
+def dam_geometry(item, W, H):
+    """(per-triangle xyz (T,3,3), per-triangle pixel uv (T,3,2) rows down, per-triangle part label, source) or None."""
+    p = os.path.join(WORK, item, "orig_metal.npz")
+    if os.path.isfile(p):
+        d = np.load(p); V, F, UV = d["V"].astype(np.float64), d["F"], d["UV"].astype(np.float64)
+        px = (UV if UV.ndim == 3 else UV[F]) * np.array([W, H]); px[..., 1] = H - px[..., 1]
+        src = p
+    elif item in RING_SOURCE:
+        d = np.load(RING_SOURCE[item]); xyz = d["xyz"].astype(np.float64); px = d["uv"].astype(np.float64)
+        V = xyz.reshape(-1, 3); F = np.arange(len(V)).reshape(-1, 3); src = RING_SOURCE[item]
+    else: return None
+    # parts: connected pieces (vertices welded at 1e-3), then pieces whose surfaces touch (within DAM_WELD) joined
+    from scipy.spatial import cKDTree
+    key = np.round(V * 1000).astype(np.int64); _, inv = np.unique(key, axis=0, return_inverse=True); inv = inv.ravel()
+    Fw = inv[F]; n = int(inv.max()) + 1
+    r = np.concatenate([Fw[:, 0], Fw[:, 1]]); c = np.concatenate([Fw[:, 1], Fw[:, 2]])
+    _, lab = connected_components(coo_matrix((np.ones(len(r)), (r, c)), shape=(n, n)), directed=False)
+    Vu = np.zeros((n, 3)); Vu[inv] = V
+    pr = cKDTree(Vu).query_pairs(DAM_WELD, output_type="ndarray")
+    pr = pr[lab[pr[:, 0]] != lab[pr[:, 1]]]
+    k = int(lab.max()) + 1
+    if len(pr):
+        _, lab2 = connected_components(coo_matrix((np.ones(len(pr)), (lab[pr[:, 0]], lab[pr[:, 1]])), shape=(k, k)), directed=False)
+        lab = lab2[lab]
+    return V[F], px, lab[Fw[:, 0]], src
+
+
+def dam_world(T, px, plab, W, H):
+    """Per texel: world position (H,W,3), part label (H,W, -1 none), covered mask. Gutters take the nearest texel's."""
+    P = np.zeros((H, W, 3)); L = np.full((H, W), -1, np.int32); cov = np.zeros((H, W), bool)
+    for t in range(len(T)):
+        a, b, c = px[t]; x0, y0 = np.floor(px[t].min(0)).astype(int); x1, y1 = np.ceil(px[t].max(0)).astype(int)
+        x0, y0 = max(x0, 0), max(y0, 0); x1, y1 = min(x1, W - 1), min(y1, H - 1)
+        if x1 < x0 or y1 < y0: continue
+        den = (b[1] - c[1]) * (a[0] - c[0]) + (c[0] - b[0]) * (a[1] - c[1])
+        if abs(den) < 1e-12: continue
+        yy, xx = np.mgrid[y0:y1 + 1, x0:x1 + 1] + 0.5
+        l1 = ((b[1] - c[1]) * (xx - c[0]) + (c[0] - b[0]) * (yy - c[1])) / den
+        l2 = ((c[1] - a[1]) * (xx - c[0]) + (a[0] - c[0]) * (yy - c[1])) / den; l3 = 1 - l1 - l2
+        m = (l1 >= -1e-3) & (l2 >= -1e-3) & (l3 >= -1e-3)
+        if not m.any(): continue
+        p = l1[..., None] * T[t, 0] + l2[..., None] * T[t, 1] + l3[..., None] * T[t, 2]
+        P[y0:y1 + 1, x0:x1 + 1][m] = p[m]; L[y0:y1 + 1, x0:x1 + 1][m] = plab[t]; cov[y0:y1 + 1, x0:x1 + 1] |= m
+    i = ndi.distance_transform_edt(~cov, return_distances=False, return_indices=True)
+    return P[i[0], i[1]], L[i[0], i[1]], cov
+
+
+def dam_uv(T, plab, P, L, sel):
+    """u (across + depth on the bevels) and v (along) for the selected texels, in each part's own frame."""
+    u = np.zeros(sel.sum()); v = np.zeros(sel.sum()); Ps = P[sel]; Ls = L[sel]
+    cen = T.mean(1); area = np.linalg.norm(np.cross(T[:, 1] - T[:, 0], T[:, 2] - T[:, 0]), axis=1) / 2
+    for j in np.unique(Ls):
+        if j < 0: continue
+        tm = plab == j; w = area[tm] + 1e-12; C = cen[tm]; c0 = (C * w[:, None]).sum(0) / w.sum()
+        cov_ = ((C - c0) * w[:, None]).T @ (C - c0) / w.sum(); ev, evec = np.linalg.eigh(cov_)
+        a1, a2, a3 = evec[:, 2], evec[:, 1], evec[:, 0]                 # long, across, thin
+        Vp = T[tm].reshape(-1, 3) - c0; s_, d2_, d3_ = Vp @ a1, Vp @ a2, Vp @ a3
+        st = np.arange(np.floor(s_.min()), np.ceil(s_.max()) + 0.5, 0.5); c2 = np.full(len(st), np.nan); c3 = c2.copy(); th = c2.copy()
+        for q, y in enumerate(st):
+            m = np.abs(s_ - y) < 0.6
+            if m.any(): c2[q] = (d2_[m].min() + d2_[m].max()) / 2; c3[q] = (d3_[m].min() + d3_[m].max()) / 2; th[q] = (d3_[m].max() - d3_[m].min()) / 2
+        ok = ~np.isnan(c2)
+        c2, c3, th = (ndi.gaussian_filter1d(np.interp(st, st[ok], a_[ok]), 4) for a_ in (c2, c3, th))
+        pm = Ls == j; Q = Ps[pm] - c0; s, d2, d3 = Q @ a1, Q @ a2, Q @ a3
+        r2 = d2 - np.interp(s, st, c2); r3 = d3 - np.interp(s, st, c3)
+        u[pm] = r2 + DAM_ZCUT * np.tanh(r2 / 0.1) * np.clip(np.interp(s, st, th) - np.abs(r3), 0, None)
+        v[pm] = s + 23.7 * j                                             # each part its own stretch of the pattern
+    return u, v
+
+
+def damascus(item, base, alb, rmo, g):
+    """The damascus pass on one recoloured metal atlas (after recolour()). Returns (albedo, rmaos, band preview or None,
+    stats). Only the plain black steel changes."""
+    Hh, Ww = alb.shape[:2]
+    geo = dam_geometry(item, Ww, Hh)
+    if geo is None: return alb, rmo, None, {"damascus": "no geometry - plain"}
+    T, px, plab, src = geo
+    a0 = np.asarray(Image.open(base + "_rmaos.png").convert("RGBA"), np.float32) / 255
+    hp = base + "_height.png"
+    if not os.path.isfile(hp): return alb, rmo, None, {"damascus": "no height map - plain"}
+    h = np.asarray(Image.open(hp).convert("L"), np.float32)
+    if h.shape != (Hh, Ww): h = np.asarray(Image.fromarray(h.astype(np.uint8)).resize((Ww, Hh), Image.BILINEAR), np.float32)
+    P, L, cov = dam_world(T, px, plab, Ww, Hh)
+    metal = smooth01((a0[..., 1] - 0.45) / 0.1); fl = smooth01((h - 247) / 5)
+    gold_near = ndi.gaussian_filter((g > 0.02).astype(np.float32), 1.0)
+    wd = ndi.gaussian_filter(metal * fl * cov, 0.6) * (1 - np.clip(g * 1.5 + gold_near, 0, 1))
+    sel = wd > 1e-3
+    u, v = dam_uv(T, plab, P, L, sel)
+    b = np.full((Hh, Ww), 0.5, np.float32); b[sel] = dam_pattern(u, v, DAM["period"], DAM["warp"], DAM["fine"])
+    s2 = (b - 0.5) * 2
+    A = np.clip(alb + (DAM["a_alb"] * s2 * wd)[..., None], 0, 1)
+    R = rmo.copy(); R[..., 0] = np.clip(rmo[..., 0] - DAM["a_r"] * s2 * wd, 0.06, 1)
+    on = wd > 0.5
+    st = dict(damascus="setting A", geometry=os.path.relpath(src, os.path.dirname(WORK)) if src.startswith(os.path.dirname(WORK)) else src,
+              parts=int(len(np.unique(plab))), damascus_px=int(on.sum()), damascus_share_of_metal=round(float(on.sum() / max((metal > 0.5).sum(), 1)), 4),
+              gold_touched_px=int(((g > 0.5) & (wd > 0.02)).sum()), floor_touched_px=int(((h < 80) & (wd > 0.02)).sum()),
+              nonmetal_touched_px=int(((a0[..., 1] < 0.4) & (wd > 0.02)).sum()),
+              albedo_L_p5_50_95=[round(float(np.percentile(A[on].mean(1), q)), 3) for q in (5, 50, 95)] if on.any() else None,
+              rough_p5_50_95=[round(float(np.percentile(R[..., 0][on], q)), 3) for q in (5, 50, 95)] if on.any() else None)
+    bad = {k: st[k] for k in ("gold_touched_px", "floor_touched_px", "nonmetal_touched_px") if st[k]}
+    if bad: raise SystemExit(f"damascus on {item} ({os.path.basename(base)}) touches what must stay as it is: {bad}")
+    return A, R, b * wd + 0.5 * (1 - wd), st
+
+
 def save_png(path, a, mode):
     Image.fromarray(np.clip(a * 255 + 0.5, 0, 255).astype(np.uint8), mode).save(path)
 
@@ -363,6 +520,11 @@ def build(items):
             W_, H_ = Image.open(base + ".png").size
             rings, found = ring_mask(item, W_, H_) if role == "metal" else (None, [])
             c, rmo, g, stt = recolour(base, rings)
+            if role == "metal" and DAMASCUS and item in DAMASCUS_ITEMS:
+                c, rmo, bands, dst = damascus(item, base, c, rmo, g); stt.update(dst)
+                if bands is not None:
+                    im = Image.fromarray(np.clip(bands * 255, 0, 255).astype(np.uint8)); im.thumbnail((1024, 1024))
+                    im.save(os.path.join(EB_WORK, "masks", name + "_damascus.jpg"), quality=90)
             ob = os.path.join(png_out, os.path.basename(base))
             save_png(ob + ".png", c, "RGB"); save_png(ob + "_rmaos.png", rmo, "RGBA")
             for suf in ("_height", "_n_gl"):
@@ -376,7 +538,9 @@ def build(items):
             mask_preview(os.path.join(EB_WORK, "masks", name + "_gold.jpg"), base + ".png", g, rings)
             stt["haft_rings"] = found; rep["atlases"][name] = stt
             done[(os.path.basename(os.path.dirname(os.path.dirname(base))), os.path.basename(base))] = ob
-            print(f"  {name}: gold {stt['gold_share']:.3f} of the metal, {len(found)} ring part(s), medallions {stt['medallions']}")
+            print(f"  {name}: gold {stt['gold_share']:.3f} of the metal, {len(found)} ring part(s), medallions {stt['medallions']}"
+                  + (f", damascus {stt['damascus_px']} px ({stt['damascus_share_of_metal']:.3f} of the metal, {stt['parts']} parts, gold/floor/non-metal touched"
+                     f" {stt['gold_touched_px']}/{stt['floor_touched_px']}/{stt['nonmetal_touched_px']})" if "damascus_px" in stt else f", damascus: {stt.get('damascus', 'off (--no-damascus)' if not DAMASCUS else 'none (not a weapon or shield steel atlas)')}"))
         if item == "quiver":
             q = ITEMS["quiver"]["shapes"]; name = tex_name("quiver", "arrow")
             ob = os.path.join(png_out, os.path.basename(q["arrow"]["tex"]))
@@ -414,6 +578,7 @@ def build(items):
 
 if __name__ == "__main__":
     a = sys.argv[1:]
+    if "--no-damascus" in a: DAMASCUS = False; a = [x for x in a if x != "--no-damascus"]
     if a and a[0] == "--plugins":
         for pth in EBONY_PLUGINS: plugin_paths(pth)
         sys.exit(0)
