@@ -93,7 +93,8 @@ WEAPONS = {
 BASE_WEAP = {0x0139B1: "sword", 0x0139AB: "waraxe", 0x0139B0: "mace", 0x0139AE: "dagger", 0x0139AC: "battleaxe",
              0x0139AF: "greatsword", 0x0139B2: "warhammer", 0x0139AD: "bow"}
 # every weapon item a Replacer - Ebony file can install (the alternates included): first-person copies are staged for each
-REPLACER_WEAPONS = ["sword", "sword2", "battleaxe", "greatsword", "warhammer", "waraxe", "dagger", "dagger2", "mace", "mace2", "bow"]
+# 1.4.0: "sword" is the straight sword, the only sword (the saber and its "sword2" alternate are gone from the main files)
+REPLACER_WEAPONS = ["sword", "battleaxe", "greatsword", "warhammer", "waraxe", "dagger", "dagger2", "mace", "mace2", "bow"]
 AMMO_FID = 0x0139BF
 FLIGHT_FILE = VAN + "ebonyarrowprojectile.nif"              # PROJ ArrowEbonyProjectile 03BE17
 SHIELD_MODEL = "weapons\\ebony\\ebonyshield.nif"

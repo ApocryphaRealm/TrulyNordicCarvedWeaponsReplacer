@@ -54,9 +54,11 @@ EB_WORK = os.path.join(WORK, EB)
 EB_STAGE = os.path.join(STAGE, EB)
 # every item an Ebony quality file ships: the main files' defaults and installer alternates, and the Additional Weapons
 # file's spear and halberd, and (1.4.0, 2026-11-14) its crossbow and bolt quiver / bolts
-MAIN = ["sword", "sword2", "battleaxe", "greatsword", "warhammer", "waraxe", "dagger", "dagger2", "mace", "mace2", "bow",
+# 1.4.0 (2026-11-15, the blade families): the main files' one sword is the straight sword ("sword"; the "sword2" option is
+# gone) and the saber line - the saber, the saber longsword and greatsword - and the European longsword are Additional Weapons
+MAIN = ["sword", "battleaxe", "greatsword", "warhammer", "waraxe", "dagger", "dagger2", "mace", "mace2", "bow",
         "shield", "shield2", "quiver"]
-ADDITIONAL = ["spear", "halberd", "crossbow", "boltquiver", "quarterstaff", "rapier"]
+ADDITIONAL = ["spear", "halberd", "crossbow", "boltquiver", "quarterstaff", "rapier", "longsword", "saber", "saberlongsword", "sabergreatsword"]
 EBONY_ITEMS = MAIN + ADDITIONAL
 
 GOLD = np.array([0.93, 0.74, 0.40], np.float32)      # satin gold (sRGB albedo) - the study's tone
@@ -69,8 +71,8 @@ RING_ALONG, RING_ALONG_X, RING_ROUND, RING_HOLE, RING_MIN_TRIS = 2.0, 0.8, 1.4, 
 # within the given radius of the axis. The spear's socket ends in a polished foot above the binding (the spear sheet's
 # "binding" view) - its last 1.2 units are its ring.
 RING_BANDS = {"spear": [(57.0, 58.5, 1.25)]}
-RING_ITEMS = {"sword", "sword2", "battleaxe", "greatsword", "warhammer", "waraxe", "dagger", "dagger2", "mace", "mace2", "bow", "spear", "halberd",
-              "crossbow", "quarterstaff", "rapier"}
+RING_ITEMS = {"sword", "battleaxe", "greatsword", "warhammer", "waraxe", "dagger", "dagger2", "mace", "mace2", "bow", "spear", "halberd",
+              "crossbow", "quarterstaff", "rapier", "longsword", "saber", "saberlongsword", "sabergreatsword"}
 # The crossbow (the owner, 2026-11-15 06:12, "Make the rings gold": the two steel collars at the ends of its grip wrap).
 # Its builder (gb_crossbow.py) leaves no orig_metal.npz, so its ring source is the painter's own triangle dump of the B5
 # metal mesh - the triangles and pixel UVs the atlas was painted from (per-triangle xyz, uv in atlas pixels, rows down).
@@ -471,7 +473,7 @@ def measure_medallions(done):
     from medallion_audit import MEDALLIONS
     faces = {}
     for key, piece, face, work, stem, cx, cy, rg, lay in MEDALLIONS:
-        eb = done.get((work, stem))
+        eb = done.get((key, work, stem))      # by item (1.4.0: the longsword recolours the greatsword's atlas too)
         if not eb or key not in EBONY_ITEMS: continue
         m = MM.measure(eb, cx, cy, rg, name=f"{piece} / {face} (ebony)")
         m.update(item=key, piece=piece, face=face, work=work, look="ebony")
@@ -541,7 +543,7 @@ def build(items):
             shutil.copy2(os.path.join(shared, name + "_n.dds"), os.path.join(tex_out, name + "_n.dds"))
             mask_preview(os.path.join(EB_WORK, "masks", name + "_gold.jpg"), base + ".png", g, rings)
             stt["haft_rings"] = found; rep["atlases"][name] = stt
-            done[(os.path.basename(os.path.dirname(os.path.dirname(base))), os.path.basename(base))] = ob
+            done[(item, os.path.basename(os.path.dirname(os.path.dirname(base))), os.path.basename(base))] = ob
             print(f"  {name}: gold {stt['gold_share']:.3f} of the metal, {len(found)} ring part(s), medallions {stt['medallions']}"
                   + (f", damascus {stt['damascus_px']} px ({stt['damascus_share_of_metal']:.3f} of the metal, {stt['parts']} parts, gold/floor/non-metal touched"
                      f" {stt['gold_touched_px']}/{stt['floor_touched_px']}/{stt['nonmetal_touched_px']})" if "damascus_px" in stt else f", damascus: {stt.get('damascus', 'off (--no-damascus)' if not DAMASCUS else 'none (not a weapon or shield steel atlas)')}"))

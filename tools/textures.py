@@ -16,7 +16,12 @@ from items import ITEMS, WORK, TEX_REL
 STAGE = os.path.join(WORK, "stage")
 TEXCONV = r"D:\Modlists\Njordlinger\tools\Skyking Toolkit\runtime\texconv.exe"
 FIX_PX = 31.0
-FIX = {"sword": FIX_PX, "battleaxe": FIX_PX, "greatsword": FIX_PX, "warhammer": FIX_PX, "waraxe": FIX_PX}   # war axe v2 was painted at one px/unit too
+FIX = {"saber": FIX_PX, "battleaxe": FIX_PX, "greatsword": FIX_PX, "warhammer": FIX_PX, "waraxe": FIX_PX}   # war axe v2 was painted at one px/unit too
+# 1.4.0 (2026-11-15, the blade families): the saber (A5i's atlas, until now the item "sword") keeps its fix under its new key;
+# the straight sword - now the item "sword" - never had it and still does not. The saber longsword / greatsword hilts are
+# A5i's parts on A5i's atlas, the longsword's hilt the greatsword's parts on the greatsword's atlas: the same fix, at each
+# part's own (scaled) density.
+FIX.update({"saberlongsword": FIX_PX, "sabergreatsword": FIX_PX, "longsword": FIX_PX})
 
 def island_density(npz, W, H):
     """Per UV island: px per model unit along the atlas u and v axes (rows of the 3D->pixel Jacobian), area-weighted,

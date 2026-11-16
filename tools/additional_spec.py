@@ -166,6 +166,75 @@ ADDITIONAL = [
                           "rapier moveset and the packs built on it look for. Requires Keyword Item Distributor (KID); without the animation "
                           "mods the keyword changes nothing."),
                   keywords=[("WeapTypeRapier", "Keyword Compatibility Framework (kcf.esm 0x805) / Animated Armoury rapier")])),
+    # THE BLADE FAMILIES (1.4.0, 2026-11-15, the owner 19:39: "use the European style single-handed sword as the base sword
+    # design and have the saber be a weapon tagged as a katana ... scale the saber up to a long sword and great sword size and
+    # add a European-styled longsword to have 3 blades each, all tagged for katana or sword animations"). The main files' sword
+    # is now the straight sword; the greatsword stays. Added here (stats helper's pick, between their neighbours: the
+    # Standalone sword 290 / 12 / 11 / 6 / 1.0 / 1.0 and greatsword 585 / 19 / 20 / 10 / 0.7 / 1.3 Nordic, 720 / 15 / 13 / 6 and
+    # 1440 / 22 / 22 / 11 Ebony):
+    #   the European LONGSWORD (option A, the owner 21:35) - a ONE-HANDED sword record (the Standalone sword's: OneHandSword,
+    #     sword keyword, sounds, recipe and temper) with reach 1.1 for its 97-unit length: sword animations, as the owner asked
+    #     for the European line; Keyword Compatibility Framework has no longsword keyword (kcf_KID.ini lists none), and a
+    #     two-handed record would only be a shorter greatsword. Heavier and slower than the sword, two more damage.
+    #   the SABER (saber B, until now the Replacer's sword) - one-handed, the sword's numbers a little lighter and quicker.
+    #   the saber LONGSWORD (A5k L) - one-handed like the European longsword, a little lighter and quicker than it.
+    #   the saber GREATSWORD (A5k G) - TWO-HANDED, the Standalone greatsword's records (TwoHandSword), a little lighter and
+    #     quicker than the greatsword, one point less damage.
+    dict(item="longsword", image="halberd.jpg",
+         records=[
+             dict(sig="STAT", fid=0x817, edid="TNCW_Longsword_1st", template=("standalone", "TNCW_Sword_1st"),
+                  set={"MODL": r"TrulyNordic\longsword\1stpersonlongsword.nif"}),
+             dict(sig="WEAP", fid=0x818, edid="TNCW_Longsword", template=("standalone", "TNCW_Sword"),
+                  set={"FULL": "Carved Nordic Longsword", "MODL": r"TrulyNordic\longsword\longsword.nif", "OBND": (-8, -20, -3, 8, 79, 3),
+                       "stats": {"nordic": (410, 15.0, 13, 7, 0.9, 1.1), "ebony": (1020, 18.0, 15, 7, 0.9, 1.1)}}),
+             dict(sig="COBJ", fid=0x819, edid="TNCW_Longsword_Recipe", template=("standalone", "TNCW_Sword_Recipe")),
+             dict(sig="COBJ", fid=0x81A, edid="TNCW_Longsword_Temper", template=("standalone", "TNCW_Sword_Temper")),
+         ]),
+    dict(item="saber", image="sword-curved-saber.jpg",
+         records=[
+             dict(sig="STAT", fid=0x81B, edid="TNCW_Saber_1st", template=("standalone", "TNCW_Sword_1st"),
+                  set={"MODL": r"TrulyNordic\saber\1stpersonsaber.nif"}),
+             dict(sig="WEAP", fid=0x81C, edid="TNCW_Saber", template=("standalone", "TNCW_Sword"),
+                  set={"FULL": "Carved Nordic Saber", "MODL": r"TrulyNordic\saber\saber.nif", "OBND": (-8, -15, -3, 5, 68, 3),
+                       "stats": {"nordic": (300, 11.0, 11, 6, 1.05, 1.0), "ebony": (740, 14.0, 13, 6, 1.05, 1.0)}}),
+             dict(sig="COBJ", fid=0x81D, edid="TNCW_Saber_Recipe", template=("standalone", "TNCW_Sword_Recipe")),
+             dict(sig="COBJ", fid=0x81E, edid="TNCW_Saber_Temper", template=("standalone", "TNCW_Sword_Temper")),
+         ],
+         # Keyword Compatibility Framework's katana keyword (kcf.esm 0x80A WeapTypeKatana) on the whole saber line - the saber, the
+         # saber longsword and the saber greatsword - in ONE step and one ini (kid "weaps"): the katana movesets key on it
+         # (e.g. the Elden Rim dual-wield katana moveset's OAR config, IsEquippedHasKeyword WeapTypeKatana), and KCF's own
+         # kid list gives it to the vanilla Akaviri katanas and to two-handed nodachi / zanbato alike. Named by EditorID, no
+         # master: without kcf.esm KID makes an empty keyword of that name and nothing changes.
+         kid=dict(weaps=["TNCW_Saber", "TNCW_SaberLongsword", "TNCW_SaberGreatsword"], ini=PLUGIN[:-4] + " - Saber_KID.ini",
+                  step="Saber animations", group="Carved Nordic Saber moveset", folder="43 Saber - Katana animation keywords",
+                  default=("Sword movesets (default)",
+                           "The saber and the saber longsword use the one-handed sword animations, the saber greatsword the greatsword "
+                           "animations - the game's own movesets. Choose this if you have no katana animation mod."),
+                  option=("Katana animation packs (keyword via KID)",
+                          "Gives the saber, the saber longsword and the saber greatsword the katana keyword of Keyword Compatibility "
+                          "Framework (WeapTypeKatana), the one the katana movesets (Animated Armoury's and the packs built on it) look "
+                          "for. Requires Keyword Item Distributor (KID); without a katana animation mod the keyword changes nothing."),
+                  keywords=[("WeapTypeKatana", "Keyword Compatibility Framework (kcf.esm 0x80A) / katana movesets")])),
+    dict(item="saberlongsword", image="sword-curved-saber.jpg",
+         records=[
+             dict(sig="STAT", fid=0x81F, edid="TNCW_SaberLongsword_1st", template=("standalone", "TNCW_Sword_1st"),
+                  set={"MODL": r"TrulyNordic\saberlongsword\1stpersonsaberlongsword.nif"}),
+             dict(sig="WEAP", fid=0x820, edid="TNCW_SaberLongsword", template=("standalone", "TNCW_Sword"),
+                  set={"FULL": "Carved Nordic Saber Longsword", "MODL": r"TrulyNordic\saberlongsword\saberlongsword.nif", "OBND": (-8, -20, -3, 5, 79, 3),
+                       "stats": {"nordic": (400, 14.0, 13, 7, 0.95, 1.1), "ebony": (1000, 17.0, 15, 7, 0.95, 1.1)}}),
+             dict(sig="COBJ", fid=0x821, edid="TNCW_SaberLongsword_Recipe", template=("standalone", "TNCW_Sword_Recipe")),
+             dict(sig="COBJ", fid=0x822, edid="TNCW_SaberLongsword_Temper", template=("standalone", "TNCW_Sword_Temper")),
+         ]),
+    dict(item="sabergreatsword", image="sword-curved-saber.jpg",
+         records=[
+             dict(sig="STAT", fid=0x823, edid="TNCW_SaberGreatsword_1st", template=("standalone", "TNCW_Greatsword_1st"),
+                  set={"MODL": r"TrulyNordic\sabergreatsword\1stpersonsabergreatsword.nif"}),
+             dict(sig="WEAP", fid=0x824, edid="TNCW_SaberGreatsword", template=("standalone", "TNCW_Greatsword"),
+                  set={"FULL": "Carved Nordic Saber Greatsword", "MODL": r"TrulyNordic\sabergreatsword\sabergreatsword.nif", "OBND": (-9, -25, -3, 6, 92, 3),
+                       "stats": {"nordic": (570, 18.0, 19, 10, 0.75, 1.3), "ebony": (1400, 21.0, 21, 11, 0.75, 1.3)}}),
+             dict(sig="COBJ", fid=0x825, edid="TNCW_SaberGreatsword_Recipe", template=("standalone", "TNCW_Greatsword_Recipe")),
+             dict(sig="COBJ", fid=0x826, edid="TNCW_SaberGreatsword_Temper", template=("standalone", "TNCW_Greatsword_Temper")),
+         ]),
 ]
 
 def check():

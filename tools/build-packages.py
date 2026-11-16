@@ -5,7 +5,8 @@ The owner (2026-11-11 22:47, then 23:23): four main files, "each with their own 
 only installs the ones that you select", with pictures from the renders in the installer. One version for all of them;
 the package folder names carry no version and no "FOMOD".
 
-MAIN FILES (each a FOMOD: Common + the steps Sword, Mace, Shield - the default or its alternate, each with a picture)
+MAIN FILES (each a FOMOD: Common + the steps Mace, Shield, Dagger - the default or its alternate, each with a picture;
+           1.4.0: no Sword step - the straight sword is the one sword, the saber line is in the optional file)
     Replacer - No ESP           the vanilla Nordic carved weapons take our models through SkyPatcher; first-person
                                 models and the shield are loose files at the vanilla paths
     Replacer - ESP              the same files and TrulyNordicCarvedWeapons.esp in place of the SkyPatcher ini
@@ -20,9 +21,9 @@ MAIN FILES (each a FOMOD: Common + the steps Sword, Mace, Shield - the default o
                                 TrulyNordicCarvedWeapons - Ebony Replacer.esp); the first-person models, the shield and the
                                 arrow in flight are loose files at the vanilla Ebony paths. Its last step, "Legacy of
                                 Ysgramor", puts the same models on LoY's Wolf Ebony weapons and shield (loose files at
-                                LoY's mesh paths + a SkyPatcher INI per LoY plugin, named after it); the sword, dagger and
-                                shield it installs follow the installer's choice through FOMOD flags (conditional installs).
-    Each option folder holds its model at the shared path (sword\sword.nif, mace\mace.nif, the shield), so only the
+                                LoY's mesh paths + a SkyPatcher INI per LoY plugin, named after it); the dagger and shield
+                                it installs follow the installer's choice through FOMOD flags (conditional installs).
+    Each option folder holds its model at the shared path (mace\mace.nif, dagger\dagger.nif, the shield), so only the
     chosen model is installed and the records find it whichever was chosen.
 
 OPTIONAL FILE (additional_spec.NAME, working name "Additional Weapons"): the NEW weapons vanilla does not have (the spear;
@@ -147,12 +148,11 @@ def docs(dest):
 # these renders in the FOMOD". Common = every item without an alternate; one step per alternated item, each option a
 # folder holding that model at the shared path (and, for a Replacer, its vanilla-path first-person model or shield), so
 # only the chosen model is ever installed. Every option shows its picture (gate row fomod-every-option-has-a-picture).
+# 1.4.0 (2026-11-15, the owner 19:39: "we'll use the European style single-handed sword as the base sword design and have the
+# saber be a weapon tagged as a katana"): the Sword step (curved saber default, straight sword option) is gone - the straight
+# sword is the one sword of every main file, in Common; the saber, with its longsword and greatsword sizes, is in the optional
+# Additional Weapons file (additional_spec.py) with the katana keyword.
 STEPS = [  # (step, group, [(option, item, folder, image, description, default)])
-    ("Sword", "Carved Nordic Sword model", [
-        ("Curved saber (default)", "sword", "10 Sword - Curved saber", "sword-curved-saber.jpg",
-         "A single-edged curved blade with a one-piece half guard sweeping up, a hooked pommel and a bold carved braid running to the point, in a falchion-shaped carved sheath.", True),
-        ("Straight sword", "sword2", "11 Sword - Straight", "sword-straight.jpg",
-         "The greatsword's double-edged blade and upper hilt at one-hand size, in a straight carved sheath of its own.", False)]),
     ("Mace", "Carved Nordic Mace model", [
         ("Six-flanged mace (default)", "mace", "20 Mace - Six-flanged", "mace-six-flanged.jpg",
          "A working six-flanged head with pointed striking edges, every flange face carved with the set's weave and a triquetra on a dark disc inside a polished ring.", True),
@@ -314,12 +314,13 @@ def write_ini(path, head, lines):
     open(path, "w", newline="\r\n").write("\n".join(body) + "\n")
 
 LOY_FOLDER = "50 Legacy of Ysgramor - Wolf Ebony weapons"
-LOY_CORE = ["battleaxe", "greatsword", "waraxe"]          # LoY's Wolf Ebony items that have no installer alternate
-LOY_ALT = {"sword": "sword", "sword2": "sword", "dagger": "dagger", "dagger2": "dagger", "shield": "shield", "shield2": "shield"}
+LOY_CORE = ["sword", "battleaxe", "greatsword", "waraxe"]          # LoY's Wolf Ebony items that have no installer alternate (1.4.0: the sword too)
+LOY_ALT = {"dagger": "dagger", "dagger2": "dagger", "shield": "shield", "shield2": "shield"}
 def loy_alt_folder(item): return f"5{list(LOY_ALT).index(item) + 1} Legacy of Ysgramor - {item}"
 def ebony_replacer_steps():
-    r"""the Replacer installer in the Ebony look - every Sword / Dagger / Shield option flags its choice - and the Legacy
-    of Ysgramor step; plus the conditional installs that give LoY's items the chosen sword, dagger and shield"""
+    r"""the Replacer installer in the Ebony look - every Dagger / Shield option flags its choice - and the Legacy of
+    Ysgramor step; plus the conditional installs that give LoY's items the chosen dagger and shield (1.4.0: the sword has no
+    alternate any more - LoY's sword takes the straight sword with the other core items)"""
     steps = []
     for st, g, opts in ebony_steps(STEPS):
         out = [tuple(o[:6]) + (({LOY_ALT[o[1]]: o[1]},) if o[1] in LOY_ALT else ()) for o in opts]
@@ -451,16 +452,22 @@ def build_package(dest, folder, ver):
 # name, chosen by the Quality step), every model and texture at meshes\TrulyNordic\<item>\ / textures\pbr\TrulyNordic\
 # <item>\ (main() refuses a path any main file also ships), and one KID step per item that has one. Everything comes
 # from additional_spec.ADDITIONAL, so a new item is a new table entry, not new code here.
+def kid_weaps(it):
+    """(EditorID, FormID) of every weapon a KID step tags: k["weap"], or k["weaps"] (1.4.0: the saber line's one katana step
+    tags the saber, the saber longsword and the saber greatsword - records of other entries in ADDITIONAL)"""
+    k = it["kid"]; recs = {r["edid"]: r for e in AS.ADDITIONAL for r in e["records"]}
+    return [(e, recs[e]["fid"]) for e in k.get("weaps", [k.get("weap")])]
 def kid_ini(it):
-    k = it["kid"]; weap = next(r for r in it["records"] if r["edid"] == k["weap"])
-    fid = f"0x{weap['fid']:X}~{AS.PLUGIN}"
-    L = [f"; {NAME} - {AS.NAME}: keywords for the {k['weap']} weapon's animation packs. Generated by tools\\build-packages.py.",
+    k = it["kid"]; ws = kid_weaps(it)
+    fid = ",".join(f"0x{f:X}~{AS.PLUGIN},{e}" for e, f in ws)
+    whose = "weapons'" if len(ws) > 1 else "weapon's"
+    L = [f"; {NAME} - {AS.NAME}: keywords for the {', '.join(e for e, _ in ws)} {whose} animation packs. Generated by tools\\build-packages.py.",
          "; Needs Keyword Item Distributor (KID). Each keyword is named by its EditorID, so this file adds no plugin masters;",
          "; a keyword whose plugin is not loaded is created by KID as a new empty keyword - it changes nothing, as the packs'",
          "; own conditions point at their own plugin's keyword. Without a pack the weapon keeps the moveset its record gives it.",
-         f"; The weapon is matched by its FormID in {AS.PLUGIN} and by its EditorID as a second, equivalent term."]
+         f"; {'Each' if len(ws) > 1 else 'The'} weapon is matched by its FormID in {AS.PLUGIN} and by its EditorID as a second, equivalent term."]
     for kw, why in k["keywords"]:
-        L += [f"; {why}", f"Keyword = {kw}|Weapon|{fid},{k['weap']}"]
+        L += [f"; {why}", f"Keyword = {kw}|Weapon|{fid}"]
     return "\n".join(L) + "\n"
 def additional_steps():
     img = AS.ADDITIONAL[0]["image"]
