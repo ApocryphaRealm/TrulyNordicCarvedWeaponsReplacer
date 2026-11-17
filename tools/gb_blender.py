@@ -7,7 +7,7 @@
 # The bow: its three shapes take vanilla's bone weights (nearest-face interpolated transfer from vanilla's BowMesh) and
 # are exported together with vanilla's armature as one skinned NIF.
 # Run: blender --background --factory-startup --python-exit-code 1 --python gb_blender.py -- <config.json> <item>
-import bpy, bmesh, sys, os, json, addon_utils
+import bpy, bmesh, sys, os, json, math, addon_utils
 import numpy as np
 from mathutils.bvhtree import BVHTree
 from mathutils.interpolate import poly_3d_calc
@@ -17,6 +17,7 @@ C = json.load(open(CFG))[KEY]
 OUT = C["out"]; os.makedirs(OUT, exist_ok=True)
 addon_utils.enable("io_scene_nifly", default_set=True)
 stats = {"item": KEY, "shapes": {}}
+WELD_SHARP_DEG = 30.0      # = blade_polish.BLADE_SHARP_DEG (a welded blade's creases over this stay hard)
 
 def clear():
     for o in list(bpy.data.objects): bpy.data.objects.remove(o)
@@ -61,10 +62,17 @@ def uv_shift(orig, dec, px=2048):
         "positions": np.round(where[bad][:12], 2).tolist()}
     return float(out.max()), float(np.percentile(out, 95)), float(np.percentile(out, 99.5))
 
-def decimate(o, target):
+def decimate(o, target, weld=False):
     select_only(o); bpy.ops.object.mode_set(mode="EDIT"); bpy.ops.mesh.select_all(action="SELECT")
-    bpy.ops.mesh.remove_doubles(threshold=0.0005, use_sharp_edge_from_normals=True)
+    bpy.ops.mesh.remove_doubles(threshold=0.0005, use_sharp_edge_from_normals=not weld)
     bpy.ops.object.mode_set(mode="OBJECT")
+    if weld:
+        # the polished blade (1.4.0, item 3 of the owner's 19:47 choice): the blade is WELDED - the source's split normals
+        # (the 1.1.0 shading-fix pass's ~180-240 seams per blade face) are not kept; only creases over WELD_SHARP_DEG are
+        # marked hard below. Any sharp mark the import made is cleared first.
+        shp0 = o.data.attributes.get("sharp_edge")
+        if shp0:
+            for e in o.data.edges: shp0.data[e.index].value = False
     # zero-area slivers (the slab builders' tessellation leaves collinear triangles along straight outline runs, e.g.
     # greatsword v4's upper guard back: 35) carry an arbitrary normal and a 180-degree corner, so Blender's angle-weighted
     # vertex normal can flip at their middle vertex once a flat face has its own vertices - dissolved here
@@ -110,9 +118,12 @@ def decimate(o, target):
     # sharp by angle as well (blade bevels, flange corners): edges over 50 degrees stay hard
     sharp = me.attributes.get("sharp_edge") or me.attributes.new("sharp_edge", "BOOLEAN", "EDGE")
     bm = bmesh.new(); bm.from_mesh(me); bm.edges.ensure_lookup_table()
+    thr = math.radians(WELD_SHARP_DEG) if weld else 0.87
+    nsh = 0
     for e in bm.edges:
-        if len(e.link_faces) == 2 and e.calc_face_angle(0) > 0.87: sharp.data[e.index].value = True
+        if len(e.link_faces) == 2 and e.calc_face_angle(0) > thr: sharp.data[e.index].value = True; nsh += 1
     bm.free(); me.update()
+    if weld: stats.setdefault("welded_blade", {})[o.name] = {"sharp_edges_over_deg": WELD_SHARP_DEG, "sharp_edges": nsh, "verts": len(me.vertices)}
     NSEAM[o.name] = nseam
     return n0
 
@@ -246,13 +257,62 @@ def drop_islands_y_over(o, thr):
            "verts_dropped": len(kill), "verts_kept": len(V) - len(kill), "kept_y_max": round(max((t for t in top.values() if t <= thr), default=0.0), 3)}
     print("DROP", o.name, json.dumps(rep)); return rep
 
+def split_blade(role, sh):
+    """THE POLISHED BLADE (1.4.0, tools\\blade_polish.py, item 4): the blade's triangles - those of the source shape whose
+    UV centroid lies in one of the layout's blocks (old atlas px, rows down) - leave it for a shape of their own (or,
+    'whole', the source shape is the blade already: the saber line), and their UVs move block by block into the blade
+    atlas: new px = dst + (old px - src corner) * k, then u = x / W, v = 1 - y / H."""
+    sp = sh["split"]; L = sp["layout"]; W, H, k = L["W"], L["H"], L["k"]
+    src = bpy.data.objects[C["shapes"][sp["from"]]["name"]]
+    def blk(x, y):
+        for b in L["blocks"]:
+            x0, y0, x1, y1 = b["src"]
+            if x0 <= x < x1 and y0 <= y < y1: return b
+        return None
+    if L["whole"]:
+        o = src
+    else:
+        # the source shape as it was, blade included: ebony.py lays the hilt atlas's damascus from it (orig_<from>_full.npz),
+        # so the Ebony hilt atlas stays byte for byte what it was before the blade left the shape
+        V0, F0, UV0 = arrays(src); np.savez(os.path.join(OUT, f"orig_{sp['from']}_full.npz"), V=V0, F=F0, UV=UV0)
+        me = src.data; uvd = me.uv_layers[0].data; pick = []
+        for p in me.polygons:
+            cx = sum(uvd[l].uv[0] for l in p.loop_indices) / len(p.loop_indices) * 2048
+            cy = (1 - sum(uvd[l].uv[1] for l in p.loop_indices) / len(p.loop_indices)) * 2048
+            pick.append(blk(cx, cy) is not None)
+        before = set(bpy.data.objects)
+        select_only(src); bpy.ops.object.mode_set(mode="EDIT"); bpy.ops.mesh.select_all(action="DESELECT")
+        bpy.ops.object.mode_set(mode="OBJECT")
+        for p, s in zip(me.polygons, pick): p.select = s
+        bpy.ops.object.mode_set(mode="EDIT"); bpy.ops.mesh.separate(type="SELECTED"); bpy.ops.object.mode_set(mode="OBJECT")
+        new = [x for x in set(bpy.data.objects) - before]
+        assert len(new) == 1, [x.name for x in new]
+        o = new[0]; o.name = sh["name"]
+        stats.setdefault("blade_split", {})[role] = {"from": sp["from"], "tris_moved": int(sum(pick)), "tris_left": len(me.polygons)}
+    uvd = o.data.uv_layers[0].data; miss = 0
+    for p in o.data.polygons:
+        cx = sum(uvd[l].uv[0] for l in p.loop_indices) / len(p.loop_indices) * 2048
+        cy = (1 - sum(uvd[l].uv[1] for l in p.loop_indices) / len(p.loop_indices)) * 2048
+        b = blk(cx, cy)
+        if b is None: miss += 1; continue
+        for l in p.loop_indices:
+            x = uvd[l].uv[0] * 2048; y = (1 - uvd[l].uv[1]) * 2048
+            nx = b["dst"][0] + (x - b["src"][0]) * k; ny = b["dst"][1] + (y - b["src"][1]) * k
+            uvd[l].uv = (nx / W, 1 - ny / H)
+    if miss: raise SystemExit(f"split_blade {role}: {miss} faces outside every block")
+    o.data.update()
+    stats.setdefault("blade_split", {}).setdefault(role, {}).update({"atlas": [W, H], "k": k, "px_new": L["px_new"]})
+
+for role, sh in C["shapes"].items():
+    if sh.get("split"): split_blade(role, sh)
+
 shapes = {}
 for role, sh in C["shapes"].items():
     o = bpy.data.objects[sh["name"]]; o.name = "dec_" + role
     if sh.get("drop_islands_y_over") is not None:
         stats.setdefault("dropped_islands", {})[role] = drop_islands_y_over(o, float(sh["drop_islands_y_over"]))
     orig = o.copy(); orig.data = o.data.copy(); orig.name = "orig_" + role; bpy.context.collection.objects.link(orig)
-    n0 = decimate(o, sh.get("target"))
+    n0 = decimate(o, sh.get("target"), weld=bool(sh.get("weld_normals")))
     V, F, UV = arrays(orig); np.savez(os.path.join(OUT, f"orig_{role}.npz"), V=V, F=F, UV=UV)
     V, F, UV = arrays(o); np.savez(os.path.join(OUT, f"dec_{role}.npz"), V=V, F=F, UV=UV)
     tree_o, tree_d = bvh(orig), bvh(o)

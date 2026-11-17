@@ -209,10 +209,10 @@ ADDITIONAL = [
          kid=dict(weaps=["TNCW_Saber", "TNCW_SaberLongsword", "TNCW_SaberGreatsword"], ini=PLUGIN[:-4] + " - Saber_KID.ini",
                   step="Saber animations", group="Carved Nordic Saber moveset", folder="43 Saber - Katana animation keywords",
                   default=("Sword movesets (default)",
-                           "The saber and the saber longsword use the one-handed sword animations, the saber greatsword the greatsword "
+                           "The saber and the saber longsword use the one-handed sword animations, the Greatsaber the greatsword "
                            "animations - the game's own movesets. Choose this if you have no katana animation mod."),
                   option=("Katana animation packs (keyword via KID)",
-                          "Gives the saber, the saber longsword and the saber greatsword the katana keyword of Keyword Compatibility "
+                          "Gives the saber, the saber longsword and the Greatsaber the katana keyword of Keyword Compatibility "
                           "Framework (WeapTypeKatana), the one the katana movesets (Animated Armoury's and the packs built on it) look "
                           "for. Requires Keyword Item Distributor (KID); without a katana animation mod the keyword changes nothing."),
                   keywords=[("WeapTypeKatana", "Keyword Compatibility Framework (kcf.esm 0x80A) / katana movesets")])),
@@ -231,7 +231,7 @@ ADDITIONAL = [
              dict(sig="STAT", fid=0x823, edid="TNCW_SaberGreatsword_1st", template=("standalone", "TNCW_Greatsword_1st"),
                   set={"MODL": r"TrulyNordic\sabergreatsword\1stpersonsabergreatsword.nif"}),
              dict(sig="WEAP", fid=0x824, edid="TNCW_SaberGreatsword", template=("standalone", "TNCW_Greatsword"),
-                  set={"FULL": "Carved Nordic Saber Greatsword", "MODL": r"TrulyNordic\sabergreatsword\sabergreatsword.nif", "OBND": "nif",
+                  set={"FULL": "Carved Nordic Greatsaber", "MODL": r"TrulyNordic\sabergreatsword\sabergreatsword.nif", "OBND": "nif",
                        "stats": {"nordic": (570, 18.0, 19, 10, 0.75, 1.3), "ebony": (1400, 21.0, 21, 11, 0.75, 1.3)}}),
              dict(sig="COBJ", fid=0x825, edid="TNCW_SaberGreatsword_Recipe", template=("standalone", "TNCW_Greatsword_Recipe")),
              dict(sig="COBJ", fid=0x826, edid="TNCW_SaberGreatsword_Temper", template=("standalone", "TNCW_Greatsword_Temper")),
@@ -275,9 +275,9 @@ def kid_texts():
         if not k or "weaps" not in k or it["item"] != "saber": continue
         k["weaps"] = [e for e in k["weaps"] if e in have]
         if "TNCW_SaberLongsword" in k["weaps"]: continue          # all three ship: the texts above stand
-        k["default"] = (k["default"][0], "The saber uses the one-handed sword animations, the saber greatsword the greatsword animations - "
+        k["default"] = (k["default"][0], "The saber uses the one-handed sword animations, the Greatsaber the greatsword animations - "
                                          "the game's own movesets. Choose this if you have no katana animation mod.")
-        k["option"] = (k["option"][0], "Gives the saber and the saber greatsword the katana keyword of Keyword Compatibility Framework "
+        k["option"] = (k["option"][0], "Gives the saber and the Greatsaber the katana keyword of Keyword Compatibility Framework "
                                        "(WeapTypeKatana), the one the katana movesets (Animated Armoury's and the packs built on it) look for. "
                                        "Requires Keyword Item Distributor (KID); without a katana animation mod the keyword changes nothing.")
 kid_texts()

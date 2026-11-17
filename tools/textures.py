@@ -118,15 +118,21 @@ def build(item):
     it = ITEMS[item]; rep = {}
     tex_dir = os.path.join(STAGE, TEX_REL, it["stem"]); os.makedirs(tex_dir, exist_ok=True)
     fixed = os.path.join(WORK, item, "tex"); os.makedirs(fixed, exist_ok=True)
+    if it.get("polish"):   # 1.4.0 (2026-11-16): the polished blade's own atlas, painted from the item's maps (tools\blade_polish.py)
+        import blade_polish; bp = blade_polish.paint(item)
+        rep["blade_polish"] = {k: bp[k] for k in ("W", "H", "k", "px_old", "px_new", "field_albedo_p50", "field_rough_p5_p50_p95", "polished_rough_p50", "floor_rough_p50")}
     for role, sh in it["shapes"].items():
         name = f"tn_{it['stem']}" + ("" if role == "metal" else f"_{role}")
         if sh.get("dds_from"):
             for suf in ("", "_n", "_rmaos"): shutil.copy2(sh["dds_from"] + suf + ".dds", os.path.join(tex_dir, name + suf + ".dds"))
             rep[role] = "DDS copied from the installed A5 test mod (unchanged)"; continue
         base = sh["tex"]
+        # the size check allows a blade atlas of its own up to 4096 on its long side (1.4.0, the polished blade: 512x4096 ..
+        # 2048x4096 at ~45-63 px/unit, sized per blade by blade_polish.layout); every shared atlas stays at 2048 at most
+        lim = 4096 if (role == "blade" and it.get("polish")) else 2048
         for suf in ("", "_n", "_rmaos"):
             w, h = Image.open(base + suf + ".png").size
-            if max(w, h) > 2048: raise SystemExit(f"{base}{suf}.png is {w}x{h}, over 2048")
+            if max(w, h) > lim: raise SystemExit(f"{base}{suf}.png is {w}x{h}, over {lim}")
         nsrc = base + "_n.png"
         if role == "metal" and item in FIX:
             rep["normal_fix"] = fix_normal(item, base, fixed); nsrc = os.path.join(fixed, os.path.basename(base) + "_n.png")
