@@ -353,9 +353,10 @@ for _k, _pc in POLISH.items():
     _it["polish"] = {"from": _src, "rects": [list(r) for r in _pc["rects"]], "maps": _sh["tex"], "px": _pc.get("px", 63.0)}
     _tex = os.path.join(WORK, _k, "blade", f"tn_{_it['stem']}_blade")
     if _src == "blade":
-        _sh.update(tex=_tex, target=None, split=True, weld_normals=True)
+        _sh.update(tex=_tex, target=None, split=True, weld_normals=True, design=os.path.dirname(os.path.dirname(_it["polish"]["maps"])))
     else:
-        _it["shapes"]["blade"] = {"name": _sh["name"] + "_blade", "tex": _tex, "target": None, "split": True, "weld_normals": True}
+        _it["shapes"]["blade"] = {"name": _sh["name"] + "_blade", "tex": _tex, "target": None, "split": True, "weld_normals": True,
+                                  "design": os.path.dirname(os.path.dirname(_it["polish"]["maps"]))}   # its faces: the painter's engraving_check.json
     _it["blood_from"] = "blade"
 
 def vanilla_path(item, which):
