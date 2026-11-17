@@ -272,6 +272,9 @@ def split_blade(role, sh):
     if L["whole"]:
         o = src
     else:
+        # the source shape as it was, blade included: ebony.py lays the hilt atlas's damascus from it (orig_<from>_full.npz),
+        # so the Ebony hilt atlas stays byte for byte what it was before the blade left the shape
+        V0, F0, UV0 = arrays(src); np.savez(os.path.join(OUT, f"orig_{sp['from']}_full.npz"), V=V0, F=F0, UV=UV0)
         me = src.data; uvd = me.uv_layers[0].data; pick = []
         for p in me.polygons:
             cx = sum(uvd[l].uv[0] for l in p.loop_indices) / len(p.loop_indices) * 2048

@@ -352,6 +352,8 @@ def dam_scale(dens):
 def dam_geometry(item, W, H, role="metal"):
     """(per-triangle xyz (T,3,3), per-triangle pixel uv (T,3,2) rows down, per-triangle part label, source) or None."""
     p = os.path.join(WORK, item, f"orig_{role}.npz")
+    pf = os.path.join(WORK, item, f"orig_{role}_full.npz")   # 1.4.0 polished blade: the shape before its blade left it
+    if role == "metal" and ITEMS[item].get("polish") and os.path.isfile(pf): p = pf
     if os.path.isfile(p):
         d = np.load(p); V, F, UV = d["V"].astype(np.float64), d["F"], d["UV"].astype(np.float64)
         px = (UV if UV.ndim == 3 else UV[F]) * np.array([W, H]); px[..., 1] = H - px[..., 1]
