@@ -121,9 +121,14 @@ ITEMS = {
     # their chamfers (set2\shading_fix_split.py, as bow v8) - geometry and maps identical; set2\shading-fix-1.1.0.png
     # 1.1.1: the metal ships UNDECIMATED (target None): the game build's decimation stretched the blade's UVs 7-23x from
     # 15 to 85 % of its height (the ladder braid the owner saw); the work mesh's planar UVs are even (1.0x)
-    "greatsword": dict(version="v5-sf", sources=[W(r"work_gs5_sf\tn_greatsword.nif")], orient=True,
+    # v6-sf (1.4.0, 2026-11-16, the bevel "notch"): v5-sf with the lower-guard boss WALL strip moved off the blade's
+    # planar island in the atlas - greatsword_v4_build.py's fixed WALL_UV (8, 900) sat on the left bevel's texels (rows
+    # 901-913, cols 9-99), so the wall's dark plain metal was painted across the bevel mid-blade (shipped 1.1.0-1.3.0).
+    # set2\greatsword_v6_wallfix.py: wall UVs +(2, 1123) px to free space, the blade under the old spot from v3 (same
+    # blade painting, no boss); positions, normals, triangles and every other UV identical (work_gs6_sf\wallfix.json).
+    "greatsword": dict(version="v6-sf", sources=[W(r"work_gs6_sf\tn_greatsword.nif")], orient=True,
                        sheath=dict(version="v3 (ringed symbol)", src=W(r"work_sheath_greatsword_v3\tn_sheath_greatsword_v3.nif"), tex=W(r"work_sheath_greatsword_v3\tex\tn_sheath_greatsword_v3")),
-                       shapes={"metal": {"name": "tn_greatsword", "tex": W(r"work_gs5_sf\tex\tn_greatsword"), "target": None}, "wrap": {"name": "TNGreatswordWrap", "tex": W(r"work_gs5_sf\tex\tn_greatsword_wrap")},
+                       shapes={"metal": {"name": "tn_greatsword", "tex": W(r"work_gs6_sf\tex\tn_greatsword"), "target": None}, "wrap": {"name": "TNGreatswordWrap", "tex": W(r"work_gs5_sf\tex\tn_greatsword_wrap")},
                                "wrap2": {"name": "TNGreatswordWrap2", "tex": W(r"work_gs5_sf\tex\tn_greatsword_wrap2"), "target": 1500}},
                        third="nordicgreatsword.nif", first="1stpersonnordicgreatsword.nif", stem="greatsword", weap="DLC2NordicGreatsword", fp_stat="03C351"),
     # -sf (1.1.0 shading fix, round 2, 2026-11-12): the same NIF with its carved faces' outline AND creases (edge chamfers,

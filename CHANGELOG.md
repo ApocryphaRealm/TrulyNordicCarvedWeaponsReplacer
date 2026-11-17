@@ -28,6 +28,7 @@ Written as changes happen, not reconstructed afterwards (rule 61). Each version 
 - Additional Weapons, Ebony quality: the crossbow and the bolts take the black-and-gold Ebony look like the spear and halberd.
 
 ### Fixed
+- The Carved Nordic Greatsword (and the Carved Nordic Ebony Greatsword): a small dark notch across the left bevel about halfway up the blade is gone. The lower guard's boss had been laid out on the same patch of the texture as the blade's bevel, so its dark steel was painted across the bevel there; the boss now has its own patch and the bevel is whole. The model's shape is unchanged.
 - Standalone - Nordic quality: the Carved Nordic Arrow's record had empty object bounds (all zero, as on the Dragonborn Nordic arrow it was copied from); it now carries the bounds of its quiver model, like the other arrows of the set.
 
 ## 1.3.0 - 2026-11-13 - untested
