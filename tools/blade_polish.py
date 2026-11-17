@@ -291,6 +291,25 @@ def paint(item, out_dir=None):
     return rep
 
 
+def resample(item, img):
+    """an image of the OLD atlas (2048, rows down) carried into the item's blade atlas block by block (bilinear; outside
+    every block the nearest block's edge) - ebony.py uses it to carry the Ebony gold mask, measured on the old atlas
+    with its own medallion records, onto the polished blade"""
+    from items import WORK
+    import json as _j
+    L = _j.load(open(os.path.join(WORK, item, "blade_layout.json"))); W, H, k = L["W"], L["H"], L["k"]
+    yy, xx = np.mgrid[0:H, 0:W].astype(np.float32) + 0.5
+    OX = np.full((H, W), np.nan, np.float32); OY = np.full((H, W), np.nan, np.float32)
+    for b in L["blocks"]:
+        x0, y0, x1, y1 = b["src"]; dx, dy = b["dst"]
+        bx0, by0 = int(math.floor(dx)), int(math.floor(dy)); bx1 = int(math.ceil(dx + (x1 - x0) * k)); by1 = int(math.ceil(dy + (y1 - y0) * k))
+        sl = (slice(max(by0, 0), min(by1, H)), slice(max(bx0, 0), min(bx1, W)))
+        OX[sl] = x0 + (xx[sl] - dx) / k; OY[sl] = y0 + (yy[sl] - dy) / k
+    from scipy import ndimage
+    idx = ndimage.distance_transform_edt(~np.isfinite(OX), return_distances=False, return_indices=True)
+    return _sample(np.asarray(img, np.float32), OX[idx[0], idx[1]], OY[idx[0], idx[1]])
+
+
 def polished_items():
     from items import ITEMS
     return [k for k, it in ITEMS.items() if it.get("polish")]

@@ -191,7 +191,7 @@ def medallions(base):
     return list({tuple(r) for r in res})
 
 
-def recolour(base, rings=None):
+def recolour(base, rings=None, g_override=None):
     """Variant A on one atlas: returns (albedo float RGB, rmaos float RGBA, gold weight, stats)."""
     alb = np.asarray(Image.open(base + ".png").convert("RGB"), np.float32) / 255
     rm = np.asarray(Image.open(base + "_rmaos.png").convert("RGBA"), np.float32) / 255
@@ -227,6 +227,8 @@ def recolour(base, rings=None):
     sok = ndi.gaussian_filter((strand_ok | disc | ~sb).astype(np.float32), 0.6)
     g = np.clip(st * sok + thin_w * fl, 0, 1)
     if rings is not None: g = np.maximum(g, ndi.gaussian_filter(rings.astype(np.float32), 0.6))
+    if g_override is not None:   # the polished blade (1.4.0): the gold measured on the painter's own atlas, carried over
+        g = np.clip(g_override, 0, 1).astype(np.float32)
     lum = alb @ np.array([0.2126, 0.7152, 0.0722], np.float32)
     black = np.minimum(EBONY[None, None] * np.clip(lum / STEEL_L, 0.05, 2.2)[..., None] ** 0.4, BLACK_CAP)
     gold = GOLD[None, None] * np.clip(lum / POLISH_L, 0.08, 1.15)[..., None] ** 0.75
@@ -600,7 +602,13 @@ def build(items):
                 _keep = (STEEL_L, ROUGH_SCALE, ROUGH_FLOOR)
                 _a = np.asarray(Image.open(base + ".png").convert("RGB"), np.float32) / 255; _h = np.asarray(Image.open(base + "_height.png").convert("L"))
                 STEEL_L = float(np.median((_a @ np.array([0.2126, 0.7152, 0.0722], np.float32))[_h >= 252])); ROUGH_SCALE, ROUGH_FLOOR = 1.0, 0.05
-            c, rmo, g, stt = recolour(base, rings)
+            gov = None
+            if pol:   # its gold (strands, thin rims, medallion rings) measured on the OLD atlas - where the medallion records and
+                      # the px-sized rim rules belong - and carried block by block onto the blade atlas (blade_polish.resample)
+                import blade_polish
+                _c0, _r0, g_old, _s0 = recolour(it["polish"]["maps"])
+                gov = blade_polish.resample(item, g_old / np.maximum(smooth01((np.asarray(Image.open(it["polish"]["maps"] + "_rmaos.png").convert("RGBA"), np.float32)[..., 1] / 255 - 0.45) / 0.1), 1e-3))
+            c, rmo, g, stt = recolour(base, rings, g_override=gov)
             if pol: stt["polished_blade"] = {"steel_l": round(STEEL_L, 3), "rough_scale": 1.0, "rough_floor": 0.05}; STEEL_L, ROUGH_SCALE, ROUGH_FLOOR = _keep
             if role in DAMASCUS_ROLES and DAMASCUS and item in DAMASCUS_ITEMS:
                 c, rmo, bands, dst = damascus(item, base, c, rmo, g, role); stt.update(dst)
