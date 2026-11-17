@@ -380,7 +380,7 @@ def blender_config():
             c["shapes"][role] = {"name": sh["name"], "target": t, "atlas_px": 2048 if role in ("metal", "board", "blade") else 512}
             if sh.get("drop_islands_y_over") is not None: c["shapes"][role]["drop_islands_y_over"] = sh["drop_islands_y_over"]
             if sh.get("split"):   # the polished blade (1.4.0): its triangles and UV blocks (tools\blade_polish.py)
-                import blade_polish
+                import sys; sys.path.insert(0, os.path.dirname(os.path.abspath(__file__))); import blade_polish   # python -I drops the script's folder
                 L = blade_polish.layout(k)
                 c["shapes"][role].update(split={"from": it["polish"]["from"], "layout": L}, weld_normals=True, atlas_px=L["H"])
         if it.get("blood_from"): c["blood_from"] = it["blood_from"]   # the shape the edge blood is cut from (default metal)
