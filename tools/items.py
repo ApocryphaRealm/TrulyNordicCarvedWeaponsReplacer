@@ -112,8 +112,10 @@ ITEMS = {
     # to the engraving layout rule - layout records in work_v13\engraving_check.json pass engraving-layout-gate
     # v14 (1.1.1): one flat carved cheek per side, the polished bevel takes the taper (battleaxe_build_v14.py), the flat
     # faces with their own vertices, the back spike's weave in the head's frame (battleaxe_paint_v14.py); set2\battleaxe-v14-*.png
-    "battleaxe": dict(version="v14", sources=[W(r"work_v14\tn_battleaxe.nif")], orient=True,
-                      shapes={"metal": {"name": "TNBattleaxe", "tex": W(r"work_v14\tex\tn_battleaxe")}, "wrap": {"name": "TNBattleaxeWrap", "tex": W(r"work_v14\tex\tn_battleaxe_wrap")}},
+    # v15 (1.4.0, 2026-11-16, the UV-overlap gate): v14 with its two lower haft rings' UV pieces moved off the head socket's
+    # texels (set2\battleaxe_v15_ringfix.py; the Ebony ring pass had painted the socket's lower rows gold); nothing else changed
+    "battleaxe": dict(version="v15 (ring fix)", sources=[W(r"work_v15\tn_battleaxe.nif")], orient=True,
+                      shapes={"metal": {"name": "TNBattleaxe", "tex": W(r"work_v15\tex\tn_battleaxe")}, "wrap": {"name": "TNBattleaxeWrap", "tex": W(r"work_v15\tex\tn_battleaxe_wrap")}},
                       third="nordicbattleaxe.nif", first="1stpersonnordicbattleaxe.nif", stem="battleaxe", weap="DLC2NordicBattleaxe", fp_stat="03C34F"),
     # orient: the ricasso wrap (TNGreatswordWrap2) came out of tn_lib wound inward on most of its faces (1.0.0)
     # v4 (approved 2026-11-12 01:14: "Greatsword looks good"): v3 with the lower-guard medallion on a level boss;
@@ -325,6 +327,37 @@ ITEMS = {
                      third="crossbow.nif", first=None, stem="crossbow", van_dir=VAN_XBOW),
 }
 
+# THE POLISHED BLADE (1.4.0, 2026-11-16; the owner 19:47: "I'd rather go with the 1 through 4 without the mirror" - the
+# mirror-finish study's items 1-4 on every Carved weapon's blade / edged steel; tools\blade_polish.py has the method).
+# Per item: the shape the blade is in ("from": metal, or the saber line's own "blade" shape) and the blade's blocks in
+# the painter's 2048 atlas (pixels, rows down: x0, y0, x1, y1) - the blade column of the swords, dagger and rapier, the
+# heads of the axes, halberd and spear (bit, cheeks, spikes and their walls; never the socket, the poll or the haft).
+# Each blade becomes the shape "<shape>_blade" (role "blade", texture set tn_<stem>_blade) on its own atlas, welded
+# (weld_normals), never decimated; the edge blood is cut from it. The hilt keeps its shape's atlas and maps unchanged.
+# Not polished: the warhammer and maces (no edge), the quarterstaff, and the longsword / saber longsword (not shipped).
+POLISH = {
+    "sword": dict(rects=[(0, 0, 190, 1870)]),
+    "greatsword": dict(rects=[(0, 0, 230, 2000)]),
+    "saber": {"from": "blade", "rects": [(0, 0, 420, 2048)]},
+    "sabergreatsword": {"from": "blade", "rects": [(0, 0, 420, 2048)]},
+    "dagger": dict(rects=[(0, 0, 490, 1828)]),
+    "dagger2": dict(rects=[(0, 0, 490, 1828)]),
+    "rapier": dict(rects=[(150, 0, 275, 1592)]),
+    "spear": dict(rects=[(730, 0, 1020, 1420)]),
+    "halberd": dict(px=52.0, rects=[(0, 0, 844, 1498), (844, 0, 1026, 1300), (0, 1545, 650, 1765)]),
+    "battleaxe": dict(rects=[(0, 320, 470, 1245), (590, 340, 900, 655), (1000, 210, 1032, 480), (1000, 885, 1032, 1190)]),
+    "waraxe": dict(rects=[(5, 5, 465, 810), (475, 0, 512, 260)]),
+}
+for _k, _pc in POLISH.items():
+    _it = ITEMS[_k]; _src = _pc.get("from", "metal"); _sh = _it["shapes"][_src]
+    _it["polish"] = {"from": _src, "rects": [list(r) for r in _pc["rects"]], "maps": _sh["tex"], "px": _pc.get("px", 63.0)}
+    _tex = os.path.join(WORK, _k, "blade", f"tn_{_it['stem']}_blade")
+    if _src == "blade":
+        _sh.update(tex=_tex, target=None, split=True, weld_normals=True)
+    else:
+        _it["shapes"]["blade"] = {"name": _sh["name"] + "_blade", "tex": _tex, "target": None, "split": True, "weld_normals": True}
+    _it["blood_from"] = "blade"
+
 def vanilla_path(item, which):
     it = ITEMS[item]
     if item.startswith("shield"): return VAN_SHIELD if which == "third" else None
@@ -346,6 +379,10 @@ def blender_config():
             t = sh.get("target", METAL_T if role == "metal" else WRAP_T)
             c["shapes"][role] = {"name": sh["name"], "target": t, "atlas_px": 2048 if role in ("metal", "board", "blade") else 512}
             if sh.get("drop_islands_y_over") is not None: c["shapes"][role]["drop_islands_y_over"] = sh["drop_islands_y_over"]
+            if sh.get("split"):   # the polished blade (1.4.0): its triangles and UV blocks (tools\blade_polish.py)
+                import blade_polish
+                L = blade_polish.layout(k)
+                c["shapes"][role].update(split={"from": it["polish"]["from"], "layout": L}, weld_normals=True, atlas_px=L["H"])
         if it.get("blood_from"): c["blood_from"] = it["blood_from"]   # the shape the edge blood is cut from (default metal)
         vp = vanilla_path(k, "third")
         if vp and k != "bow":

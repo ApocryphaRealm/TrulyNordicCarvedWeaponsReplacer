@@ -67,6 +67,10 @@ EBONY_ITEMS = MAIN + ADDITIONAL
 GOLD = np.array([0.93, 0.74, 0.40], np.float32)      # satin gold (sRGB albedo) - the study's tone
 EBONY = np.array([0.135, 0.135, 0.148], np.float32)  # ebony steel at the painted steel's mean tone
 STEEL_L, POLISH_L = 0.40, 0.80
+# the polished blade (1.4.0, 2026-11-16, the owner 19:47 "1 through 4 without the mirror" = the demo's E4a): a role "blade"
+# atlas of a polished item is recoloured at the CURRENT black (EBONY at the polished field's own luminance, the cap
+# BLACK_CAP), keeping the polished roughness (scale 1.0, floor 0.05) instead of max(0.85 r, 0.12)
+BLACK_CAP, ROUGH_SCALE, ROUGH_FLOOR = 0.30, 0.85, 0.12
 RING_ALONG, RING_ALONG_X, RING_ROUND, RING_HOLE, RING_MIN_TRIS = 2.0, 0.8, 1.4, 0.35, 50
 # the items whose rings are gold: every weapon held by a haft or grip (the owner: "the pole arms rings on the pole
 # around the handle"); the quiver's bands go round its tube, not a handle, and stay ebony black
@@ -224,13 +228,13 @@ def recolour(base, rings=None):
     g = np.clip(st * sok + thin_w * fl, 0, 1)
     if rings is not None: g = np.maximum(g, ndi.gaussian_filter(rings.astype(np.float32), 0.6))
     lum = alb @ np.array([0.2126, 0.7152, 0.0722], np.float32)
-    black = np.minimum(EBONY[None, None] * np.clip(lum / STEEL_L, 0.05, 2.2)[..., None] ** 0.4, 0.30)
+    black = np.minimum(EBONY[None, None] * np.clip(lum / STEEL_L, 0.05, 2.2)[..., None] ** 0.4, BLACK_CAP)
     gold = GOLD[None, None] * np.clip(lum / POLISH_L, 0.08, 1.15)[..., None] ** 0.75
     c = black * (1 - g[..., None]) + gold * g[..., None]
     c = alb * fw[..., None] + c * (1 - fw[..., None])              # floors exactly as painted
     c = alb * (1 - metal[..., None]) + c * metal[..., None]        # non-metal untouched
     r0, m0 = rm[..., 0], rm[..., 1]
-    rb = np.maximum(r0 * 0.85, 0.12); rg = np.clip(0.16 + 0.6 * (r0 - 0.18), 0.16, 0.38)
+    rb = np.maximum(r0 * ROUGH_SCALE, ROUGH_FLOOR); rg = np.clip(0.16 + 0.6 * (r0 - 0.18), 0.16, 0.38)
     rr = (rb * (1 - g) + rg * g) * (1 - fw) + r0 * fw; rr = r0 * (1 - metal) + rr * metal
     rmo = rm.copy(); rmo[..., 0] = rr; rmo[..., 1] = np.maximum(m0, (1 - fw) * metal)
     stats = dict(medallions=len(meds), strand_pieces=int(ns), bevel_pieces=int(notstrand.sum()), has_height=os.path.isfile(hp),
@@ -590,7 +594,14 @@ def build(items):
                 rep["atlases"][name] = "no metal - the shared maps, copied"; continue
             W_, H_ = Image.open(base + ".png").size
             rings, found = ring_mask(item, W_, H_) if role == "metal" else (None, [])
+            pol = role == "blade" and bool(it.get("polish"))
+            if pol:   # the polished blade: the field's own luminance is the steel tone that maps to EBONY
+                global STEEL_L, ROUGH_SCALE, ROUGH_FLOOR
+                _keep = (STEEL_L, ROUGH_SCALE, ROUGH_FLOOR)
+                _a = np.asarray(Image.open(base + ".png").convert("RGB"), np.float32) / 255; _h = np.asarray(Image.open(base + "_height.png").convert("L"))
+                STEEL_L = float(np.median((_a @ np.array([0.2126, 0.7152, 0.0722], np.float32))[_h >= 252])); ROUGH_SCALE, ROUGH_FLOOR = 1.0, 0.05
             c, rmo, g, stt = recolour(base, rings)
+            if pol: stt["polished_blade"] = {"steel_l": round(STEEL_L, 3), "rough_scale": 1.0, "rough_floor": 0.05}; STEEL_L, ROUGH_SCALE, ROUGH_FLOOR = _keep
             if role in DAMASCUS_ROLES and DAMASCUS and item in DAMASCUS_ITEMS:
                 c, rmo, bands, dst = damascus(item, base, c, rmo, g, role); stt.update(dst)
                 if bands is not None:
