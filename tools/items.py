@@ -116,7 +116,10 @@ ITEMS = {
     # build-packages.py) keeps its own. design_offset: the design is centred on z 0; the 1.4.0 sword (and vanilla) hold the
     # grip at z +0.67, so every shape is moved there (assemble.py) and the hand holds it where it held 1.4.0's. Hip: the
     # 1.4.0 turn and shift, pivoted on this grip's centre (y -4.75).
-    "sword": dict(hip=dict(rot_x_deg=-4.0, pivot=[0.0, -4.75, 0.0], shift=[0.0, 0.0, -1.25]), design_offset=[0.0, 0.0, 0.67], version="Viking-age try 12", sources=[VKW("t12S", "tn_nordsword12S.nif")], orient=True, path_stem="sword",
+    # 1.5.0 hold fix (the owner 08:04 after the first in-game run: "Hand too close to guard"): the whole sword moved +4.75
+    # along the blade (design_offset y) so the hand origin sits at the MIDDLE of the 13.4-long grip (was right under the
+    # guard); the sheath moves with it; the hip turn stays (its pivot is in the design frame, applied before the offset).
+    "sword": dict(hip=dict(rot_x_deg=-4.0, pivot=[0.0, -4.75, 0.0], shift=[0.0, 0.0, -1.25]), design_offset=[0.0, 4.75, 0.67], version="Viking-age try 12", sources=[VKW("t12S", "tn_nordsword12S.nif")], orient=True, path_stem="sword",
                    sheath=dict(version="Viking-age t12S (straight sword sheath v3 construction, refitted)", src=VKW("sheath_t12S_sf", "tn_sheath_t12S.nif"), tex=VKW("sheath_t12S_sf", "tex", "tn_sheath_t12S")),
                    shapes={"metal": {"name": "TNNordsword12", "tex": VKW("t12S", "tex_nordic", "tn_nordsword12S"), "target": None},
                            "wrap": {"name": "TNNordsword12Wrap", "tex": os.path.join(VK, "game", "wrap", "tn_nordsword12S_wrap"), "target": None, "design": VKW("t12S")}},
