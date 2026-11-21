@@ -596,6 +596,17 @@ def build(items):
                     for suf in ("", "_rmaos", "_n_gl"):
                         if os.path.isfile(base + suf + ".png"): shutil.copy2(base + suf + ".png", os.path.join(png_out, os.path.basename(base) + suf + ".png"))
                 rep["atlases"][name] = "no metal - the shared maps, copied"; continue
+            pre = (it.get("ebony_maps") or {}).get(role)
+            if pre:   # 1.5.0 (the Viking-age pair): the approved design's own finished Ebony maps (make_maps12.py: recolour, rims,
+                      # rope ring, wires, satin knuckles, raindrop damascus), shipped as they are; the normal map is the shared one
+                ob = os.path.join(png_out, os.path.basename(base))
+                for suf in ("", "_rmaos"): shutil.copy2(pre + suf + ".png", ob + suf + ".png")
+                for suf in ("_height", "_n_gl"):
+                    if os.path.isfile(base + suf + ".png"): shutil.copy2(base + suf + ".png", ob + suf + ".png")
+                TX.texconv(ob + ".png", tex_out, name, "BC7_UNORM_SRGB", srgb=True)
+                TX.texconv(ob + "_rmaos.png", tex_out, name + "_rmaos", "BC7_UNORM")
+                shutil.copy2(os.path.join(shared, name + "_n.dds"), os.path.join(tex_out, name + "_n.dds"))
+                rep["atlases"][name] = {"prebuilt": pre}; print(f"  {name}: the design's finished Ebony maps ({pre})"); continue
             W_, H_ = Image.open(base + ".png").size
             rings, found = ring_mask(item, W_, H_) if role == "metal" else (None, [])
             pol = role == "blade" and bool(it.get("polish"))
@@ -608,8 +619,14 @@ def build(items):
             if pol:   # its gold (strands, thin rims, medallion rings) measured on the OLD atlas - where the medallion records and
                       # the px-sized rim rules belong - and carried block by block onto the blade atlas (blade_polish.resample)
                 import blade_polish
-                _c0, _r0, g_old, _s0 = recolour(it["polish"]["maps"])
-                gov = blade_polish.resample(item, g_old / np.maximum(smooth01((np.asarray(Image.open(it["polish"]["maps"] + "_rmaos.png").convert("RGBA"), np.float32)[..., 1] / 255 - 0.45) / 0.1), 1e-3))
+                pre_e = (it.get("ebony_maps") or {}).get(it["polish"]["from"])
+                if pre_e:   # 1.5.0 (the Viking-age pair): the gold exactly where the approved Ebony maps have it (strands, dots, the
+                            # fuller's thin rim): gold's chroma (R - B) / R is 0.57, the black steel's and the floors' ~0
+                    _pe = np.asarray(Image.open(pre_e + ".png").convert("RGB"), np.float32) / 255
+                    gov = blade_polish.resample(item, np.clip((_pe[..., 0] - _pe[..., 2]) / np.maximum(_pe[..., 0], 0.02) / 0.57, 0, 1))
+                else:
+                    _c0, _r0, g_old, _s0 = recolour(it["polish"]["maps"])
+                    gov = blade_polish.resample(item, g_old / np.maximum(smooth01((np.asarray(Image.open(it["polish"]["maps"] + "_rmaos.png").convert("RGBA"), np.float32)[..., 1] / 255 - 0.45) / 0.1), 1e-3))
             c, rmo, g, stt = recolour(base, rings, g_override=gov)
             if pol: stt["polished_blade"] = {"steel_l": round(STEEL_L, 3), "rough_scale": 1.0, "rough_floor": 0.05}; STEEL_L, ROUGH_SCALE, ROUGH_FLOOR = _keep
             if role in DAMASCUS_ROLES and DAMASCUS and item in DAMASCUS_ITEMS:

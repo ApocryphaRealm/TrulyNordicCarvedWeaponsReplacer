@@ -8,6 +8,14 @@ Written as changes happen, not reconstructed afterwards (rule 61). Each version 
 * **failed** - built but crashed or malfunctioned; the number was reclaimed
 * **scratch** - a hypothesis-test build that never held a real number
 
+## 1.5.0 - 2026-11-21 - untested
+
+### Added
+- A Sword style step in the installer of every main file: the Viking-age sword and greatsword (the default), or the European-style sword and greatsword of 1.4.0, unchanged. Both use the same records, so an existing save keeps its swords and shows the style you picked.
+
+### Changed
+- The Carved Nordic Sword and Carved Nordic Greatsword are new Viking-age designs in every main file (Replacer, Replacer - Ebony and Standalone, both qualities). The blade is shaped like a Viking sword's, tapering to a rounded point; a broad shallow fuller carries the set's three-strand braid with a dot in each loop, at one even pitch, narrowing to a point near the tip; the wider base of the blade has its own two-strand cable inside a thin border. The guard is a boat-shaped bar with the triquetra on a dark disc in a polished ring, the grip is an oval black wrap, and the pommel is a braided band, carved all the way round without a break, over five fused knuckles. The greatsword has a carved rope ring in the middle of its grip. Both hang in refitted sheaths in the set's style. Ebony quality: black steel with the raindrop damascus, gold braids, gold rims and gold pommel wires, satin black knuckles. The sword is 81.9 units long and the greatsword 116.9, the same as before.
+
 ## 1.4.0 - 2026-11-14 - untested
 
 ### Added

@@ -16,6 +16,8 @@ TEX_REL = r"textures\pbr\TrulyNordic"
 METAL_T, WRAP_T = 11500, 3000
 
 def W(*p): return os.path.join(S2, *p)
+VK = r"D:\Claude output\4. plans\nordic-carved-sword-redesign-20261121"   # 1.5.0: the Viking-age sword + greatsword design
+def VKW(*p): return os.path.join(VK, "work", *p)
 # ring pass (2026-11-12 after 1.1.1, the owner 08:35: "make the symbols all have the black filled ring"): repaint only, every
 # NIF byte for byte its 1.1.1 source - sheaths dagger v6 / saber C2 / straight v3 / greatsword v3 (the locket's triquetra on
 # the dark filled disc + polished ring), greatsword v5-sf (the pommel), bow v9 (both riser plates); set2 ring-pass-*.png
@@ -104,10 +106,22 @@ ITEMS = {
     # 1.1.0 shading fix (2026-11-12): v1-sf = v1's NIF with the flat guard and pommel faces' outline vertices split from
     # their chamfers (set2\shading_fix_split.py, as bow v8) - geometry and maps identical; set2\shading-fix-1.1.0.png
     # hip: as the saber's (same clip: Nordic carved 9 hidden slices / depth sum 19.0 -> 5 / 3.9), pivot its own grip centre
-    "sword": dict(hip=dict(rot_x_deg=-4.0, pivot=[0.0, -4.02, 0.67], shift=[0.0, 0.0, -1.25]), version="straight v1-sf", sources=[W(r"work_straightsword_sf\tn_straightsword.nif")], orient=True, path_stem="sword",
-                   sheath=dict(version="v3 (ringed symbol)", src=W(r"work_sheath_straightsword_v3\tn_sheath_straightsword_v3.nif"), tex=W(r"work_sheath_straightsword_v3\tex\tn_sheath_straightsword_v3")),
-                   shapes={"metal": {"name": "tn_straightsword", "tex": W(r"work_straightsword_sf\tex\tn_straightsword")}, "wrap": {"name": "TNStraightswordWrap", "tex": W(r"work_straightsword_sf\tex\tn_straightsword_wrap")}},
-                   third="nordicsword.nif", first="1stpersonnordicsword.nif", stem="swordstraight", weap="DLC2NordicSword", fp_stat="03C353"),
+    # 1.5.0 (2026-11-21, the owner 06:33: "This the new default option for 1.5 and have the current 1.4 longsword and regular
+    # sword versions as optional replacers"): the VIKING-AGE sword (4. plans\nordic-carved-sword-redesign-20261121, approved
+    # try 11 06:21 + try 12's seamless pommel band) - NordwarUA-shaped blade (81.9 long), fuller with the 1.4.0 three-strand
+    # braid + dots, the wide base's two-strand cable, the triquetra guard, oval grip, braided band over five knuckles. Its maps
+    # are the approved design's finished maps (make_maps12.py: tex_nordic, tex_ebony - dots, rims, wires, satin knuckles and
+    # the Ebony damascus already in them; ebony.py ships tex_ebony as it is: "ebony_maps"). Its own texture folder
+    # (swordviking) so the 1.4.0 straight sword (the installer's European option, frozen from the posted 1.4.0 files in
+    # build-packages.py) keeps its own. design_offset: the design is centred on z 0; the 1.4.0 sword (and vanilla) hold the
+    # grip at z +0.67, so every shape is moved there (assemble.py) and the hand holds it where it held 1.4.0's. Hip: the
+    # 1.4.0 turn and shift, pivoted on this grip's centre (y -4.75).
+    "sword": dict(hip=dict(rot_x_deg=-4.0, pivot=[0.0, -4.75, 0.0], shift=[0.0, 0.0, -1.25]), design_offset=[0.0, 0.0, 0.67], version="Viking-age try 12", sources=[VKW("t12S", "tn_nordsword12S.nif")], orient=True, path_stem="sword",
+                   sheath=dict(version="Viking-age t12S (straight sword sheath v3 construction, refitted)", src=VKW("sheath_t12S_sf", "tn_sheath_t12S.nif"), tex=VKW("sheath_t12S_sf", "tex", "tn_sheath_t12S")),
+                   shapes={"metal": {"name": "TNNordsword12", "tex": VKW("t12S", "tex_nordic", "tn_nordsword12S"), "target": None},
+                           "wrap": {"name": "TNNordsword12Wrap", "tex": os.path.join(VK, "game", "wrap", "tn_nordsword12S_wrap"), "target": None}},
+                   ebony_maps={"metal": VKW("t12S", "tex_ebony", "tn_nordsword12S")},
+                   third="nordicsword.nif", first="1stpersonnordicsword.nif", stem="swordviking", weap="DLC2NordicSword", fp_stat="03C353"),
     # v13 (approved 2026-11-11 23:57): v12's head (the owner's traced outline, 21:32; the same NIF, byte for byte) repainted
     # to the engraving layout rule - layout records in work_v13\engraving_check.json pass engraving-layout-gate
     # v14 (1.1.1): one flat carved cheek per side, the polished bevel takes the taper (battleaxe_build_v14.py), the flat
@@ -128,11 +142,16 @@ ITEMS = {
     # 901-913, cols 9-99), so the wall's dark plain metal was painted across the bevel mid-blade (shipped 1.1.0-1.3.0).
     # set2\greatsword_v6_wallfix.py: wall UVs +(2, 1123) px to free space, the blade under the old spot from v3 (same
     # blade painting, no boss); positions, normals, triangles and every other UV identical (work_gs6_sf\wallfix.json).
-    "greatsword": dict(version="v6-sf", sources=[W(r"work_gs6_sf\tn_greatsword.nif")], orient=True,
-                       sheath=dict(version="v3 (ringed symbol)", src=W(r"work_sheath_greatsword_v3\tn_sheath_greatsword_v3.nif"), tex=W(r"work_sheath_greatsword_v3\tex\tn_sheath_greatsword_v3")),
-                       shapes={"metal": {"name": "tn_greatsword", "tex": W(r"work_gs6_sf\tex\tn_greatsword"), "target": None}, "wrap": {"name": "TNGreatswordWrap", "tex": W(r"work_gs5_sf\tex\tn_greatsword_wrap")},
-                               "wrap2": {"name": "TNGreatswordWrap2", "tex": W(r"work_gs5_sf\tex\tn_greatsword_wrap2"), "target": 1500}},
-                       third="nordicgreatsword.nif", first="1stpersonnordicgreatsword.nif", stem="greatsword", weap="DLC2NordicGreatsword", fp_stat="03C351"),
+    # 1.5.0 (2026-11-21): the VIKING-AGE greatsword (116.9 long; as the sword above, plus the carved black-and-gold rope
+    # ring at the oval grip's exact middle). The 1.4.0 European greatsword (v6-sf) is the installer's European option, frozen
+    # from the posted 1.4.0 files. Its own texture folder (greatswordviking), the mesh paths unchanged (path_stem). The
+    # 1.4.0 greatsword (and vanilla) hold the grip at x -0.30, z +0.60: design_offset moves the design (centred on 0) there.
+    "greatsword": dict(design_offset=[-0.30, 0.0, 0.60], version="Viking-age try 12", sources=[VKW("t12G", "tn_nordsword12G.nif")], orient=True, path_stem="greatsword",
+                       sheath=dict(version="Viking-age t12G (greatsword sheath v3 construction, refitted)", src=VKW("sheath_t12G_sf", "tn_sheath_t12G.nif"), tex=VKW("sheath_t12G_sf", "tex", "tn_sheath_t12G")),
+                       shapes={"metal": {"name": "TNNordsword12", "tex": VKW("t12G", "tex_nordic", "tn_nordsword12G"), "target": None},
+                               "wrap": {"name": "TNNordsword12Wrap", "tex": os.path.join(VK, "game", "wrap", "tn_nordsword12G_wrap"), "target": None}},
+                       ebony_maps={"metal": VKW("t12G", "tex_ebony", "tn_nordsword12G")},
+                       third="nordicgreatsword.nif", first="1stpersonnordicgreatsword.nif", stem="greatswordviking", weap="DLC2NordicGreatsword", fp_stat="03C351"),
     # -sf (1.1.0 shading fix, round 2, 2026-11-12): the same NIF with its carved faces' outline AND creases (edge chamfers,
     # caps) given their own vertices (set2\shading_fix_split.py --crease=35); geometry and maps identical; set2\shading-fix-1.1.0.png
     # v2g-knurl (2026-11-12, the owner 20:05: "for the war axe and war hammer, I want the gnarling to be the entire face of the
@@ -336,8 +355,16 @@ ITEMS = {
 # (weld_normals), never decimated; the edge blood is cut from it. The hilt keeps its shape's atlas and maps unchanged.
 # Not polished: the warhammer and maces (no edge), the quarterstaff, and the longsword / saber longsword (not shipped).
 POLISH = {
-    "sword": dict(rects=[(0, 0, 190, 1870)]),
-    "greatsword": dict(rects=[(0, 0, 230, 2000)]),
+    # 1.5.0 the Viking-age pair: the blade's 16 UV islands in the design atlas (4. plans\nordic-carved-sword-redesign-20261121\
+    # game\blade_rects.py: every blade island, no other triangle's centroid inside), repainted on the blade's own atlas at
+    # 1.4.0's density (Main Agent's order 3: the braid as 3D and lustrous as 1.4.0's) from "maps" = game\polish_src.py's
+    # source (the approved carving's height and normals with the dots, the painter's roughness); "design": the painter's folder
+    "sword": dict(maps=os.path.join(VK, "game", "polish_src", "tn_nordsword12S"), design=VKW("t12S"), rects=[(10, 10, 97, 1992), (108, 58, 131, 1476), (109, 11, 144, 45), (109, 1488, 144, 1523), (142, 58, 165, 1476),
+                                            (176, 10, 199, 1428), (176, 1441, 414, 2015), (210, 10, 233, 1428), (244, 10, 248, 1430), (259, 10, 262, 1430),
+                                            (273, 10, 356, 68), (273, 79, 356, 138), (273, 149, 319, 1257), (330, 149, 376, 1257), (387, 10, 433, 1118), (444, 10, 490, 1118)]),
+    "greatsword": dict(maps=os.path.join(VK, "game", "polish_src", "tn_nordsword12G"), design=VKW("t12G"), rects=[(10, 10, 83, 1998), (94, 58, 120, 1980), (95, 11, 130, 45), (95, 1992, 130, 2027), (131, 58, 156, 1980),
+                                                 (167, 10, 193, 1932), (167, 1945, 266, 2007), (204, 10, 230, 1932), (241, 10, 244, 1934), (255, 10, 259, 1934),
+                                                 (270, 10, 561, 718), (277, 1943, 375, 2005), (572, 10, 628, 1558), (639, 10, 695, 1558), (706, 10, 762, 1558), (773, 10, 829, 1558)]),
     "saber": {"from": "blade", "rects": [(0, 0, 420, 2048)]},
     "sabergreatsword": {"from": "blade", "rects": [(0, 0, 420, 2048)]},
     "dagger": dict(rects=[(0, 0, 490, 1828)]),
@@ -350,13 +377,13 @@ POLISH = {
 }
 for _k, _pc in POLISH.items():
     _it = ITEMS[_k]; _src = _pc.get("from", "metal"); _sh = _it["shapes"][_src]
-    _it["polish"] = {"from": _src, "rects": [list(r) for r in _pc["rects"]], "maps": _sh["tex"], "px": _pc.get("px", 63.0)}
+    _it["polish"] = {"from": _src, "rects": [list(r) for r in _pc["rects"]], "maps": _pc.get("maps", _sh["tex"]), "px": _pc.get("px", 63.0)}
     _tex = os.path.join(WORK, _k, "blade", f"tn_{_it['stem']}_blade")
     if _src == "blade":
         _sh.update(tex=_tex, target=None, split=True, weld_normals=True, design=os.path.dirname(os.path.dirname(_it["polish"]["maps"])))
     else:
         _it["shapes"]["blade"] = {"name": _sh["name"] + "_blade", "tex": _tex, "target": None, "split": True, "weld_normals": True,
-                                  "design": os.path.dirname(os.path.dirname(_it["polish"]["maps"]))}   # its faces: the painter's engraving_check.json
+                                  "design": _pc.get("design") or os.path.dirname(os.path.dirname(_it["polish"]["maps"]))}   # its faces: the painter's engraving_check.json
     _it["blood_from"] = "blade"
 
 def vanilla_path(item, which):

@@ -152,7 +152,22 @@ def docs(dest):
 # saber be a weapon tagged as a katana"): the Sword step (curved saber default, straight sword option) is gone - the straight
 # sword is the one sword of every main file, in Common; the saber, with its longsword and greatsword sizes, is in the optional
 # Additional Weapons file (additional_spec.py) with the katana keyword.
+# 1.5.0 (2026-11-21, the owner 06:33: "This the new default option for 1.5 and have the current 1.4 longsword and regular sword
+# versions as optional replacers. In the fomod for the main file"): the Sword style step - the Viking-age sword + greatsword
+# (items "sword" / "greatsword", built from the approved design) by default, or the 1.4.0 European pair: those are the POSTED
+# 1.4.0 files themselves, frozen byte for byte per main file (FROZEN, game/freeze_european_140.py in the design folder) and put
+# at the same paths - the records, the SkyPatcher lines and the Legacy of Ysgramor files find either pair.
+SWORD_PAIR = ("sword", "greatsword")
+FROZEN = os.path.join(WORK, "frozen_european_140")
 STEPS = [  # (step, group, [(option, item, folder, image, description, default)])
+    ("Sword style", "Carved Nordic sword and greatsword", [
+        ("Viking-age sword and greatsword (default)", "viking", "10 Sword style - Viking-age", "sword-style-viking.jpg",
+         "A Viking-age blade with a broad fuller carrying the set's three-strand braid, a wider base with its own two-strand cable, "
+         "a guard with the triquetra disc, an oval grip and a braided pommel band over five knuckles. The greatsword has a carved "
+         "rope ring in the middle of its grip.", True),
+        ("European sword and greatsword", "european", "11 Sword style - European", "sword-style-european.jpg",
+         "The European-style sword and greatsword of version 1.4.0: a straight blade with one braid down its centre, the "
+         "medallion guards and the round pommels.", False)]),
     ("Mace", "Carved Nordic Mace model", [
         ("Six-flanged mace (default)", "mace", "20 Mace - Six-flanged", "mace-six-flanged.jpg",
          "A working six-flanged head with pointed striking edges, every flange face carved with the set's weave and a triquetra on a dark disc inside a polished ring.", True),
@@ -171,7 +186,7 @@ STEPS = [  # (step, group, [(option, item, folder, image, description, default)]
         ("Serpent dagger", "dagger2", "41 Dagger - Serpent", "dagger-serpent.jpg",
          "The same dagger with a Jormungandr world serpent coiling along the blade and biting toward the point.", False)]),
 ]
-ALTERNATED = {o[1] for _, _, opts in STEPS for o in opts}
+ALTERNATED = {o[1] for _, _, opts in STEPS for o in opts} | set(SWORD_PAIR)   # 1.5.0: the sword pair is in the Sword style step
 CORE = [i for i in DEFAULT if i not in ALTERNATED]
 PACKAGES = {  # folder: (kind, plugin or ini, description for info.xml)
     "Replacer - No ESP": ("replacer", "ini", "Replaces the Dragonborn Nordic carved weapons' and shield's models. No plugin: SkyPatcher swaps the models by record."),
@@ -224,8 +239,26 @@ def place(item, dest, kind, ebony=False):
         elif item in FIRST_OWN: put(s, os.path.join(dest, MESH_REL, item, "1stperson" + item + ".nif"))
     textures(item, dest)
 
+def place_european(dest, folder, top="Common"):
+    r"""1.5.0: the 1.4.0 European sword + greatsword of this main file - every frozen file of the posted 1.4.0 package's
+    <folder>\<top> (Common, or the Legacy of Ysgramor folder), at its own path"""
+    src = os.path.join(FROZEN, folder, top)
+    if not os.path.isdir(src): fail(f"no frozen 1.4.0 European files at {src}")
+    put_tree(src, dest)
+
+def place_opt(item, dest, kind, ebony=False, folder=None):
+    """an installer option's files: the Sword style options place a PAIR (1.5.0), every other option its one item"""
+    if item == "viking":
+        for i in SWORD_PAIR: place(i, dest, kind, ebony=ebony)
+    elif item == "european": place_european(dest, folder)
+    else: place(item, dest, kind, ebony=ebony)
+
 ER_FIRST = {v[0]: v[2] for v in ER.WEAPONS.values()}      # our item's path stem -> the vanilla Ebony first-person file
-def place_loy(item, dest):
+def place_loy(item, dest, folder=None):
+    if item == "viking":      # 1.5.0: the Sword style's pair on LoY's sword and greatsword
+        for i in SWORD_PAIR: place_loy(i, dest)
+        return
+    if item == "european": return place_european(dest, folder, LOY_FOLDER)
     r"""Legacy of Ysgramor: the item's ebony first-person file (the shield: our ebony shield) at LoY's mesh path, which
     both views of every LoY variant use; the textures come with the main option of the same item."""
     if item.startswith("shield"): src = os.path.join(EBL.EB_STAGE, item, "replacer", "shield.nif"); f = ER.LOY_FILES["shield"]
@@ -314,8 +347,8 @@ def write_ini(path, head, lines):
     open(path, "w", newline="\r\n").write("\n".join(body) + "\n")
 
 LOY_FOLDER = "50 Legacy of Ysgramor - Wolf Ebony weapons"
-LOY_CORE = ["sword", "battleaxe", "greatsword", "waraxe"]          # LoY's Wolf Ebony items that have no installer alternate (1.4.0: the sword too)
-LOY_ALT = {"dagger": "dagger", "dagger2": "dagger", "shield": "shield", "shield2": "shield"}
+LOY_CORE = ["battleaxe", "waraxe"]          # LoY's Wolf Ebony items that have no installer alternate (1.5.0: the sword and greatsword follow the Sword style)
+LOY_ALT = {"dagger": "dagger", "dagger2": "dagger", "shield": "shield", "shield2": "shield", "viking": "swords", "european": "swords"}
 def loy_alt_folder(item): return f"5{list(LOY_ALT).index(item) + 1} Legacy of Ysgramor - {item}"
 def ebony_replacer_steps():
     r"""the Replacer installer in the Ebony look - every Dagger / Shield option flags its choice - and the Legacy of
@@ -358,7 +391,7 @@ def build_ebony_replacer(dest, folder, ver):
     steps, cond = ebony_replacer_steps()
     for _, _, opts in steps:
         for o in opts:
-            if o[1]: place(o[1], os.path.join(dest, o[2]), kind)
+            if o[1]: place_opt(o[1], os.path.join(dest, o[2]), kind, folder=folder)
     # Legacy of Ysgramor: the items without an alternate, and one INI per LoY plugin named after it (loads only beside it)
     loy = os.path.join(dest, LOY_FOLDER)
     for item in LOY_CORE: place_loy(item, loy)
@@ -372,7 +405,7 @@ def build_ebony_replacer(dest, folder, ver):
         write_ini(os.path.join(loy, ARMO_INI_DIR, plug + ".ini"), [
             f"Legacy of Ysgramor's Wolf Ebony shield ({plug}): the name (the model is the loose file at LoY's own path).",
             "This file loads only when that plugin is active. " + gen], ER.loy_lines(plug, "armor", models))
-    for item in LOY_ALT: place_loy(item, os.path.join(dest, loy_alt_folder(item)))
+    for item in LOY_ALT: place_loy(item, os.path.join(dest, loy_alt_folder(item)), folder)
     fomod(dest, f"{NAME} - {folder}", steps, ver, desc, cond)
     # every install the installer can make: Common + one option per step + the conditional folders whose flags match
     import itertools
@@ -431,7 +464,7 @@ def build_package(dest, folder, ver):
     else:
         put(os.path.join(REPO, "plugin", "standalone-" + what, SA_PLUGIN), os.path.join(common, SA_PLUGIN))
     for _, _, opts in STEPS:
-        for _, item, f, _, _, _ in opts: place(item, os.path.join(dest, f), kind, ebony=eb)
+        for _, item, f, _, _, _ in opts: place_opt(item, os.path.join(dest, f), kind, ebony=eb, folder=folder)
     fomod(dest, f"{NAME} - {folder}", ebony_steps(STEPS) if eb else STEPS, ver, desc)
     # every install the installer can make: Common + one option per step -> every texture resolves, no vanilla path in
     # a Standalone, every model path its plugin names is shipped

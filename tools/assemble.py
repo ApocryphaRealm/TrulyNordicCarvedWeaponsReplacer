@@ -156,6 +156,7 @@ def offset_1st(item):
 
 def build_static(item, which, out_path):
     it = ITEMS[item]; off = (0.0, 0.0, 0.0) if which == "third" else offset_1st(item)
+    if it.get("design_offset"): off = tuple(float(a + b) for a, b in zip(off, it["design_offset"]))   # 1.5.0: the design's frame -> the grip's place
     rot, t_hip = hip_xf(item, which)
     if rot is not None: off = tuple(float(x) for x in np.array(off) + t_hip)
     n = niflib.Nif(vanilla_path(item, which)); D = os.path.join(WORK, item); rep = {"offset": off}

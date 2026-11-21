@@ -7,9 +7,9 @@ it is - its edges, its head, its silhouette - and is rebuilt to be realistic in 
 ## The models
 | Item | New look |
 |---|---|
-| Carved Nordic Sword | straight double-edged blade with one carved braid up its middle, the greatsword's carved guard and disc pommel at one-hand size; a straight sheath |
+| Carved Nordic Sword | Viking-age blade tapering to a rounded point; a broad fuller carved with a three-strand braid (a dot in each loop) narrowing to a point, a wider base with its own two-strand cable; a boat-shaped guard with the triquetra disc, an oval grip, a braided pommel band over five knuckles; a straight sheath (the 1.4.0 European sword is an installer option) |
 | Carved Nordic Battleaxe | a tall upper horn, one long curved cutting edge down to a single beard point, a curved back spike; steel haft forged with the head, carved knot fields, a forged knob pommel |
-| Carved Nordic Greatsword | double-edged blade, carved guards and ricasso, a triquetra medallion on a level boss at the lower guard, two wrapped grips; a straight sheath on the back |
+| Carved Nordic Greatsword | the same Viking-age design at 116.9 units, with a carved rope ring in the middle of its long oval grip; a straight sheath on the back (the 1.4.0 European greatsword is an installer option) |
 | Carved Nordic Warhammer | hammer face and curved pick, a triquetra ring centred on the face, a forged knob pommel |
 | Carved Nordic War Axe | bearded blade with a square hammer poll, a triquetra at the widest point, a forged knob pommel |
 | Carved Nordic Dagger | kukri form, the blade carved with weave and a ringed triquetra (or, in the installer, a world serpent); its own sheath |
@@ -24,10 +24,11 @@ the back) when the weapon is drawn.
 Pick ONE Nordic file (Replacer - No ESP, Replacer - ESP or Standalone - Nordic quality) and, if you want the black and
 gold Ebony look, ONE Ebony file (Replacer - Ebony - No ESP, Replacer - Ebony - ESP or Standalone - Ebony quality): the
 Replacer - Ebony files put the look on the vanilla Ebony weapons, the Standalone - Ebony quality file adds it as a set
-of new items beside them. Each main file has its own installer with three choices, each shown with a picture: the
-mace (six-flanged, the default, or the classic four-flanged one, both with pointed striking edges), the shield (carved,
-the default, or clean) and the dagger (carved, the default, or the serpent). The sword is the straight sword in every
-file; the curved saber is in Additional Weapons, with a greatsword of its own. Only the chosen model is installed, at the one path every record
+of new items beside them. Each main file has its own installer with four choices, each shown with a picture: the
+sword style (the Viking-age sword and greatsword, the default, or the European-style pair of 1.4.0), the mace
+(six-flanged, the default, or the classic four-flanged one, both with pointed striking edges), the shield (carved, the
+default, or clean) and the dagger (carved, the default, or the serpent). The curved saber is in Additional Weapons, with
+a greatsword of its own. Only the chosen model is installed, at the one path every record
 uses, so nothing is left over. To change a choice later, reinstall and pick again.
 
 | Main file | What it does |
@@ -66,7 +67,7 @@ Standalone items: Carved Nordic Sword, Carved Nordic War Axe, Carved Nordic Batt
 Nordic Warhammer, Carved Nordic Dagger, Carved Nordic Mace, Carved Nordic Bow, Carved Nordic Shield, Carved Nordic Arrow.
 At Ebony quality each name carries "Ebony": Carved Nordic Ebony Sword, Carved Nordic Ebony War Axe, ... Carved Nordic Ebony
 Shield, Carved Nordic Ebony Arrow (and in Additional Weapons: Carved Nordic Ebony Spear, Halberd, Quarterstaff, Rapier,
-Saber, Greatsaber, Crossbow and Bolt). The installer's model choices (the mace, shield and dagger)
+Saber, Greatsaber, Crossbow and Bolt). The installer's model choices (the sword style, mace, shield and dagger)
 change only the model, not the name.
 
 Replacer names: the Replacer files rename the Nordic pieces to the same names - Carved Nordic Sword, ... Carved
@@ -110,5 +111,6 @@ The source models and maps come from the design work folder named in `tools\item
 - **NordwarUA**, Legacy of Ysgramor ([Nexus 109963](https://www.nexusmods.com/skyrimspecialedition/mods/109963)), and
   **Xtudo**, Legacy of Ysgramor - My patches and fixes
   ([Nexus 111121](https://www.nexusmods.com/skyrimspecialedition/mods/111121)): the Wolf Ebony weapons the Replacer -
-  Ebony files' optional step re-models. None of their files ship here (see NOTICE.md).
+  Ebony files' optional step re-models. None of their files ship here (see NOTICE.md). The Viking-age sword and
+  greatsword's blade shape follows NordwarUA's Wolf Ebony sword and greatsword; the models and textures are our own.
 - SkyPatcher, by its author, for the runtime model and name swap.
