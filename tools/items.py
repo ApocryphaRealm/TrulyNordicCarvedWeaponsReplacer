@@ -119,7 +119,7 @@ ITEMS = {
     "sword": dict(hip=dict(rot_x_deg=-4.0, pivot=[0.0, -4.75, 0.0], shift=[0.0, 0.0, -1.25]), design_offset=[0.0, 0.0, 0.67], version="Viking-age try 12", sources=[VKW("t12S", "tn_nordsword12S.nif")], orient=True, path_stem="sword",
                    sheath=dict(version="Viking-age t12S (straight sword sheath v3 construction, refitted)", src=VKW("sheath_t12S_sf", "tn_sheath_t12S.nif"), tex=VKW("sheath_t12S_sf", "tex", "tn_sheath_t12S")),
                    shapes={"metal": {"name": "TNNordsword12", "tex": VKW("t12S", "tex_nordic", "tn_nordsword12S"), "target": None},
-                           "wrap": {"name": "TNNordsword12Wrap", "tex": os.path.join(VK, "game", "wrap", "tn_nordsword12S_wrap"), "target": None}},
+                           "wrap": {"name": "TNNordsword12Wrap", "tex": os.path.join(VK, "game", "wrap", "tn_nordsword12S_wrap"), "target": None, "design": VKW("t12S")}},
                    ebony_maps={"metal": VKW("t12S", "tex_ebony", "tn_nordsword12S")},
                    third="nordicsword.nif", first="1stpersonnordicsword.nif", stem="swordviking", weap="DLC2NordicSword", fp_stat="03C353"),
     # v13 (approved 2026-11-11 23:57): v12's head (the owner's traced outline, 21:32; the same NIF, byte for byte) repainted
@@ -149,7 +149,7 @@ ITEMS = {
     "greatsword": dict(design_offset=[-0.30, 0.0, 0.60], version="Viking-age try 12", sources=[VKW("t12G", "tn_nordsword12G.nif")], orient=True, path_stem="greatsword",
                        sheath=dict(version="Viking-age t12G (greatsword sheath v3 construction, refitted)", src=VKW("sheath_t12G_sf", "tn_sheath_t12G.nif"), tex=VKW("sheath_t12G_sf", "tex", "tn_sheath_t12G")),
                        shapes={"metal": {"name": "TNNordsword12", "tex": VKW("t12G", "tex_nordic", "tn_nordsword12G"), "target": None},
-                               "wrap": {"name": "TNNordsword12Wrap", "tex": os.path.join(VK, "game", "wrap", "tn_nordsword12G_wrap"), "target": None}},
+                               "wrap": {"name": "TNNordsword12Wrap", "tex": os.path.join(VK, "game", "wrap", "tn_nordsword12G_wrap"), "target": None, "design": VKW("t12G")}},
                        ebony_maps={"metal": VKW("t12G", "tex_ebony", "tn_nordsword12G")},
                        third="nordicgreatsword.nif", first="1stpersonnordicgreatsword.nif", stem="greatswordviking", weap="DLC2NordicGreatsword", fp_stat="03C351"),
     # -sf (1.1.0 shading fix, round 2, 2026-11-12): the same NIF with its carved faces' outline AND creases (edge chamfers,
