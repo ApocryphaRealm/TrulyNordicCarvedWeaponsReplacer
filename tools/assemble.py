@@ -202,7 +202,7 @@ def build_bow(out_path):
             sh = shader_of(n, main); ts = texset_of(n, sh); nm = struct.unpack_from("<i", n.blocks[main], 0)[0]
         else:
             idx_shape, idx_skin, idx_data, idx_part = (len(n.blocks) + i for i in range(4))
-            for t in ("BSTriShape", "BSDismemberSkinInstance", "NiSkinData", "NiSkinPartition"): n.btypes.append(t); n.blocks.append(bytearray())
+            for t in ("BSTriShape", "NiSkinInstance", "NiSkinData", "NiSkinPartition"): n.btypes.append(t); n.blocks.append(bytearray())
             ts = len(n.blocks); n.btypes.append("BSShaderTextureSet"); n.blocks.append(bytearray())
             sh = len(n.blocks); n.btypes.append("BSLightingShaderProperty"); n.blocks.append(bytearray(T_PLAIN))
             nm = new_string(n, f"TN_bow_{role}")
@@ -216,7 +216,10 @@ def build_bow(out_path):
         for j in range(nb):
             bi = struct.unpack_from("<i", k, 16 + 4 * j)[0]; nmj = s.name(bi); names.append(nmj)
             struct.pack_into("<i", k, 16 + 4 * j, bones_v[nmj])
-        n.btypes[idx_skin] = "BSDismemberSkinInstance"; n.blocks[idx_skin] = k
+        # NiSkinInstance, vanilla's type (2026-11-24, landor5's Nexus report): a BSDismemberSkinInstance with an
+        # SBP_32_BODY partition is hidden whenever armour covers slot 32, so the bow vanished once equipped or drawn
+        # by an armoured character; drop the partition list after the bone refs, as the crossbow already does
+        n.btypes[idx_skin] = "NiSkinInstance"; n.blocks[idx_skin] = k[:16 + 4 * nb]
         n.btypes[idx_data] = "NiSkinData"; n.blocks[idx_data] = bytearray(s.blocks[sd])
         n.btypes[idx_part] = "NiSkinPartition"; n.blocks[idx_part] = bytearray(s.blocks[sp])
         n.blocks[ts] = texset_block(tex_paths(item, role)); set_shader(n, sh, ts, struct.unpack_from("<i", n.blocks[sh], 4)[0] if role == "metal" else -1)

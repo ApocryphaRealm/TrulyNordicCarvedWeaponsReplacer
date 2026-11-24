@@ -8,6 +8,11 @@ Written as changes happen, not reconstructed afterwards (rule 61). Each version 
 * **failed** - built but crashed or malfunctioned; the number was reclaimed
 * **scratch** - a hypothesis-test build that never held a real number
 
+## 1.5.1 - 2026-11-24 - untested
+
+### Fixed
+- The bow (Nordic and Ebony, every file) no longer turns invisible when equipped or drawn by a character wearing body armour: its model now uses the game's plain skin type, as vanilla's bows do, instead of a body-slot partition the game hides under a cuirass. Reported by landor5, who also found the fix.
+
 ## 1.5.0 - 2026-11-21 - untested
 
 ### Added
